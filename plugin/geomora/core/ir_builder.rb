@@ -104,11 +104,23 @@ module Geomora
               'depth' => wall_thickness
             },
             'component' => {
-              'definition_id' => "window_standard_#{width.to_i}"
+              'definition_id' => window_definition_id(win, width, height)
             },
-            'confidence' => 1.0
+            'confidence' => win['confidence'] || 1.0
           }
         end
+      end
+
+      def window_definition_id(win, width, height)
+        pattern = @params['pattern']
+        if pattern.is_a?(Hash) && pattern['component_id'] && !pattern['component_id'].to_s.empty?
+          return pattern['component_id']
+        end
+        if win['component_id'] && !win['component_id'].to_s.empty?
+          return win['component_id']
+        end
+
+        "window_standard_#{width.to_i}"
       end
 
       def build_door(wall_id)
@@ -129,7 +141,7 @@ module Geomora
             'depth' => wall_thickness
           },
           'component' => {
-            'definition_id' => "door_standard_#{width.to_i}"
+            'definition_id' => door_component_id({ 'width' => width, 'height' => (door['height'] || 2100).to_f })
           },
           'confidence' => 1.0
         }
@@ -191,8 +203,57 @@ module Geomora
         if applied.include?('symmetry')
           constraints << constraint_entry('constraint_symmetry', 'symmetry', window_ids)
         end
+        constraints.concat(pattern_constraints(windows))
 
         constraints
+      end
+
+      def pattern_constraints(windows)
+        pattern = @params['pattern']
+        return [] unless pattern.is_a?(Hash)
+
+        constraints = []
+        window_ids = windows.map { |w| w['id'] }
+        detected = pattern['patterns_detected']
+        detected = [] unless detected.is_a?(Array)
+
+        if detected.include?('grid') && pattern['bay_pitch']
+          constraints << {
+            'id' => 'constraint_grid',
+            'type' => 'grid',
+            'targets' => window_ids,
+            'priority' => 'hard',
+            'parameters' => {
+              'pitch' => pattern['bay_pitch'],
+              'bay_count' => pattern['bay_count']
+            }
+          }
+        end
+
+        if detected.include?('mirror') && pattern['mirror_axis']
+          constraints << {
+            'id' => 'constraint_mirror',
+            'type' => 'symmetry',
+            'targets' => window_ids,
+            'priority' => 'soft',
+            'parameters' => {
+              'axis' => 'vertical',
+              'position' => pattern['mirror_axis']
+            }
+          }
+        end
+
+        constraints
+      end
+
+      def door_component_id(door)
+        pattern = @params['pattern']
+        width = door['width'].to_i
+        if pattern.is_a?(Hash) && pattern['door_component_id'] && !pattern['door_component_id'].to_s.empty?
+          return pattern['door_component_id']
+        end
+
+        "door_standard_#{width}"
       end
 
       def constraint_entry(id, type, targets)
@@ -218,6 +279,9 @@ module Geomora
         end
         if @params['rationalization'].is_a?(Hash)
           metadata['rationalization'] = @params['rationalization']
+        end
+        if @params['pattern'].is_a?(Hash)
+          metadata['pattern'] = @params['pattern']
         end
 
         sources << {

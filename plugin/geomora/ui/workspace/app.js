@@ -19,7 +19,8 @@
     corners: null,
     originalImageSize: null,
     cornerDrag: null,
-    rationalization: null
+    rationalization: null,
+    pattern: null
   };
 
   const els = {
@@ -825,6 +826,14 @@
       );
     }
 
+    if (state.pattern) {
+      items.push(
+        'Pattern: ' + state.pattern.type +
+        ' (' + (state.pattern.patterns_detected || []).join(', ') + ')' +
+        (state.pattern.component_id ? ' · ' + state.pattern.component_id : '')
+      );
+    }
+
     if (state.rationalization) {
       items.push(
         'Rationalized: ' + state.rationalization.method +
@@ -872,7 +881,8 @@
         ? state.corners.map(function (c) { return [c[0], c[1]]; })
         : null,
       detection_method: els.detectMethod ? els.detectMethod.value : 'auto',
-      rationalization: state.rationalization
+      rationalization: state.rationalization,
+      pattern: state.pattern
     };
   }
 
@@ -940,6 +950,7 @@
 
     state.detection = null;
     state.rationalization = null;
+    state.pattern = null;
     state.overlayImageUrl = null;
     state.doorBbox = null;
     state.drag = null;
@@ -974,6 +985,7 @@
     state.rectification = null;
     state.detection = null;
     state.rationalization = null;
+    state.pattern = null;
     state.overlayImageUrl = null;
     state.doorBbox = null;
     state.drag = null;
@@ -1067,6 +1079,42 @@
     }
   }
 
+  function applyPattern(payload) {
+    const windows = (payload.windows || []).map(function (win) {
+      return {
+        offset: Number(win.offset),
+        width: Number(win.width),
+        height: Number(win.height),
+        sill_height: Number(win.sill_height),
+        bbox_norm: win.bbox_norm || windowBboxFromMm(win),
+        component_id: win.component_id
+      };
+    });
+
+    renderWindows(windows);
+
+    const door = payload.door || {};
+    const doorWidth = Number(door.width) || 0;
+    els.form.elements.namedItem('door_offset').value = door.offset || 0;
+    els.form.elements.namedItem('door_width').value = doorWidth;
+    els.form.elements.namedItem('door_height').value = doorWidth > 0 ? (door.height || 2100) : 0;
+    state.doorBbox = doorWidth > 0 ? (door.bbox_norm || doorBboxFromMm(door)) : null;
+
+    state.pattern = payload.pattern || null;
+    scheduleOverlayRender();
+    renderTree();
+
+    const patternType = state.pattern ? state.pattern.type : 'none';
+    if (patternType === 'none' || patternType === 'custom') {
+      setStatus('', 'No repeating bay pattern detected — dimensions kept as-is.');
+    } else {
+      setStatus(
+        'success',
+        'Pattern applied — shared component ' + (state.pattern.component_id || 'pending') + '.'
+      );
+    }
+  }
+
   function applyRationalization(payload) {
     const windows = (payload.windows || []).map(function (win) {
       const mapped = {
@@ -1105,6 +1153,7 @@
     setRectifiedImage: setRectifiedImage,
     applyDetection: applyDetection,
     applyRationalization: applyRationalization,
+    applyPattern: applyPattern,
     setDetectionMeta: setDetectionMeta,
     setIrPreview: setIrPreview,
     setStatus: setStatus
@@ -1136,6 +1185,14 @@
       return;
     }
     sketchupCall('rationalize', JSON.stringify(collectParams()));
+  });
+
+  document.getElementById('btn-apply-pattern').addEventListener('click', function () {
+    if (state.windows.length < 2) {
+      setStatus('error', 'Add at least two windows before applying a pattern.');
+      return;
+    }
+    sketchupCall('apply_pattern', JSON.stringify(collectParams()));
   });
 
   document.getElementById('btn-validate').addEventListener('click', function () {

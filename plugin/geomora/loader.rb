@@ -32,6 +32,7 @@ module Geomora
     perception/detect_client
     core/detection_mapper
     core/rationalizer
+    core/pattern_analyzer
     core/ir_builder
     core/project
     ui/workspace_dialog

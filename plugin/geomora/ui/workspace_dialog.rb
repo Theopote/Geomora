@@ -166,6 +166,29 @@ module Geomora
             dialog.execute_script("window.geomora.loadPayload(#{payload_from_ir(data).to_json}, 'template')")
           end
 
+          dialog.add_action_callback('apply_pattern') do |_ctx, json|
+            params = JSON.parse(json)
+            if params['windows'].is_a?(Array) && params['windows'].length < 2
+              raise GeomoraError, 'Add at least two windows before applying a pattern.'
+            end
+
+            result = Core::Project.analyze_pattern(params)
+            payload = params.merge(result)
+            dialog.execute_script("window.geomora.applyPattern(#{payload.to_json})")
+            pattern = result['pattern'] || {}
+            post_message(
+              dialog,
+              'success',
+              format(
+                'Pattern: %s (%s)',
+                pattern['type'] || 'none',
+                (pattern['patterns_detected'] || []).join(', ')
+              )
+            )
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
           dialog.add_action_callback('rationalize') do |_ctx, json|
             params = JSON.parse(json)
             if params['windows'].is_a?(Array) && params['windows'].empty?

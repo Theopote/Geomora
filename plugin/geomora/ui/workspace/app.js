@@ -18,7 +18,8 @@
     drag: null,
     corners: null,
     originalImageSize: null,
-    cornerDrag: null
+    cornerDrag: null,
+    rationalization: null
   };
 
   const els = {
@@ -259,6 +260,33 @@
       renderCornerOverlay();
       window.requestAnimationFrame(renderCornerOverlay);
     });
+  }
+
+  function windowBboxFromMm(win) {
+    const wallLength = Number(els.form.elements.namedItem('wall_length').value) || 10000;
+    const wallHeight = Number(els.form.elements.namedItem('wall_height').value) || 3300;
+    if (!wallLength || !wallHeight || !win.width || !win.height) {
+      return null;
+    }
+    const x1 = win.offset / wallLength;
+    const x2 = (win.offset + win.width) / wallLength;
+    const y2 = 1 - win.sill_height / wallHeight;
+    const y1 = 1 - (win.sill_height + win.height) / wallHeight;
+    return [x1, y1, x2, y2];
+  }
+
+  function doorBboxFromMm(door) {
+    const wallLength = Number(els.form.elements.namedItem('wall_length').value) || 10000;
+    const wallHeight = Number(els.form.elements.namedItem('wall_height').value) || 3300;
+    const width = Number(door.width) || 0;
+    if (!width) return null;
+    const offset = Number(door.offset) || 0;
+    const height = Number(door.height) || 2100;
+    const x1 = offset / wallLength;
+    const x2 = (offset + width) / wallLength;
+    const y2 = 1;
+    const y1 = 1 - height / wallHeight;
+    return [x1, y1, x2, y2];
   }
 
   function overlayEditable() {
@@ -797,6 +825,13 @@
       );
     }
 
+    if (state.rationalization) {
+      items.push(
+        'Rationalized: ' + state.rationalization.method +
+        ' (' + (state.rationalization.constraints_applied || []).join(', ') + ')'
+      );
+    }
+
     params.windows.forEach(function (win, index) {
       items.push(
         'Window ' + (index + 1) + ': ' + win.width + '×' + win.height +
@@ -836,7 +871,8 @@
       corners: state.corners && state.corners.length === 4
         ? state.corners.map(function (c) { return [c[0], c[1]]; })
         : null,
-      detection_method: els.detectMethod ? els.detectMethod.value : 'auto'
+      detection_method: els.detectMethod ? els.detectMethod.value : 'auto',
+      rationalization: state.rationalization
     };
   }
 
@@ -903,6 +939,7 @@
     els.form.elements.namedItem('door_height').value = door.height || 2100;
 
     state.detection = null;
+    state.rationalization = null;
     state.overlayImageUrl = null;
     state.doorBbox = null;
     state.drag = null;
@@ -936,6 +973,7 @@
     state.rectifiedImageUrl = null;
     state.rectification = null;
     state.detection = null;
+    state.rationalization = null;
     state.overlayImageUrl = null;
     state.doorBbox = null;
     state.drag = null;
@@ -1029,6 +1067,33 @@
     }
   }
 
+  function applyRationalization(payload) {
+    const windows = (payload.windows || []).map(function (win) {
+      const mapped = {
+        offset: Number(win.offset),
+        width: Number(win.width),
+        height: Number(win.height),
+        sill_height: Number(win.sill_height),
+        bbox_norm: win.bbox_norm || windowBboxFromMm(win)
+      };
+      return mapped;
+    });
+
+    renderWindows(windows);
+
+    const door = payload.door || {};
+    const doorWidth = Number(door.width) || 0;
+    els.form.elements.namedItem('door_offset').value = door.offset || 0;
+    els.form.elements.namedItem('door_width').value = doorWidth;
+    els.form.elements.namedItem('door_height').value = doorWidth > 0 ? (door.height || 2100) : 0;
+    state.doorBbox = doorWidth > 0 ? (door.bbox_norm || doorBboxFromMm(door)) : null;
+
+    state.rationalization = payload.rationalization || null;
+    scheduleOverlayRender();
+    renderTree();
+    setStatus('success', 'Dimensions rationalized — review Inspector, then Validate or Generate.');
+  }
+
   function setIrPreview(ir) {
     if (!ir || !ir.openings) return;
     renderTree();
@@ -1039,6 +1104,7 @@
     setImage: setImage,
     setRectifiedImage: setRectifiedImage,
     applyDetection: applyDetection,
+    applyRationalization: applyRationalization,
     setDetectionMeta: setDetectionMeta,
     setIrPreview: setIrPreview,
     setStatus: setStatus
@@ -1062,6 +1128,14 @@
 
   document.getElementById('btn-load-template').addEventListener('click', function () {
     sketchupCall('load_template');
+  });
+
+  document.getElementById('btn-rationalize').addEventListener('click', function () {
+    if (!state.windows.length) {
+      setStatus('error', 'Add at least one window before rationalizing.');
+      return;
+    }
+    sketchupCall('rationalize', JSON.stringify(collectParams()));
   });
 
   document.getElementById('btn-validate').addEventListener('click', function () {

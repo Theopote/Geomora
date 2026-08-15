@@ -64,10 +64,11 @@ This boundary ensures AI can be swapped, upgraded, or run offline without touchi
 | 0 | Complete | IR + SketchUp geometry kernel |
 | 1 | Complete | HtmlDialog workspace + manual facade definition |
 | 2 | Complete (core) | Perspective rectification (OpenCV, local Python); manual 4-corner UI v0.5.0 |
-| 3 | In progress | Semantic detection (`contour_v1`) + interactive overlay editing |
-| 4+ | Future | YOLO/SAM, geometry rationalization |
+| 3 | In progress | Semantic detection (`contour_v1` / `yolo_v1`) + overlay editing |
+| 4 | Complete (core) | Geometry rationalization — snap, equal spacing, symmetry |
+| 5+ | Future | Pattern intelligence, multi-view reconstruction |
 
-See `docs/PHASE_0.md`, `PHASE_1.md`, `PHASE_2.md`, `PHASE_3.md`, `ACCEPTANCE.md`.
+See `docs/PHASE_0.md` … `PHASE_4.md`, `ACCEPTANCE.md`.
 
 ## Key Design Decisions (ADRs)
 

@@ -33,6 +33,7 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 
 | # | Step | Expected |
 |---|---|---|
+| 4.0 | **Rationalize** (≥1 window) | Equal widths/heights/sills; even spacing; overlay boxes update |
 | 4.1 | Door width = 0 | No door in element tree / IR when no door on facade |
 | 4.2 | Validate | Passes with consistent openings |
 | 4.3 | Generate | SketchUp geometry created in one undo step |

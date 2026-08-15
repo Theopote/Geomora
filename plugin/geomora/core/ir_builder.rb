@@ -170,14 +170,38 @@ module Geomora
       def build_constraints(windows)
         return [] if windows.length < 2
 
-        [
-          {
-            'id' => 'constraint_001',
-            'type' => 'equal_width',
-            'targets' => windows.map { |w| w['id'] },
-            'priority' => 'hard'
-          }
-        ]
+        window_ids = windows.map { |w| w['id'] }
+        rationalization = @params['rationalization']
+        applied = rationalization.is_a?(Hash) ? rationalization['constraints_applied'] : nil
+        applied = %w[equal_width equal_height equal_spacing align symmetry] if applied.nil? || applied.empty?
+
+        constraints = []
+        if applied.include?('equal_width')
+          constraints << constraint_entry('constraint_equal_width', 'equal_width', window_ids)
+        end
+        if applied.include?('equal_height')
+          constraints << constraint_entry('constraint_equal_height', 'equal_height', window_ids)
+        end
+        if applied.include?('equal_spacing') && window_ids.length >= 2
+          constraints << constraint_entry('constraint_equal_spacing', 'equal_spacing', window_ids)
+        end
+        if applied.include?('align')
+          constraints << constraint_entry('constraint_align', 'align', window_ids)
+        end
+        if applied.include?('symmetry')
+          constraints << constraint_entry('constraint_symmetry', 'symmetry', window_ids)
+        end
+
+        constraints
+      end
+
+      def constraint_entry(id, type, targets)
+        {
+          'id' => id,
+          'type' => type,
+          'targets' => targets,
+          'priority' => 'hard'
+        }
       end
 
       def build_sources
@@ -191,6 +215,9 @@ module Geomora
         end
         if @params['detection'].is_a?(Hash)
           metadata.merge!(@params['detection'])
+        end
+        if @params['rationalization'].is_a?(Hash)
+          metadata['rationalization'] = @params['rationalization']
         end
 
         sources << {

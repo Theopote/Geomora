@@ -166,6 +166,25 @@ module Geomora
             dialog.execute_script("window.geomora.loadPayload(#{payload_from_ir(data).to_json}, 'template')")
           end
 
+          dialog.add_action_callback('rationalize') do |_ctx, json|
+            params = JSON.parse(json)
+            if params['windows'].is_a?(Array) && params['windows'].empty?
+              raise GeomoraError, 'Add at least one window before rationalizing.'
+            end
+
+            result = Core::Project.rationalize_facade(params)
+            payload = params.merge(result)
+            dialog.execute_script("window.geomora.applyRationalization(#{payload.to_json})")
+            applied = result.dig('rationalization', 'constraints_applied') || []
+            post_message(
+              dialog,
+              'success',
+              format('Rationalized (%s)', applied.join(', '))
+            )
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
           dialog.add_action_callback('validate') do |_ctx, json|
             params = enrich_params(JSON.parse(json))
             ir = Core::Project.build_manual_facade(params)

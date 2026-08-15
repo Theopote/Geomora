@@ -42,6 +42,10 @@ module Geomora
         true
       end
 
+      def self.rationalize_facade(params, grid_mm: Rationalizer::DEFAULT_GRID_MM)
+        Rationalizer.rationalize(params, grid_mm: grid_mm)
+      end
+
       def self.build_manual_facade(params)
         IRBuilder.build_manual_facade(params)
       end

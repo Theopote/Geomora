@@ -270,26 +270,38 @@ module Geomora
         source_id = @params['source_id']
         return sources if source_id.nil? || source_id.to_s.empty?
 
-        metadata = { 'path' => @params['source_path'] }
-        if @params['rectification'].is_a?(Hash)
-          metadata.merge!(@params['rectification'])
-        end
-        if @params['detection'].is_a?(Hash)
-          metadata.merge!(@params['detection'])
-        end
-        if @params['rationalization'].is_a?(Hash)
-          metadata['rationalization'] = @params['rationalization']
-        end
-        if @params['pattern'].is_a?(Hash)
-          metadata['pattern'] = @params['pattern']
-        end
+        metadata = { 'path' => @params['source_path'], 'role' => 'primary' }
+        metadata.merge!(view_metadata(@params['rectification'])) if @params['rectification'].is_a?(Hash)
+        metadata.merge!(view_metadata(@params['detection'])) if @params['detection'].is_a?(Hash)
+        metadata['rationalization'] = @params['rationalization'] if @params['rationalization'].is_a?(Hash)
+        metadata['pattern'] = @params['pattern'] if @params['pattern'].is_a?(Hash)
+        metadata['multiview'] = @params['multiview'] if @params['multiview'].is_a?(Hash)
 
         sources << {
           'id' => source_id.to_s,
           'type' => 'image',
           'metadata' => metadata.compact
         }
+
+        secondary_path = @params['secondary_source_path']
+        if secondary_path && !secondary_path.to_s.empty?
+          secondary_meta = { 'path' => secondary_path, 'role' => 'secondary' }
+          if @params['multiview'].is_a?(Hash)
+            view = (@params['multiview']['views'] || []).find { |item| item['role'] == 'secondary' }
+            secondary_meta['transform_to_primary'] = view['transform_to_primary'] if view
+          end
+          sources << {
+            'id' => 'view_002',
+            'type' => 'image',
+            'metadata' => secondary_meta.compact
+          }
+        end
+
         sources
+      end
+
+      def view_metadata(data)
+        data.is_a?(Hash) ? data : {}
       end
 
       def default_windows

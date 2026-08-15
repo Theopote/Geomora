@@ -90,4 +90,4 @@ tests/ir/pattern_analyzer_test.rb
 
 ## 6. Gate to Phase 6
 
-Phase 5 covers **single-storey facade bay patterns**. Phase 6 adds multi-view depth / camera fusion for full building reconstruction.
+Phase 5 covers **single-storey facade bay patterns**. See [PHASE_6.md](PHASE_6.md) for multi-view registration.

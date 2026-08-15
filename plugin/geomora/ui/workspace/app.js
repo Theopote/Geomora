@@ -20,12 +20,18 @@
     originalImageSize: null,
     cornerDrag: null,
     rationalization: null,
-    pattern: null
+    pattern: null,
+    secondarySourcePath: null,
+    secondarySourceId: null,
+    secondaryImageUrl: null,
+    multiview: null
   };
 
   const els = {
     status: document.getElementById('status'),
     sourceMeta: document.getElementById('source-meta'),
+    secondaryMeta: document.getElementById('secondary-meta'),
+    multiviewMeta: document.getElementById('multiview-meta'),
     rectifyMeta: document.getElementById('rectify-meta'),
     detectMeta: document.getElementById('detect-meta'),
     imageStack: document.getElementById('image-stack'),
@@ -826,6 +832,14 @@
       );
     }
 
+    if (state.multiview) {
+      items.push(
+        'Multi-view: ' + state.multiview.method +
+        ' — ' + state.multiview.match_count + ' matches, ' +
+        state.multiview.inlier_count + ' inliers (' + state.multiview.confidence + ')'
+      );
+    }
+
     if (state.pattern) {
       items.push(
         'Pattern: ' + state.pattern.type +
@@ -877,12 +891,15 @@
       },
       source_path: state.sourcePath,
       source_id: state.sourceId,
+      secondary_source_path: state.secondarySourcePath,
+      secondary_source_id: state.secondarySourceId,
       corners: state.corners && state.corners.length === 4
         ? state.corners.map(function (c) { return [c[0], c[1]]; })
         : null,
       detection_method: els.detectMethod ? els.detectMethod.value : 'auto',
       rationalization: state.rationalization,
-      pattern: state.pattern
+      pattern: state.pattern,
+      multiview: state.multiview
     };
   }
 
@@ -986,6 +1003,10 @@
     state.detection = null;
     state.rationalization = null;
     state.pattern = null;
+    state.secondarySourcePath = null;
+    state.secondarySourceId = null;
+    state.secondaryImageUrl = null;
+    state.multiview = null;
     state.overlayImageUrl = null;
     state.doorBbox = null;
     state.drag = null;
@@ -994,7 +1015,9 @@
     state.cornerDrag = null;
     setDrawMode(false);
     clearSelection();
-    els.sourceMeta.textContent = sourcePath || 'Image loaded';
+    els.sourceMeta.textContent = sourcePath || 'Primary image loaded';
+    els.secondaryMeta.textContent = 'Secondary: not loaded';
+    els.multiviewMeta.textContent = 'Multi-view: not registered';
     els.rectifyMeta.textContent = 'Rectification: not run';
     els.detectMeta.textContent = 'Detection: not run';
     renderWindows([]);
@@ -1004,6 +1027,30 @@
     setActiveView('original');
     renderTree();
     setStatus('', 'Photo loaded — drag corners to frame facade, then Rectify');
+  }
+
+  function setSecondaryImage(fileUrl, sourcePath) {
+    state.secondarySourcePath = sourcePath;
+    state.secondarySourceId = sourcePath ? 'view_002' : null;
+    state.secondaryImageUrl = fileUrl;
+    state.multiview = null;
+    els.secondaryMeta.textContent = sourcePath || 'Secondary image loaded';
+    els.multiviewMeta.textContent = 'Multi-view: not registered';
+    renderTree();
+    setStatus('', 'Secondary image loaded — click Register Views to align with primary');
+  }
+
+  function setMultiviewRegistration(result) {
+    state.multiview = result || null;
+    if (state.multiview) {
+      els.multiviewMeta.textContent =
+        'Multi-view: ' + state.multiview.method +
+        ' | ' + state.multiview.match_count + ' matches, ' +
+        state.multiview.inlier_count + ' inliers | confidence ' + state.multiview.confidence;
+    } else {
+      els.multiviewMeta.textContent = 'Multi-view: not registered';
+    }
+    renderTree();
   }
 
   function setRectifiedImage(fileUrl, result) {
@@ -1150,6 +1197,8 @@
   window.geomora = {
     loadPayload: loadPayload,
     setImage: setImage,
+    setSecondaryImage: setSecondaryImage,
+    setMultiviewRegistration: setMultiviewRegistration,
     setRectifiedImage: setRectifiedImage,
     applyDetection: applyDetection,
     applyRationalization: applyRationalization,
@@ -1161,6 +1210,22 @@
 
   document.getElementById('btn-pick-image').addEventListener('click', function () {
     sketchupCall('pick_image');
+  });
+
+  document.getElementById('btn-pick-secondary').addEventListener('click', function () {
+    sketchupCall('pick_secondary_image');
+  });
+
+  document.getElementById('btn-register-views').addEventListener('click', function () {
+    if (!state.sourcePath) {
+      setStatus('error', 'Load a primary image first.');
+      return;
+    }
+    if (!state.secondarySourcePath) {
+      setStatus('error', 'Load a secondary image first.');
+      return;
+    }
+    sketchupCall('register_views', JSON.stringify(collectParams()));
   });
 
   document.getElementById('btn-reset-corners').addEventListener('click', function () {

@@ -1,6 +1,6 @@
-# Geomora Perception Service (Phase 2 + 3)
+# Geomora Perception Service (Phase 2–6)
 
-Local Python service for facade rectification and element detection.
+Local Python service for facade rectification, detection, and multi-view registration.
 
 ## Setup
 
@@ -56,6 +56,16 @@ python scripts/train_yolo_facade.py
 ```
 
 See `models/README.md`. Without `facade_yolo_v1.onnx`, `method=auto` uses `contour_v1`.
+
+```http
+POST /multiview/register
+Content-Type: multipart/form-data
+
+primary: <file>
+secondary: <file>
+```
+
+Returns homography mapping secondary → primary pixels, match/inlier counts, and view metadata.
 
 ## Tests
 

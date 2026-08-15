@@ -41,6 +41,14 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 4.5 | Generate (after Apply Pattern) | Single shared window ComponentDefinition in Components panel |
 | 4.6 | Ctrl+Z | Entire generation reverts |
 
+## Phase 6 — Multi-view
+
+| # | Step | Expected |
+|---|---|---|
+| 6.1 | Load Primary + Secondary images | Both paths shown in Sources panel |
+| 6.2 | Register Views | Match/inlier counts; confidence > 0.4 on similar facades |
+| 6.3 | Generate (after registration) | IR `sources[]` contains primary + `view_002` with transform |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos

@@ -44,6 +44,47 @@ module Geomora
             dialog.execute_script("window.geomora.loadPayload(#{payload.to_json})")
           end
 
+          dialog.add_action_callback('pick_secondary_image') do |_ctx, _|
+            path = ::UI.openpanel('Select secondary facade image', '', 'Images|*.jpg;*.jpeg;*.png;*.webp;||')
+            if path
+              @secondary_source_path = path
+              file_url = path_to_file_url(path)
+              dialog.execute_script(
+                "window.geomora.setSecondaryImage(#{file_url.to_json}, #{path.to_json})"
+              )
+            end
+          end
+
+          dialog.add_action_callback('register_views') do |_ctx, json|
+            params = JSON.parse(json)
+            primary_path = params['source_path']
+            secondary_path = params['secondary_source_path']
+            if primary_path.nil? || primary_path.empty?
+              raise GeomoraError, 'Load a primary reference image first.'
+            end
+            if secondary_path.nil? || secondary_path.empty?
+              raise GeomoraError, 'Load a secondary image before registering views.'
+            end
+
+            Logger.info("Registering views: #{primary_path} + #{secondary_path}")
+            result = Perception::MultiviewClient.register(primary_path, secondary_path)
+            @multiview = result.to_source_metadata
+            dialog.execute_script("window.geomora.setMultiviewRegistration(#{result.to_dict.to_json})")
+            post_message(
+              dialog,
+              result.inlier_count >= 20 ? 'success' : '',
+              format(
+                'Views registered — %d matches, %d inliers (%.2f %s)',
+                result.match_count,
+                result.inlier_count,
+                result.confidence,
+                result.method
+              )
+            )
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
           dialog.add_action_callback('pick_image') do |_ctx, _|
             path = ::UI.openpanel('Select facade reference image', '', 'Images|*.jpg;*.jpeg;*.png;*.webp;||')
             if path
@@ -238,6 +279,7 @@ module Geomora
         def enrich_params(params)
           params['rectification'] = @rectification if @rectification
           params['detection'] = @detection if @detection
+          params['multiview'] = @multiview if @multiview
           params
         end
 
@@ -268,7 +310,9 @@ module Geomora
             'windows' => [],
             'door' => { 'offset' => 0, 'width' => 0, 'height' => 2100 },
             'source_path' => nil,
-            'source_id' => nil
+            'source_id' => nil,
+            'secondary_source_path' => nil,
+            'secondary_source_id' => nil
           }
         end
 

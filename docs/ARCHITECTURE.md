@@ -67,9 +67,10 @@ This boundary ensures AI can be swapped, upgraded, or run offline without touchi
 | 3 | In progress | Semantic detection (`contour_v1` / `yolo_v1`) + overlay editing |
 | 4 | Complete (core) | Geometry rationalization — snap, equal spacing, symmetry |
 | 5 | Complete (core) | Pattern intelligence — bay detection, shared components |
-| 6+ | Future | Multi-view reconstruction |
+| 6 | Complete (core) | Multi-view registration — ORB homography, dual sources |
+| 7+ | Future | Full building elements |
 
-See `docs/PHASE_0.md` … `PHASE_5.md`, `ACCEPTANCE.md`.
+See `docs/PHASE_0.md` … `PHASE_6.md`, `ACCEPTANCE.md`.
 
 ## Key Design Decisions (ADRs)
 

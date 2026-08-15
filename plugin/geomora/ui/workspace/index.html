@@ -32,8 +32,15 @@
 
     <section class="panel viewer">
       <h2>Image Viewer</h2>
-      <div class="viewer-frame">
-        <img id="reference-image" alt="Reference facade image" hidden>
+      <div class="viewer-frame" id="viewer-frame">
+        <div id="image-stack" class="image-stack" hidden>
+          <img id="reference-image" alt="Reference facade image">
+          <svg id="detection-overlay" class="detection-overlay" aria-hidden="true"></svg>
+        </div>
+        <div id="viewer-toolbar" class="viewer-toolbar" hidden>
+          <button id="btn-delete-selected" class="btn secondary" type="button" disabled>Delete selected</button>
+          <span id="viewer-hint" class="viewer-hint">Click a box to select · Del to remove</span>
+        </div>
         <div id="viewer-placeholder" class="placeholder">Load a facade photo for manual reference</div>
       </div>
     </section>

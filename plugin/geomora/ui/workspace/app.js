@@ -10,7 +10,10 @@
     rectification: null,
     detection: null,
     overlayImageUrl: null,
-    activeView: 'original'
+    activeView: 'original',
+    selectedWindowIndex: null,
+    selectedDoor: false,
+    doorBbox: null
   };
 
   const els = {
@@ -18,7 +21,12 @@
     sourceMeta: document.getElementById('source-meta'),
     rectifyMeta: document.getElementById('rectify-meta'),
     detectMeta: document.getElementById('detect-meta'),
+    imageStack: document.getElementById('image-stack'),
     image: document.getElementById('reference-image'),
+    overlaySvg: document.getElementById('detection-overlay'),
+    viewerToolbar: document.getElementById('viewer-toolbar'),
+    btnDeleteSelected: document.getElementById('btn-delete-selected'),
+    viewerHint: document.getElementById('viewer-hint'),
     placeholder: document.getElementById('viewer-placeholder'),
     tree: document.getElementById('element-tree'),
     form: document.getElementById('facade-form'),
@@ -42,6 +50,154 @@
     els.status.className = 'status ' + (level || '');
   }
 
+  function clearSelection() {
+    state.selectedWindowIndex = null;
+    state.selectedDoor = false;
+    updateSelectionUi();
+  }
+
+  function selectWindow(index) {
+    state.selectedWindowIndex = index;
+    state.selectedDoor = false;
+    updateSelectionUi();
+    const row = els.windowsContainer.querySelector('[data-win-row="' + index + '"]');
+    if (row) {
+      row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }
+
+  function selectDoor() {
+    state.selectedDoor = true;
+    state.selectedWindowIndex = null;
+    updateSelectionUi();
+  }
+
+  function updateSelectionUi() {
+    els.windowsContainer.querySelectorAll('.window-row').forEach(function (row) {
+      const index = parseInt(row.dataset.winRow, 10);
+      row.classList.toggle('selected', state.selectedWindowIndex === index);
+    });
+    const hasSelection = state.selectedDoor || state.selectedWindowIndex !== null;
+    els.btnDeleteSelected.disabled = !hasSelection;
+    renderDetectionOverlay();
+  }
+
+  function removeWindowAt(index) {
+    if (index < 0 || index >= state.windows.length) return;
+    state.windows.splice(index, 1);
+    if (state.selectedWindowIndex === index) {
+      clearSelection();
+    } else if (state.selectedWindowIndex !== null && state.selectedWindowIndex > index) {
+      state.selectedWindowIndex -= 1;
+    }
+    renderWindows(state.windows);
+    updateReviewStatus();
+  }
+
+  function removeSelectedDoor() {
+    els.form.elements.namedItem('door_offset').value = 0;
+    els.form.elements.namedItem('door_width').value = 0;
+    els.form.elements.namedItem('door_height').value = 0;
+    state.doorBbox = null;
+    clearSelection();
+    renderTree();
+    updateReviewStatus();
+  }
+
+  function removeSelected() {
+    if (state.selectedDoor) {
+      removeSelectedDoor();
+      return;
+    }
+    if (state.selectedWindowIndex !== null) {
+      removeWindowAt(state.selectedWindowIndex);
+    }
+  }
+
+  function updateReviewStatus() {
+    if (state.windows.length > REVIEW_WINDOW_LIMIT) {
+      setStatus(
+        'error',
+        'Still ' + state.windows.length + ' windows — click false boxes on the image and Delete.'
+      );
+    } else if (state.windows.length > 0) {
+      setStatus('', 'Selection updated — Generate when the image looks correct.');
+    }
+  }
+
+  function interactiveOverlayEnabled() {
+    return (
+      (state.activeView === 'rectified' || state.activeView === 'overlay') &&
+      state.rectifiedImageUrl &&
+      (state.windows.some(function (win) { return win.bbox_norm; }) || state.doorBbox)
+    );
+  }
+
+  function renderDetectionOverlay() {
+    const svg = els.overlaySvg;
+    if (!interactiveOverlayEnabled() || !els.image.complete || !els.image.naturalWidth) {
+      svg.innerHTML = '';
+      return;
+    }
+
+    const nw = els.image.naturalWidth;
+    const nh = els.image.naturalHeight;
+    svg.setAttribute('viewBox', '0 0 ' + nw + ' ' + nh);
+
+    let markup = '';
+    state.windows.forEach(function (win, index) {
+      if (!win.bbox_norm || win.bbox_norm.length !== 4) return;
+      const x1 = win.bbox_norm[0] * nw;
+      const y1 = win.bbox_norm[1] * nh;
+      const w = (win.bbox_norm[2] - win.bbox_norm[0]) * nw;
+      const h = (win.bbox_norm[3] - win.bbox_norm[1]) * nh;
+      const selected = state.selectedWindowIndex === index;
+      markup +=
+        '<rect class="det-box' + (selected ? ' selected' : '') + '" data-kind="window" data-index="' + index +
+        '" x="' + x1 + '" y="' + y1 + '" width="' + w + '" height="' + h + '" />' +
+        '<text class="det-label" x="' + (x1 + 4) + '" y="' + (y1 + 16) + '">' + (index + 1) + '</text>';
+    });
+
+    const doorWidth = Number(els.form.elements.namedItem('door_width').value) || 0;
+    if (state.doorBbox && state.doorBbox.length === 4 && doorWidth > 0) {
+      const x1 = state.doorBbox[0] * nw;
+      const y1 = state.doorBbox[1] * nh;
+      const w = (state.doorBbox[2] - state.doorBbox[0]) * nw;
+      const h = (state.doorBbox[3] - state.doorBbox[1]) * nh;
+      const selected = state.selectedDoor;
+      markup +=
+        '<rect class="det-box door' + (selected ? ' selected' : '') + '" data-kind="door" x="' +
+        x1 + '" y="' + y1 + '" width="' + w + '" height="' + h + '" />' +
+        '<text class="det-label" x="' + (x1 + 4) + '" y="' + (y1 + 16) + '">D</text>';
+    }
+
+    svg.innerHTML = markup;
+    svg.querySelectorAll('.det-box').forEach(function (box) {
+      box.addEventListener('click', onOverlayBoxClick);
+    });
+  }
+
+  function onOverlayBoxClick(event) {
+    event.stopPropagation();
+    const kind = event.target.getAttribute('data-kind');
+    if (kind === 'door') {
+      selectDoor();
+    } else {
+      const index = parseInt(event.target.getAttribute('data-index'), 10);
+      if (!Number.isNaN(index)) {
+        selectWindow(index);
+      }
+    }
+  }
+
+  function updateViewerToolbar() {
+    const enabled = interactiveOverlayEnabled();
+    els.viewerToolbar.hidden = !enabled;
+    if (enabled) {
+      els.viewerHint.textContent = 'Click a box to select · Del or button to remove';
+    }
+  }
+
   function renderWindows(windows) {
     state.windows = windows || [];
     els.windowsContainer.innerHTML = '';
@@ -49,6 +205,10 @@
     state.windows.forEach(function (win, index) {
       const row = document.createElement('div');
       row.className = 'window-row';
+      row.dataset.winRow = String(index);
+      if (state.selectedWindowIndex === index) {
+        row.classList.add('selected');
+      }
       row.innerHTML =
         '<div class="window-row-header">' +
         '<h3>Window ' + (index + 1) + '</h3>' +
@@ -69,22 +229,24 @@
       button.addEventListener('click', onRemoveWindow);
     });
 
+    els.windowsContainer.querySelectorAll('.window-row-header h3').forEach(function (heading) {
+      heading.addEventListener('click', function () {
+        const row = heading.closest('.window-row');
+        if (!row) return;
+        selectWindow(parseInt(row.dataset.winRow, 10));
+      });
+    });
+
     renderTree();
+    renderDetectionOverlay();
+    updateViewerToolbar();
   }
 
   function onRemoveWindow(event) {
+    event.stopPropagation();
     const index = parseInt(event.target.dataset.removeWin, 10);
     if (Number.isNaN(index)) return;
-    state.windows.splice(index, 1);
-    renderWindows(state.windows);
-    if (state.windows.length <= REVIEW_WINDOW_LIMIT) {
-      setStatus('', 'Window removed — you can Generate when the list looks correct.');
-    } else {
-      setStatus(
-        'error',
-        'Still ' + state.windows.length + ' windows — remove more false positives before Generate.'
-      );
-    }
+    removeWindowAt(index);
   }
 
   function onWindowFieldChange(event) {
@@ -159,19 +321,19 @@
 
   function updateViewer() {
     let url = null;
-    if (state.activeView === 'overlay' && state.overlayImageUrl) {
-      url = state.overlayImageUrl;
-    } else if (state.activeView === 'rectified') {
+    if (state.activeView === 'rectified' || state.activeView === 'overlay') {
       url = state.rectifiedImageUrl;
     } else {
       url = state.originalImageUrl;
     }
 
     if (!url) {
-      els.image.hidden = true;
+      els.imageStack.hidden = true;
+      els.viewerToolbar.hidden = true;
       els.placeholder.hidden = false;
+      els.overlaySvg.innerHTML = '';
       if (state.activeView === 'overlay') {
-        els.placeholder.textContent = 'Run Detect Elements to see overlay';
+        els.placeholder.textContent = 'Run Detect Elements to see interactive boxes';
       } else if (state.activeView === 'rectified') {
         els.placeholder.textContent = 'Run Rectify Facade to see corrected image';
       } else {
@@ -180,9 +342,15 @@
       return;
     }
 
-    els.image.src = url;
-    els.image.hidden = false;
+    els.imageStack.hidden = false;
     els.placeholder.hidden = true;
+    if (els.image.getAttribute('src') !== url) {
+      els.image.src = url;
+    }
+    updateViewerToolbar();
+    if (els.image.complete) {
+      renderDetectionOverlay();
+    }
   }
 
   function setActiveView(view) {
@@ -208,6 +376,8 @@
 
     state.detection = null;
     state.overlayImageUrl = null;
+    state.doorBbox = null;
+    clearSelection();
     els.detectMeta.textContent = 'Detection: not run';
 
     if (payload.source_path) {
@@ -234,6 +404,8 @@
     state.rectification = null;
     state.detection = null;
     state.overlayImageUrl = null;
+    state.doorBbox = null;
+    clearSelection();
     els.sourceMeta.textContent = sourcePath || 'Image loaded';
     els.rectifyMeta.textContent = 'Rectification: not run';
     els.detectMeta.textContent = 'Detection: not run';
@@ -277,9 +449,11 @@
         offset: Number(win.offset),
         width: Number(win.width),
         height: Number(win.height),
-        sill_height: Number(win.sill_height)
+        sill_height: Number(win.sill_height),
+        bbox_norm: win.bbox_norm
       };
     });
+    clearSelection();
     renderWindows(windows);
 
     const door = payload.door || {};
@@ -287,6 +461,7 @@
     els.form.elements.namedItem('door_offset').value = door.offset || 0;
     els.form.elements.namedItem('door_width').value = doorWidth;
     els.form.elements.namedItem('door_height').value = doorWidth > 0 ? (door.height || 2100) : 0;
+    state.doorBbox = door.bbox_norm && doorWidth > 0 ? door.bbox_norm : null;
 
     state.detection = payload.detection || null;
     state.overlayImageUrl = overlayUrl || null;
@@ -297,21 +472,19 @@
         ' | confidence ' + state.detection.confidence;
     }
 
-    if (overlayUrl) {
-      setActiveView('overlay');
-    }
+    setActiveView('overlay');
     renderTree();
 
     const doorCount = state.detection ? state.detection.doors : 0;
     if (windows.length > REVIEW_WINDOW_LIMIT || payload.review_required) {
       setStatus(
         'error',
-        'Detected ' + windows.length + ' windows — check Overlay, remove false positives (Remove), then Generate.'
+        'Detected ' + windows.length + ' windows — click false boxes on the image and Delete.'
       );
     } else if (doorCount === 0) {
-      setStatus('success', 'No door detected — door fields cleared. Review windows before Generate.');
+      setStatus('success', 'No door detected — click boxes on image to review, then Generate.');
     } else {
-      setStatus('success', 'Detection applied — review values before Generate.');
+      setStatus('success', 'Click boxes on image to review, then Generate.');
     }
   }
 
@@ -354,11 +527,30 @@
     if (state.windows.length > REVIEW_WINDOW_LIMIT) {
       setStatus(
         'error',
-        'Too many windows (' + state.windows.length + '). Remove false positives in Inspector, then Generate again.'
+        'Too many windows (' + state.windows.length + '). Delete false boxes on the image, then Generate.'
       );
       return;
     }
     sketchupCall('generate', JSON.stringify(collectParams()));
+  });
+
+  els.btnDeleteSelected.addEventListener('click', function () {
+    removeSelected();
+  });
+
+  els.image.addEventListener('load', function () {
+    renderDetectionOverlay();
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key !== 'Delete' && event.key !== 'Backspace') return;
+    const tag = (event.target && event.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (!interactiveOverlayEnabled()) return;
+    if (state.selectedDoor || state.selectedWindowIndex !== null) {
+      event.preventDefault();
+      removeSelected();
+    }
   });
 
   els.btnViewOriginal.addEventListener('click', function () {

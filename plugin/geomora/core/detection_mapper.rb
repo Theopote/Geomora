@@ -66,7 +66,8 @@ module Geomora
           width: width.round(1),
           height: height.round(1),
           sill_height: sill_height.round(1),
-          confidence: element['confidence'].to_f
+          confidence: element['confidence'].to_f,
+          bbox_norm: [x_min, y_min, x_max, y_max]
         }
       end
 
@@ -111,13 +112,17 @@ module Geomora
       end
 
       def stringify(hash)
-        {
+        result = {
           'offset' => hash[:offset],
           'width' => hash[:width],
           'height' => hash[:height],
           'sill_height' => hash.fetch(:sill_height, 0),
           'confidence' => hash[:confidence]
-        }.compact
+        }
+        if hash[:bbox_norm]
+          result['bbox_norm'] = hash[:bbox_norm].map { |value| value.round(4) }
+        end
+        result.compact
       end
 
       def empty_door

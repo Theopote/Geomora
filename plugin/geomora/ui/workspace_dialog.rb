@@ -121,7 +121,7 @@ module Geomora
                   dialog,
                   'error',
                   format(
-                    'Detected %d windows — check Overlay, remove false positives in Inspector, then Generate.',
+                    'Detected %d windows — click false boxes on the image and Delete, then Generate.',
                     window_count
                   )
                 )
@@ -172,7 +172,7 @@ module Geomora
             windows = params['windows']
             if windows.is_a?(Array) && windows.length > REVIEW_WINDOW_LIMIT
               raise GeomoraError,
-                    "Too many windows (#{windows.length}). Remove false positives in Inspector (max #{REVIEW_WINDOW_LIMIT}), then Generate again."
+                    "Too many windows (#{windows.length}). Delete false boxes on the image (max #{REVIEW_WINDOW_LIMIT}), then Generate again."
             end
 
             ir = Core::Project.build_manual_facade(params)

@@ -145,6 +145,45 @@ body {
   stroke-width: 3;
 }
 
+.detection-overlay .det-handle {
+  fill: #fbbc05;
+  stroke: #fff;
+  stroke-width: 1.5;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.detection-overlay .det-handle[data-handle="nw"],
+.detection-overlay .det-handle[data-handle="se"] {
+  cursor: nwse-resize;
+}
+
+.detection-overlay .det-handle[data-handle="ne"],
+.detection-overlay .det-handle[data-handle="sw"] {
+  cursor: nesw-resize;
+}
+
+.detection-overlay .det-preview {
+  fill: rgba(66, 133, 244, 0.2);
+  stroke: #8ab4f8;
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+  pointer-events: none;
+}
+
+.image-stack.draw-mode {
+  cursor: crosshair;
+}
+
+.image-stack.draw-mode .det-box {
+  cursor: crosshair;
+}
+
+#btn-draw-window.active {
+  background: #3367d6;
+  border-color: #3367d6;
+}
+
 .detection-overlay .det-label {
   fill: #fbbc05;
   font-size: 14px;

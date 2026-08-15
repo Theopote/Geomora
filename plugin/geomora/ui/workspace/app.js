@@ -13,7 +13,9 @@
     activeView: 'original',
     selectedWindowIndex: null,
     selectedDoor: false,
-    doorBbox: null
+    doorBbox: null,
+    drawMode: false,
+    drag: null
   };
 
   const els = {
@@ -25,6 +27,7 @@
     image: document.getElementById('reference-image'),
     overlaySvg: document.getElementById('detection-overlay'),
     viewerToolbar: document.getElementById('viewer-toolbar'),
+    btnDrawWindow: document.getElementById('btn-draw-window'),
     btnDeleteSelected: document.getElementById('btn-delete-selected'),
     viewerHint: document.getElementById('viewer-hint'),
     placeholder: document.getElementById('viewer-placeholder'),
@@ -99,6 +102,8 @@
     els.form.elements.namedItem('door_width').value = 0;
     els.form.elements.namedItem('door_height').value = 0;
     state.doorBbox = null;
+    state.drag = null;
+    setDrawMode(false);
     clearSelection();
     renderTree();
     updateReviewStatus();
@@ -125,76 +130,384 @@
     }
   }
 
-  function interactiveOverlayEnabled() {
+  function overlayEditable() {
     return (
       (state.activeView === 'rectified' || state.activeView === 'overlay') &&
-      state.rectifiedImageUrl &&
-      (state.windows.some(function (win) { return win.bbox_norm; }) || state.doorBbox)
+      state.rectifiedImageUrl
     );
+  }
+
+  function imageDimensions() {
+    return {
+      width: els.image.naturalWidth || 1,
+      height: els.image.naturalHeight || 1
+    };
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function bboxNormFromPixels(x1, y1, x2, y2) {
+    const dims = imageDimensions();
+    const left = clamp(Math.min(x1, x2), 0, dims.width);
+    const top = clamp(Math.min(y1, y2), 0, dims.height);
+    const right = clamp(Math.max(x1, x2), 0, dims.width);
+    const bottom = clamp(Math.max(y1, y2), 0, dims.height);
+    return [
+      left / dims.width,
+      top / dims.height,
+      right / dims.width,
+      bottom / dims.height
+    ];
+  }
+
+  function bboxPixelsFromNorm(bbox) {
+    const dims = imageDimensions();
+    return {
+      x: bbox[0] * dims.width,
+      y: bbox[1] * dims.height,
+      w: (bbox[2] - bbox[0]) * dims.width,
+      h: (bbox[3] - bbox[1]) * dims.height
+    };
+  }
+
+  function bboxNormToWindow(bbox) {
+    const wallLength = Number(els.form.elements.namedItem('wall_length').value) || 10000;
+    const wallHeight = Number(els.form.elements.namedItem('wall_height').value) || 3300;
+    const x1 = bbox[0];
+    const y1 = bbox[1];
+    const x2 = bbox[2];
+    const y2 = bbox[3];
+    return {
+      offset: Math.round(x1 * wallLength * 10) / 10,
+      width: Math.round((x2 - x1) * wallLength * 10) / 10,
+      height: Math.round((y2 - y1) * wallHeight * 10) / 10,
+      sill_height: Math.round((1 - y2) * wallHeight * 10) / 10,
+      bbox_norm: bbox.slice()
+    };
+  }
+
+  function bboxNormToDoor(bbox) {
+    const wallLength = Number(els.form.elements.namedItem('wall_length').value) || 10000;
+    const wallHeight = Number(els.form.elements.namedItem('wall_height').value) || 3300;
+    const x1 = bbox[0];
+    const y1 = bbox[1];
+    const x2 = bbox[2];
+    const y2 = bbox[3];
+    return {
+      offset: Math.round(x1 * wallLength * 10) / 10,
+      width: Math.round((x2 - x1) * wallLength * 10) / 10,
+      height: Math.round((y2 - y1) * wallHeight * 10) / 10
+    };
+  }
+
+  function applyBboxToWindow(index, bboxNorm) {
+    const mapped = bboxNormToWindow(bboxNorm);
+    state.windows[index] = Object.assign({}, state.windows[index], mapped);
+    syncWindowRowFromState(index);
+    renderDetectionOverlay();
+    renderTree();
+  }
+
+  function applyBboxToDoor(bboxNorm) {
+    const mapped = bboxNormToDoor(bboxNorm);
+    els.form.elements.namedItem('door_offset').value = mapped.offset;
+    els.form.elements.namedItem('door_width').value = mapped.width;
+    els.form.elements.namedItem('door_height').value = mapped.height;
+    state.doorBbox = bboxNorm.slice();
+    renderDetectionOverlay();
+    renderTree();
+  }
+
+  function syncWindowRowFromState(index) {
+    const win = state.windows[index];
+    const row = els.windowsContainer.querySelector('[data-win-row="' + index + '"]');
+    if (!row || !win) {
+      renderWindows(state.windows);
+      return;
+    }
+    row.querySelector('[data-field="offset"]').value = win.offset;
+    row.querySelector('[data-field="width"]').value = win.width;
+    row.querySelector('[data-field="height"]').value = win.height;
+    row.querySelector('[data-field="sill_height"]').value = win.sill_height;
+  }
+
+  function addWindowFromBboxNorm(bboxNorm) {
+    const win = bboxNormToWindow(bboxNorm);
+    state.windows.push(win);
+    renderWindows(state.windows);
+    selectWindow(state.windows.length - 1);
+    updateReviewStatus();
+  }
+
+  function setDrawMode(enabled) {
+    state.drawMode = enabled;
+    els.btnDrawWindow.classList.toggle('active', enabled);
+    els.imageStack.classList.toggle('draw-mode', enabled);
+    updateViewerHint();
+  }
+
+  function svgPointFromEvent(event) {
+    const pt = els.overlaySvg.createSVGPoint();
+    pt.x = event.clientX;
+    pt.y = event.clientY;
+    const matrix = els.overlaySvg.getScreenCTM();
+    if (!matrix) {
+      return { x: 0, y: 0 };
+    }
+    const transformed = pt.matrixTransform(matrix.inverse());
+    return { x: transformed.x, y: transformed.y };
+  }
+
+  function minBoxPixels() {
+    const dims = imageDimensions();
+    return {
+      width: dims.width * 0.02,
+      height: dims.height * 0.02
+    };
+  }
+
+  function interactiveOverlayEnabled() {
+    return overlayEditable();
+  }
+
+  function renderHandleMarkup(x, y, w, h, kind, index) {
+    const corners = [
+      ['nw', x, y],
+      ['ne', x + w, y],
+      ['se', x + w, y + h],
+      ['sw', x, y + h]
+    ];
+    let markup = '';
+    corners.forEach(function (corner) {
+      markup +=
+        '<circle class="det-handle" data-kind="' + kind + '" data-index="' + index +
+        '" data-handle="' + corner[0] + '" cx="' + corner[1] + '" cy="' + corner[2] + '" r="7" />';
+    });
+    return markup;
   }
 
   function renderDetectionOverlay() {
     const svg = els.overlaySvg;
-    if (!interactiveOverlayEnabled() || !els.image.complete || !els.image.naturalWidth) {
+    if (!overlayEditable() || !els.image.complete || !els.image.naturalWidth) {
       svg.innerHTML = '';
       return;
     }
 
-    const nw = els.image.naturalWidth;
-    const nh = els.image.naturalHeight;
+    const dims = imageDimensions();
+    const nw = dims.width;
+    const nh = dims.height;
     svg.setAttribute('viewBox', '0 0 ' + nw + ' ' + nh);
 
     let markup = '';
     state.windows.forEach(function (win, index) {
       if (!win.bbox_norm || win.bbox_norm.length !== 4) return;
-      const x1 = win.bbox_norm[0] * nw;
-      const y1 = win.bbox_norm[1] * nh;
-      const w = (win.bbox_norm[2] - win.bbox_norm[0]) * nw;
-      const h = (win.bbox_norm[3] - win.bbox_norm[1]) * nh;
-      const selected = state.selectedWindowIndex === index;
+      const box = bboxPixelsFromNorm(win.bbox_norm);
+      const selected = state.selectedWindowIndex === index && !state.selectedDoor;
       markup +=
         '<rect class="det-box' + (selected ? ' selected' : '') + '" data-kind="window" data-index="' + index +
-        '" x="' + x1 + '" y="' + y1 + '" width="' + w + '" height="' + h + '" />' +
-        '<text class="det-label" x="' + (x1 + 4) + '" y="' + (y1 + 16) + '">' + (index + 1) + '</text>';
+        '" x="' + box.x + '" y="' + box.y + '" width="' + box.w + '" height="' + box.h + '" />' +
+        '<text class="det-label" x="' + (box.x + 4) + '" y="' + (box.y + 16) + '">' + (index + 1) + '</text>';
+      if (selected && !state.drawMode) {
+        markup += renderHandleMarkup(box.x, box.y, box.w, box.h, 'window', index);
+      }
     });
 
     const doorWidth = Number(els.form.elements.namedItem('door_width').value) || 0;
     if (state.doorBbox && state.doorBbox.length === 4 && doorWidth > 0) {
-      const x1 = state.doorBbox[0] * nw;
-      const y1 = state.doorBbox[1] * nh;
-      const w = (state.doorBbox[2] - state.doorBbox[0]) * nw;
-      const h = (state.doorBbox[3] - state.doorBbox[1]) * nh;
+      const box = bboxPixelsFromNorm(state.doorBbox);
       const selected = state.selectedDoor;
       markup +=
-        '<rect class="det-box door' + (selected ? ' selected' : '') + '" data-kind="door" x="' +
-        x1 + '" y="' + y1 + '" width="' + w + '" height="' + h + '" />' +
-        '<text class="det-label" x="' + (x1 + 4) + '" y="' + (y1 + 16) + '">D</text>';
+        '<rect class="det-box door' + (selected ? ' selected' : '') + '" data-kind="door" data-index="-1" x="' +
+        box.x + '" y="' + box.y + '" width="' + box.w + '" height="' + box.h + '" />' +
+        '<text class="det-label" x="' + (box.x + 4) + '" y="' + (box.y + 16) + '">D</text>';
+      if (selected && !state.drawMode) {
+        markup += renderHandleMarkup(box.x, box.y, box.w, box.h, 'door', -1);
+      }
+    }
+
+    if (state.drag && state.drag.preview) {
+      const p = state.drag.preview;
+      markup +=
+        '<rect class="det-preview" x="' + p.x + '" y="' + p.y + '" width="' + p.w + '" height="' + p.h + '" />';
     }
 
     svg.innerHTML = markup;
-    svg.querySelectorAll('.det-box').forEach(function (box) {
-      box.addEventListener('click', onOverlayBoxClick);
-    });
   }
 
-  function onOverlayBoxClick(event) {
-    event.stopPropagation();
-    const kind = event.target.getAttribute('data-kind');
-    if (kind === 'door') {
-      selectDoor();
-    } else {
-      const index = parseInt(event.target.getAttribute('data-index'), 10);
-      if (!Number.isNaN(index)) {
+  function onOverlayMouseDown(event) {
+    if (!overlayEditable() || state.drag) return;
+    const target = event.target;
+    if (target.classList.contains('det-handle')) {
+      event.preventDefault();
+      startResizeDrag(event, target);
+      return;
+    }
+    if (target.classList.contains('det-box')) {
+      event.preventDefault();
+      const kind = target.getAttribute('data-kind');
+      const index = parseInt(target.getAttribute('data-index'), 10);
+      if (kind === 'door') {
+        selectDoor();
+        if (!state.drawMode) {
+          startMoveDrag(event, true, -1);
+        }
+      } else if (!Number.isNaN(index)) {
         selectWindow(index);
+        if (!state.drawMode) {
+          startMoveDrag(event, false, index);
+        }
       }
+      return;
+    }
+    if (state.drawMode && (target === els.overlaySvg || target.classList.contains('det-preview'))) {
+      event.preventDefault();
+      startDrawDrag(event);
+    }
+  }
+
+  function startDrawDrag(event) {
+    const pt = svgPointFromEvent(event);
+    state.drag = {
+      mode: 'draw',
+      startX: pt.x,
+      startY: pt.y,
+      preview: { x: pt.x, y: pt.y, w: 0, h: 0 }
+    };
+    renderDetectionOverlay();
+  }
+
+  function startMoveDrag(event, isDoor, index) {
+    const bbox = isDoor ? state.doorBbox : state.windows[index].bbox_norm;
+    if (!bbox) return;
+    const box = bboxPixelsFromNorm(bbox);
+    const pt = svgPointFromEvent(event);
+    state.drag = {
+      mode: 'move',
+      isDoor: isDoor,
+      index: index,
+      startX: pt.x,
+      startY: pt.y,
+      orig: { x: box.x, y: box.y, w: box.w, h: box.h }
+    };
+  }
+
+  function startResizeDrag(event, target) {
+    const kind = target.getAttribute('data-kind');
+    const index = parseInt(target.getAttribute('data-index'), 10);
+    const handle = target.getAttribute('data-handle');
+    const isDoor = kind === 'door';
+    const bbox = isDoor ? state.doorBbox : state.windows[index].bbox_norm;
+    if (!bbox) return;
+    const box = bboxPixelsFromNorm(bbox);
+    const pt = svgPointFromEvent(event);
+    state.drag = {
+      mode: 'resize',
+      isDoor: isDoor,
+      index: index,
+      handle: handle,
+      startX: pt.x,
+      startY: pt.y,
+      orig: { x: box.x, y: box.y, w: box.w, h: box.h }
+    };
+  }
+
+  function onOverlayMouseMove(event) {
+    if (!state.drag) return;
+    const pt = svgPointFromEvent(event);
+    const dims = imageDimensions();
+    const min = minBoxPixels();
+    const drag = state.drag;
+
+    if (drag.mode === 'draw') {
+      const x = Math.min(drag.startX, pt.x);
+      const y = Math.min(drag.startY, pt.y);
+      const w = Math.abs(pt.x - drag.startX);
+      const h = Math.abs(pt.y - drag.startY);
+      drag.preview = { x: x, y: y, w: w, h: h };
+      renderDetectionOverlay();
+      return;
+    }
+
+    const orig = drag.orig;
+    let x = orig.x;
+    let y = orig.y;
+    let w = orig.w;
+    let h = orig.h;
+
+    if (drag.mode === 'move') {
+      const dx = pt.x - drag.startX;
+      const dy = pt.y - drag.startY;
+      x = clamp(orig.x + dx, 0, dims.width - orig.w);
+      y = clamp(orig.y + dy, 0, dims.height - orig.h);
+    } else if (drag.mode === 'resize') {
+      const right = orig.x + orig.w;
+      const bottom = orig.y + orig.h;
+      let left = orig.x;
+      let top = orig.y;
+      let rightEdge = right;
+      let bottomEdge = bottom;
+      if (drag.handle.indexOf('w') >= 0) left = clamp(pt.x, 0, right - min.width);
+      if (drag.handle.indexOf('e') >= 0) rightEdge = clamp(pt.x, left + min.width, dims.width);
+      if (drag.handle.indexOf('n') >= 0) top = clamp(pt.y, 0, bottom - min.height);
+      if (drag.handle.indexOf('s') >= 0) bottomEdge = clamp(pt.y, top + min.height, dims.height);
+      x = left;
+      y = top;
+      w = rightEdge - left;
+      h = bottomEdge - top;
+    }
+
+    drag.preview = { x: x, y: y, w: w, h: h };
+    renderDetectionOverlay();
+  }
+
+  function onOverlayMouseUp(event) {
+    if (!state.drag) return;
+    const drag = state.drag;
+    state.drag = null;
+
+    if (!drag.preview || drag.preview.w < minBoxPixels().width || drag.preview.h < minBoxPixels().height) {
+      renderDetectionOverlay();
+      return;
+    }
+
+    const bboxNorm = bboxNormFromPixels(
+      drag.preview.x,
+      drag.preview.y,
+      drag.preview.x + drag.preview.w,
+      drag.preview.y + drag.preview.h
+    );
+
+    if (drag.mode === 'draw') {
+      addWindowFromBboxNorm(bboxNorm);
+      setDrawMode(false);
+      return;
+    }
+
+    if (drag.isDoor) {
+      applyBboxToDoor(bboxNorm);
+    } else {
+      applyBboxToWindow(drag.index, bboxNorm);
+    }
+    updateReviewStatus();
+  }
+
+  function updateViewerHint() {
+    if (!overlayEditable()) return;
+    if (state.drawMode) {
+      els.viewerHint.textContent = 'Drag on image to draw a window · Esc to cancel';
+    } else {
+      els.viewerHint.textContent =
+        'Click to select · drag box to move · drag corners to resize · Draw window to add';
     }
   }
 
   function updateViewerToolbar() {
-    const enabled = interactiveOverlayEnabled();
+    const enabled = overlayEditable();
     els.viewerToolbar.hidden = !enabled;
     if (enabled) {
-      els.viewerHint.textContent = 'Click a box to select · Del or button to remove';
+      updateViewerHint();
     }
   }
 
@@ -333,7 +646,7 @@
       els.placeholder.hidden = false;
       els.overlaySvg.innerHTML = '';
       if (state.activeView === 'overlay') {
-        els.placeholder.textContent = 'Run Detect Elements to see interactive boxes';
+        els.placeholder.textContent = 'Rectify then use Overlay to edit boxes on image';
       } else if (state.activeView === 'rectified') {
         els.placeholder.textContent = 'Run Rectify Facade to see corrected image';
       } else {
@@ -377,6 +690,8 @@
     state.detection = null;
     state.overlayImageUrl = null;
     state.doorBbox = null;
+    state.drag = null;
+    setDrawMode(false);
     clearSelection();
     els.detectMeta.textContent = 'Detection: not run';
 
@@ -405,6 +720,8 @@
     state.detection = null;
     state.overlayImageUrl = null;
     state.doorBbox = null;
+    state.drag = null;
+    setDrawMode(false);
     clearSelection();
     els.sourceMeta.textContent = sourcePath || 'Image loaded';
     els.rectifyMeta.textContent = 'Rectification: not run';
@@ -473,6 +790,7 @@
     }
 
     setActiveView('overlay');
+    setDrawMode(false);
     renderTree();
 
     const doorCount = state.detection ? state.detection.doors : 0;
@@ -538,15 +856,32 @@
     removeSelected();
   });
 
+  els.btnDrawWindow.addEventListener('click', function () {
+    setDrawMode(!state.drawMode);
+  });
+
+  els.overlaySvg.addEventListener('mousedown', onOverlayMouseDown);
+  document.addEventListener('mousemove', onOverlayMouseMove);
+  document.addEventListener('mouseup', onOverlayMouseUp);
+
   els.image.addEventListener('load', function () {
     renderDetectionOverlay();
   });
 
   document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      if (state.drawMode) {
+        setDrawMode(false);
+        state.drag = null;
+        renderDetectionOverlay();
+        event.preventDefault();
+        return;
+      }
+    }
     if (event.key !== 'Delete' && event.key !== 'Backspace') return;
     const tag = (event.target && event.target.tagName) || '';
     if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-    if (!interactiveOverlayEnabled()) return;
+    if (!overlayEditable()) return;
     if (state.selectedDoor || state.selectedWindowIndex !== null) {
       event.preventDefault();
       removeSelected();

@@ -1,13 +1,13 @@
 # Geomora Phase 2 — Perspective Rectification
 
-**Status:** Planning complete · Implementation in progress (v0.3.0)
+**Status:** Core gate **PASSED** (v0.3.1, user verified 2026-08-16)
 
 | Step | Status |
 |---|---|
 | 2.1–2.5 Backend pipeline + API | ✅ |
 | 2.6–2.7 Ruby client + Workspace UI | ✅ |
-| 2.8 Manual 4-corner UI | ⏳ |
-| 2.9–2.11 Integration gate | ⏳ |
+| 2.8 Manual 4-corner UI | ⏳ deferred |
+| 2.9–2.11 Integration gate | ✅ core path verified |
 
 ### Quick start
 
@@ -289,28 +289,30 @@ Phase 2 is complete when:
 
 ### Backend
 
-- [ ] `backend/` starts locally (`uvicorn` or equivalent)
-- [ ] `/rectify` accepts image, returns rectified result
-- [ ] Line detection runs on sample facade photo
-- [ ] Homography produces visibly fronto-parallel output
-- [ ] Manual 4-corner input works as fallback
-- [ ] No cloud / no AI models
+- [x] `backend/` starts locally (`uvicorn` or equivalent)
+- [x] `/rectify` accepts image, returns rectified result
+- [x] Line detection runs on sample facade photo
+- [x] Homography produces visibly fronto-parallel output
+- [ ] Manual 4-corner input works as fallback — API supports corners; UI pending (Step 2.8)
+- [x] No cloud / no AI models
 
 ### Plugin
 
-- [ ] Workspace **Rectify** button calls Python service
-- [ ] Rectified image displays in Image Viewer
-- [ ] Original / Rectified toggle works
-- [ ] Rectification metadata stored in session / IR sources
-- [ ] Service offline → clear error message (no crash)
-- [ ] Phase 0 + Phase 1 features still work
+- [x] Workspace **Rectify** button calls Python service
+- [x] Rectified image displays in Image Viewer
+- [x] Original / Rectified toggle works
+- [x] Rectification metadata stored in session / IR sources
+- [x] Service offline → clear error message (no crash)
+- [x] Phase 0 + Phase 1 features still work
 
 ### Quality
 
-- [ ] Python unit tests for line VP homography modules
-- [ ] At least 2 test images (good perspective + failure case)
-- [ ] `docs/PHASE_2.md` updated with results
-- [ ] README documents how to start backend
+- [x] Python unit tests for line VP homography modules
+- [ ] At least 2 test images (good perspective + failure case) — synthetic tests only
+- [x] `docs/PHASE_2.md` updated with results
+- [x] README documents how to start backend
+
+**Recommendation:** Phase 2 **core complete** — ready for Phase 3 planning. Step 2.8 (manual corners UI) can ship as patch.
 
 ---
 

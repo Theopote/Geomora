@@ -20,5 +20,8 @@ desktop.ini
 *.log
 
 backend/.venv/
+backend/runs/
+backend/data/
+backend/models/*.onnx
 .pytest_tmp/
 plugin/geomora/cache/

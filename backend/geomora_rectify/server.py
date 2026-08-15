@@ -11,6 +11,16 @@ from .pipeline import parse_corners, rectify_image
 app = FastAPI(title="Geomora Rectify", version="0.3.0")
 
 
+@app.get("/")
+def root() -> dict[str, str]:
+    return {
+        "service": "geomora-rectify",
+        "status": "ok",
+        "health": "/health",
+        "rectify": "POST /rectify",
+    }
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "service": "geomora-rectify"}

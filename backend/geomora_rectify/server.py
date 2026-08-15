@@ -7,11 +7,11 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 
 from geomora_detect.pipeline import detect_facade
-from geomora_multiview.pipeline import fuse_openings, register_views
+from geomora_multiview.pipeline import fuse_openings, multiview_capabilities, register_views
 
 from .pipeline import parse_corners, rectify_image
 
-app = FastAPI(title="Geomora Perception", version="0.10.0")
+app = FastAPI(title="Geomora Perception", version="0.11.0")
 
 
 @app.get("/")
@@ -24,6 +24,7 @@ def root() -> dict[str, str]:
         "detect": "POST /detect",
         "multiview_register": "POST /multiview/register",
         "multiview_fuse": "POST /multiview/fuse",
+        "multiview_capabilities": "GET /multiview/capabilities",
     }
 
 
@@ -95,10 +96,16 @@ async def detect(
         return JSONResponse(result.to_dict())
 
 
+@app.get("/multiview/capabilities")
+def multiview_caps() -> dict[str, object]:
+    return multiview_capabilities()
+
+
 @app.post("/multiview/register")
 async def multiview_register(
     primary: UploadFile = File(...),
     secondary: UploadFile = File(...),
+    method: str = Form(default="auto"),
 ) -> JSONResponse:
     if not is_image_upload(primary) or not is_image_upload(secondary):
         raise HTTPException(status_code=400, detail="Upload must be image files")
@@ -110,7 +117,7 @@ async def multiview_register(
         secondary_path.write_bytes(await secondary.read())
 
         try:
-            result = register_views(str(primary_path), str(secondary_path))
+            result = register_views(str(primary_path), str(secondary_path), method=method)
         except ValueError as error:
             raise HTTPException(status_code=400, detail=str(error)) from error
         except Exception as error:  # pragma: no cover - safety net
@@ -125,6 +132,8 @@ async def multiview_fuse(
     secondary: UploadFile = File(...),
     homography: str | None = Form(default=None),
     method: str = Form(default="auto"),
+    depth_method: str = Form(default="auto"),
+    register_method: str = Form(default="auto"),
 ) -> JSONResponse:
     if not is_image_upload(primary) or not is_image_upload(secondary):
         raise HTTPException(status_code=400, detail="Upload must be image files")
@@ -141,6 +150,8 @@ async def multiview_fuse(
                 str(secondary_path),
                 homography=homography,
                 detect_method=method,
+                depth_method=depth_method,
+                register_method=register_method,
                 return_overlay=True,
             )
         except ValueError as error:

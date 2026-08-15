@@ -5,7 +5,7 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 ## Prerequisites
 
 - [ ] Python backend responds at `http://127.0.0.1:8765/health`
-- [ ] SketchUp extension **Geomora** enabled (v0.10.0+)
+- [ ] SketchUp extension **Geomora** enabled (v0.11.0+)
 - [ ] Fixture available: `examples/facade_perspective_synthetic.jpg`
 
 ## Phase 2 — Rectification
@@ -50,6 +50,8 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 6.3 | Generate (after registration) | IR `sources[]` contains primary + `view_002` with transform |
 | 6.4 | **Fuse Openings** (after Rectify recommended) | Merged windows on overlay; fewer duplicates than single-view detect |
 | 6.5 | Generate (after fusion) | IR `sources[]` includes `fusion` metadata with `fusion_method` |
+| 6.6 | Registration = COLMAP (if installed) | Method `colmap_sparse_v1`; pose debug in multiview metadata |
+| 6.7 | Depth = MiDaS (if model downloaded) | Fusion debug `depth_method: midas_v21_v1` |
 
 ## Known limitations (acceptable for Stage A)
 

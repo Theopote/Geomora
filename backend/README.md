@@ -79,6 +79,25 @@ method: auto | yolo_v1 | contour_v1
 
 Detects openings on both views, warps secondary boxes to primary, fuses with depth-weighted NMS (`multiview_fusion_v1`).
 
+```http
+GET /multiview/capabilities
+
+POST /multiview/register
+method: auto | feature_homography_v1 | colmap_sparse_v1
+
+POST /multiview/fuse
+depth_method: auto | gradient_laplacian_v1 | midas_v21_v1
+register_method: auto | feature_homography_v1 | colmap_sparse_v1
+```
+
+Optional MiDaS model:
+
+```bat
+.venv\Scripts\python.exe scripts\download_midas_model.py
+```
+
+COLMAP: install the CLI and ensure `colmap` is on PATH for `colmap_sparse_v1`.
+
 ## Tests
 
 From repository root:

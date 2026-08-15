@@ -1,6 +1,6 @@
 # Geomora Phase 6 — Multi-view Reconstruction
 
-**Status:** Phase 6 **COMPLETE** (v0.9.0) · Phase 6.5 **COMPLETE** (v0.10.0)
+**Status:** Phase 6 **COMPLETE** (v0.9.0) · Phase 6.5 **COMPLETE** (v0.10.0) · Phase 6.5+ **COMPLETE** (v0.11.0)
 
 | Step | Status |
 |---|---|
@@ -98,17 +98,70 @@ tests/backend/
 
 ---
 
-## 5. Future (Phase 6.5+)
+## 5. Future (Phase 6.5++)
 
-- Monocular depth (Depth Anything / Marigold) for opening depth ranking
-- COLMAP sparse reconstruction for true camera poses
-- Fuse detections from multiple rectified views into one opening set
+- Depth Anything v2 / Marigold ONNX exports
+- COLMAP dense reconstruction and mesh export
+- Cross-session multi-photo opening graph fusion
 
 ---
 
 ## 6. Gate to Phase 7
 
 Phase 6 links multiple **photos** to one facade session. See **Phase 6.5** below and [PHASE_6.md](PHASE_6.md) for fusion.
+
+---
+
+## Phase 6.5+ — Neural Depth + COLMAP (v0.11.0)
+
+| Step | Status |
+|---|---|
+| 6.5.6 MiDaS ONNX depth (`midas_v21_v1`) with auto fallback | ✅ |
+| 6.5.7 COLMAP sparse registration (`colmap_sparse_v1`) | ✅ |
+| 6.5.8 `GET /multiview/capabilities` + Workspace method selectors | ✅ |
+| 6.5.9 Depth Anything / COLMAP dense / full SfM export | ⏳ deferred |
+
+### Depth methods
+
+| Method | Description |
+|---|---|
+| `auto` | MiDaS if `backend/models/midas_v21_small.onnx` exists, else gradient |
+| `gradient_laplacian_v1` | Fast Laplacian + radial proxy (default without model) |
+| `midas_v21_v1` | Monocular neural depth via ONNX Runtime |
+
+Download model:
+
+```bat
+cd backend
+.venv\Scripts\python.exe scripts\download_midas_model.py
+```
+
+Or set `GEOMORA_MIDAS_MODEL` to a custom ONNX path.
+
+### Registration methods
+
+| Method | Description |
+|---|---|
+| `auto` | COLMAP if `colmap` is on PATH, else ORB homography |
+| `feature_homography_v1` | ORB + RANSAC homography (Phase 6) |
+| `colmap_sparse_v1` | COLMAP SIFT sparse reconstruction + shared 3D observations |
+
+Install [COLMAP](https://colmap.github.io/) and ensure `colmap` is available in your shell PATH.
+
+### API
+
+```http
+GET /multiview/capabilities
+
+POST /multiview/register
+method: auto | feature_homography_v1 | colmap_sparse_v1
+
+POST /multiview/fuse
+method: auto | yolo_v1 | contour_v1
+depth_method: auto | gradient_laplacian_v1 | midas_v21_v1
+register_method: auto | feature_homography_v1 | colmap_sparse_v1
+homography: optional JSON 3x3 matrix
+```
 
 ---
 
@@ -120,7 +173,7 @@ Phase 6 links multiple **photos** to one facade session. See **Phase 6.5** below
 | 6.5.2 Transform secondary detections via homography | ✅ |
 | 6.5.3 IoU fusion + depth-weighted confidence | ✅ |
 | 6.5.4 `POST /multiview/fuse` + Workspace **Fuse Openings** | ✅ |
-| 6.5.5 MiDaS / COLMAP depth | ⏳ deferred |
+| 6.5.5 MiDaS / COLMAP depth | ✅ (see Phase 6.5+ below) |
 
 ### Workflow
 

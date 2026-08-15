@@ -50,7 +50,9 @@
     btnViewOriginal: document.getElementById('btn-view-original'),
     btnViewRectified: document.getElementById('btn-view-rectified'),
     btnViewOverlay: document.getElementById('btn-view-overlay'),
-    detectMethod: document.getElementById('detect-method')
+    detectMethod: document.getElementById('detect-method'),
+    registerMethod: document.getElementById('register-method'),
+    depthMethod: document.getElementById('depth-method')
   };
 
   function sketchupCall(name, arg) {
@@ -906,6 +908,8 @@
         ? state.corners.map(function (c) { return [c[0], c[1]]; })
         : null,
       detection_method: els.detectMethod ? els.detectMethod.value : 'auto',
+      register_method: els.registerMethod ? els.registerMethod.value : 'auto',
+      depth_method: els.depthMethod ? els.depthMethod.value : 'auto',
       rationalization: state.rationalization,
       pattern: state.pattern,
       multiview: state.multiview,

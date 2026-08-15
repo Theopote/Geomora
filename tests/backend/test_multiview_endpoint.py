@@ -36,6 +36,7 @@ def test_multiview_register_endpoint(client: TestClient, tmp_path):
                 "primary": ("primary.jpg", primary_file, "image/jpeg"),
                 "secondary": ("secondary.jpg", secondary_file, "image/jpeg"),
             },
+            data={"method": "feature_homography_v1"},
         )
 
     assert response.status_code == 200
@@ -43,3 +44,12 @@ def test_multiview_register_endpoint(client: TestClient, tmp_path):
     assert payload["method"] == "feature_homography_v1"
     assert payload["match_count"] > 0
     assert len(payload["views"]) == 2
+
+
+def test_multiview_capabilities_endpoint(client: TestClient):
+    response = client.get("/multiview/capabilities")
+    assert response.status_code == 200
+    payload = response.json()
+    assert "colmap_available" in payload
+    assert "midas_available" in payload
+    assert "depth_methods" in payload

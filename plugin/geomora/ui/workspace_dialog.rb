@@ -69,13 +69,19 @@ module Geomora
             homography = params.dig('multiview', 'homography') || params['homography']
             detection_method = params['detection_method'].to_s.strip
             detection_method = 'auto' if detection_method.empty?
+            depth_method = params['depth_method'].to_s.strip
+            depth_method = 'auto' if depth_method.empty?
+            register_method = params['register_method'].to_s.strip
+            register_method = 'auto' if register_method.empty?
 
             Logger.info("Fusing openings: #{primary_path} + #{secondary_path}")
             result = Perception::MultiviewClient.fuse(
               primary_path,
               secondary_path,
               homography: homography,
-              method: detection_method
+              method: detection_method,
+              depth_method: depth_method,
+              register_method: register_method
             )
             @fusion = result.to_source_metadata
             if result.registration
@@ -130,7 +136,13 @@ module Geomora
             end
 
             Logger.info("Registering views: #{primary_path} + #{secondary_path}")
-            result = Perception::MultiviewClient.register(primary_path, secondary_path)
+            register_method = params['register_method'].to_s.strip
+            register_method = 'auto' if register_method.empty?
+            result = Perception::MultiviewClient.register(
+              primary_path,
+              secondary_path,
+              method: register_method
+            )
             @multiview = result.to_source_metadata
             dialog.execute_script("window.geomora.setMultiviewRegistration(#{result.to_dict.to_json})")
             post_message(

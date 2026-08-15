@@ -12,7 +12,7 @@ module Geomora
       DEFAULT_TIMEOUT = 60
 
       class << self
-        def register(primary_path, secondary_path, host: DEFAULT_HOST, port: DEFAULT_PORT)
+        def register(primary_path, secondary_path, method: 'auto', host: DEFAULT_HOST, port: DEFAULT_PORT)
           raise GeomoraError, "Primary image not found: #{primary_path}" unless File.exist?(primary_path)
           raise GeomoraError, "Secondary image not found: #{secondary_path}" unless File.exist?(secondary_path)
 
@@ -20,7 +20,8 @@ module Geomora
             host: host,
             port: port,
             primary_path: primary_path,
-            secondary_path: secondary_path
+            secondary_path: secondary_path,
+            method: method
           )
 
           unless response.is_a?(Net::HTTPSuccess)
@@ -33,7 +34,8 @@ module Geomora
                 'Perception service is not running. Start backend: backend/start_server.bat'
         end
 
-        def fuse(primary_path, secondary_path, homography: nil, method: 'auto', host: DEFAULT_HOST, port: DEFAULT_PORT)
+        def fuse(primary_path, secondary_path, homography: nil, method: 'auto', depth_method: 'auto',
+                 register_method: 'auto', host: DEFAULT_HOST, port: DEFAULT_PORT)
           raise GeomoraError, "Primary image not found: #{primary_path}" unless File.exist?(primary_path)
           raise GeomoraError, "Secondary image not found: #{secondary_path}" unless File.exist?(secondary_path)
 
@@ -43,7 +45,9 @@ module Geomora
             primary_path: primary_path,
             secondary_path: secondary_path,
             homography: homography,
-            method: method
+            method: method,
+            depth_method: depth_method,
+            register_method: register_method
           )
 
           unless response.is_a?(Net::HTTPSuccess)
@@ -58,9 +62,9 @@ module Geomora
 
         private
 
-        def post_multipart(host:, port:, primary_path:, secondary_path:)
+        def post_multipart(host:, port:, primary_path:, secondary_path:, method: 'auto')
           boundary = "----Geomora#{rand(1_000_000)}"
-          body = build_register_body(boundary, primary_path, secondary_path)
+          body = build_register_body(boundary, primary_path, secondary_path, method)
 
           uri = URI("http://#{host}:#{port}/multiview/register")
           request = Net::HTTP::Post.new(uri)
@@ -72,17 +76,20 @@ module Geomora
           end
         end
 
-        def build_register_body(boundary, primary_path, secondary_path)
+        def build_register_body(boundary, primary_path, secondary_path, method)
           parts = []
           parts << file_part(boundary, 'primary', primary_path)
           parts << file_part(boundary, 'secondary', secondary_path)
+          parts << form_field(boundary, 'method', method.to_s)
           parts << "--#{boundary}--\r\n"
           parts.join
         end
 
-        def post_fuse_multipart(host:, port:, primary_path:, secondary_path:, homography:, method:)
+        def post_fuse_multipart(host:, port:, primary_path:, secondary_path:, homography:, method:,
+                                depth_method:, register_method:)
           boundary = "----Geomora#{rand(1_000_000)}"
-          body = build_fuse_body(boundary, primary_path, secondary_path, homography, method)
+          body = build_fuse_body(boundary, primary_path, secondary_path, homography, method, depth_method,
+                                 register_method)
 
           uri = URI("http://#{host}:#{port}/multiview/fuse")
           request = Net::HTTP::Post.new(uri)
@@ -94,7 +101,8 @@ module Geomora
           end
         end
 
-        def build_fuse_body(boundary, primary_path, secondary_path, homography, method)
+        def build_fuse_body(boundary, primary_path, secondary_path, homography, method, depth_method,
+                            register_method)
           parts = []
           parts << file_part(boundary, 'primary', primary_path)
           parts << file_part(boundary, 'secondary', secondary_path)
@@ -104,12 +112,20 @@ module Geomora
             parts << homography.is_a?(String) ? homography : homography.to_json
             parts << "\r\n"
           end
-          parts << "--#{boundary}\r\n"
-          parts << "Content-Disposition: form-data; name=\"method\"\r\n\r\n"
-          parts << method.to_s
-          parts << "\r\n"
+          parts << form_field(boundary, 'method', method.to_s)
+          parts << form_field(boundary, 'depth_method', depth_method.to_s)
+          parts << form_field(boundary, 'register_method', register_method.to_s)
           parts << "--#{boundary}--\r\n"
           parts.join
+        end
+
+        def form_field(boundary, name, value)
+          part = []
+          part << "--#{boundary}\r\n"
+          part << "Content-Disposition: form-data; name=\"#{name}\"\r\n\r\n"
+          part << value.to_s
+          part << "\r\n"
+          part.join
         end
 
         def file_part(boundary, field_name, path)

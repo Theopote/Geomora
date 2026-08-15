@@ -9,7 +9,9 @@ import numpy as np
 from geomora_detect.overlays import draw_overlay, encode_overlay_jpeg
 from geomora_detect.pipeline import detect_facade
 
-from .depth import relative_depth_map
+from .colmap_sparse import colmap_available, register_views_colmap
+from .depth import DEPTH_METHODS, compute_depth_map
+from .neural_depth import model_available as midas_model_available
 from .feature_match import (
     detect_and_match,
     estimate_planar_homography,
@@ -19,8 +21,21 @@ from .feature_match import (
 from .fusion import fuse_elements, transform_element
 from .models import FusionResult, MultiviewResult, ViewRegistration
 
+REGISTER_METHODS = ("auto", "feature_homography_v1", "colmap_sparse_v1")
 
-def register_views(primary_path: str, secondary_path: str) -> MultiviewResult:
+
+def resolve_register_method(method: str) -> str:
+    normalized = (method or "auto").strip().lower()
+    if normalized == "auto":
+        return "colmap_sparse_v1" if colmap_available() else "feature_homography_v1"
+    if normalized not in REGISTER_METHODS:
+        raise ValueError(f"Unsupported registration method: {method}")
+    if normalized == "colmap_sparse_v1" and not colmap_available():
+        raise ValueError("COLMAP executable not found on PATH")
+    return normalized
+
+
+def register_views_orb(primary_path: str, secondary_path: str) -> MultiviewResult:
     primary = Path(primary_path)
     secondary = Path(secondary_path)
     if not primary.exists():
@@ -62,11 +77,19 @@ def register_views(primary_path: str, secondary_path: str) -> MultiviewResult:
         views=views,
         homography=homography_list,
         debug={
+            "registration_backend": "orb",
             "detector": "ORB",
             "matcher": "BF_HAMMING_CROSSCHECK",
             "ransac_threshold": 5.0,
         },
     )
+
+
+def register_views(primary_path: str, secondary_path: str, *, method: str = "auto") -> MultiviewResult:
+    resolved = resolve_register_method(method)
+    if resolved == "colmap_sparse_v1":
+        return register_views_colmap(primary_path, secondary_path)
+    return register_views_orb(primary_path, secondary_path)
 
 
 def parse_homography(raw: str | list | None) -> np.ndarray | None:
@@ -91,6 +114,8 @@ def fuse_openings(
     *,
     homography: list[list[float]] | str | None = None,
     detect_method: str = "auto",
+    depth_method: str = "auto",
+    register_method: str = "auto",
     return_overlay: bool = True,
 ) -> FusionResult:
     primary = Path(primary_path)
@@ -103,7 +128,7 @@ def fuse_openings(
     registration = None
     homography_matrix = parse_homography(homography)
     if homography_matrix is None:
-        registration = register_views(str(primary), str(secondary))
+        registration = register_views(str(primary), str(secondary), method=register_method)
         if registration.homography is None:
             raise ValueError("Unable to estimate homography between views")
         homography_matrix = np.array(registration.homography, dtype=np.float64)
@@ -115,8 +140,7 @@ def fuse_openings(
 
     primary_h, primary_w = primary_bgr.shape[:2]
     secondary_h, secondary_w = secondary_bgr.shape[:2]
-    primary_gray = cv2.cvtColor(primary_bgr, cv2.COLOR_BGR2GRAY)
-    depth_map = relative_depth_map(primary_gray)
+    depth_map, resolved_depth_method = compute_depth_map(primary_bgr, method=depth_method)
 
     primary_detection = detect_facade(str(primary), method=detect_method, return_overlay=False)
     secondary_detection = detect_facade(str(secondary), method=detect_method, return_overlay=False)
@@ -158,9 +182,19 @@ def fuse_openings(
         homography=homography_matrix.astype(float).tolist(),
         debug={
             "detect_method": detect_method,
+            "depth_method": resolved_depth_method,
+            "register_method": registration.method if registration else "provided_homography",
             "primary_elements": len(primary_detection.elements),
             "secondary_elements": len(secondary_detection.elements),
             "fused_elements": len(fused_elements),
-            "depth_method": "gradient_laplacian_v1",
         },
     )
+
+
+def multiview_capabilities() -> dict[str, object]:
+    return {
+        "colmap_available": colmap_available(),
+        "midas_available": midas_model_available(),
+        "register_methods": list(REGISTER_METHODS),
+        "depth_methods": list(DEPTH_METHODS),
+    }

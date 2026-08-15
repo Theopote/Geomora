@@ -58,34 +58,29 @@ def estimate_facade_quad_from_vps(
     width: int,
     height: int,
     vanishing_points: list[tuple[float, float] | None],
-    margin_ratio: float = 0.12,
+    margin_ratio: float = 0.03,
 ) -> list[list[float]]:
-  """Estimate a plausible facade quadrilateral using image bounds and VPs."""
-  margin_x = width * margin_ratio
-  margin_y = height * margin_ratio
+    """Estimate facade region from image bounds with a small inset.
 
-  left = margin_x
-  right = width - margin_x
-  top = margin_y
-  bottom = height - margin_y
+    Auto mode keeps most of the photo visible. Aggressive VP-based cropping
+    removed in v0.4.1 — it often cut off rooflines and ground. Use manual
+    corners when the building does not fill the frame.
+    """
+    _ = vanishing_points  # reserved for future perspective-aware quads
+    margin_x = width * margin_ratio
+    margin_y = height * margin_ratio
 
-  finite_vps = [vp for vp in vanishing_points if vp is not None]
-  confidence_skew = 0.0
-  if len(finite_vps) >= 2:
-      vp1, vp2 = finite_vps[0], finite_vps[1]
-      horizon_y = (vp1[1] + vp2[1]) / 2.0
-      if 0 < horizon_y < height:
-          top = max(margin_y, min(horizon_y * 0.35, height * 0.25))
-          bottom = min(height - margin_y, max(horizon_y * 1.15, height * 0.75))
-          confidence_skew = 0.15
+    left = margin_x
+    right = width - margin_x
+    top = margin_y
+    bottom = height - margin_y
 
-  quad = [
-      [left, bottom],
-      [right, bottom],
-      [right, top],
-      [left, top],
-  ]
-  return quad
+    return [
+        [left, bottom],
+        [right, bottom],
+        [right, top],
+        [left, top],
+    ]
 
 
 def quad_confidence(

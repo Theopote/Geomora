@@ -187,14 +187,26 @@ module Geomora
       end
 
       def validate_opening_overlaps(openings, wall_id)
-        sorted = openings.sort_by { |o| o.offset.to_f }
-        sorted.each_cons(2) do |a, b|
-          a_end = a.offset.to_f + a.width.to_f
-          b_start = b.offset.to_f
-          if a_end > b_start
-            @errors << "Opening overlap on #{wall_id}: #{a.id} and #{b.id}"
-          end
+        openings.combination(2).each do |a, b|
+          next unless openings_overlap?(a, b)
+
+          @errors << "Opening overlap on #{wall_id}: #{a.id} and #{b.id}"
         end
+      end
+
+      def openings_overlap?(a, b)
+        a_left = a.offset.to_f
+        a_right = a_left + a.width.to_f
+        b_left = b.offset.to_f
+        b_right = b_left + b.width.to_f
+        horizontal = a_left < b_right && b_left < a_right
+        return false unless horizontal
+
+        a_bottom = a.sill_height.to_f
+        a_top = a_bottom + a.height.to_f
+        b_bottom = b.sill_height.to_f
+        b_top = b_bottom + b.height.to_f
+        a_bottom < b_top && b_bottom < a_top
       end
 
       def validate_constraints

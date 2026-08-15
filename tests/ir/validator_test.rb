@@ -52,6 +52,14 @@ class ValidatorTest < Minitest::Test
     assert_match(/Opening overlap/, error.message)
   end
 
+  def test_door_below_window_is_not_overlap
+    data = JSON.parse(File.read(File.join(ROOT, 'examples', 'facade_phase0.json')))
+    data['openings'].find { |o| o['id'] == 'door_001' }['geometry']['offset'] = 500
+    doc = Geomora::IR::Parser.parse(data)
+
+    assert Geomora::IR::Validator.validate(doc)
+  end
+
   def test_zero_length_wall
     data = JSON.parse(File.read(File.join(ROOT, 'examples', 'facade_phase0.json')))
     data['buildings'][0]['storeys'][0]['elements'][0]['geometry']['baseline'] = [[0, 0, 0], [0, 0, 0]]

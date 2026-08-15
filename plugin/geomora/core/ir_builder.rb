@@ -16,6 +16,9 @@ module Geomora
         storey_id = 'storey_01'
         windows = build_windows(wall_id)
         door = build_door(wall_id)
+        opening_ids = windows.map { |w| w['id'] }
+        opening_ids << door['id'] if door
+        openings = windows + (door ? [door] : [])
 
         {
           'schema_version' => Geomora::SCHEMA_VERSION,
@@ -47,7 +50,7 @@ module Geomora
                         'thickness' => wall_thickness
                       },
                       'semantic' => { 'exterior' => true },
-                      'opening_ids' => windows.map { |w| w['id'] } + [door['id']],
+                      'opening_ids' => opening_ids,
                       'confidence' => 1.0
                     }
                   ]
@@ -55,7 +58,7 @@ module Geomora
               ]
             }
           ],
-          'openings' => windows + [door],
+          'openings' => openings,
           'components' => build_components(windows, door),
           'constraints' => build_constraints(windows),
           'sources' => build_sources
@@ -83,7 +86,8 @@ module Geomora
 
       def build_windows(wall_id)
         raw = @params['windows']
-        raw = default_windows unless raw.is_a?(Array) && !raw.empty?
+        return [] unless raw.is_a?(Array)
+        return [] if raw.empty?
 
         raw.each_with_index.map do |win, index|
           width = (win['width'] || 1500).to_f
@@ -108,14 +112,18 @@ module Geomora
       end
 
       def build_door(wall_id)
-        door = @params['door'].is_a?(Hash) ? @params['door'] : default_door
-        width = (door['width'] || 900).to_f
+        door = @params['door']
+        return nil unless door.is_a?(Hash)
+
+        width = (door['width'] || 0).to_f
+        return nil if width <= 0
+
         {
           'id' => 'door_001',
           'type' => 'door',
           'parent_id' => wall_id,
           'geometry' => {
-            'offset' => (door['offset'] || 8500).to_f,
+            'offset' => (door['offset'] || 0).to_f,
             'width' => width,
             'height' => (door['height'] || 2100).to_f,
             'depth' => wall_thickness
@@ -144,15 +152,17 @@ module Geomora
           }
         end
 
-        door_def = door.dig('component', 'definition_id')
-        defs[door_def] = {
-          'id' => door_def,
-          'type' => 'door',
-          'parameters' => {
-            'width' => door.dig('geometry', 'width'),
-            'height' => door.dig('geometry', 'height')
+        if door
+          door_def = door.dig('component', 'definition_id')
+          defs[door_def] = {
+            'id' => door_def,
+            'type' => 'door',
+            'parameters' => {
+              'width' => door.dig('geometry', 'width'),
+              'height' => door.dig('geometry', 'height')
+            }
           }
-        }
+        end
 
         defs.values
       end

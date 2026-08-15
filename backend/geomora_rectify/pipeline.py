@@ -7,9 +7,10 @@ from pathlib import Path
 import cv2
 import numpy as np
 
+from .facade_quad import estimate_facade_quad
 from .homography import (
     compute_rectifying_homography,
-    estimate_facade_quad_from_vps,
+    order_points_clockwise,
     quad_confidence,
     warp_image,
 )
@@ -33,11 +34,23 @@ def rectify_image(
 
     manual = corners is not None and len(corners) == 4
     if manual:
-        corners_src = corners
+        ordered = order_points_clockwise(np.array(corners, dtype=np.float32))
+        corners_src = [
+            [float(ordered[0][0]), float(ordered[0][1])],
+            [float(ordered[1][0]), float(ordered[1][1])],
+            [float(ordered[2][0]), float(ordered[2][1])],
+            [float(ordered[3][0]), float(ordered[3][1])],
+        ]
         method = "manual_corners"
     else:
-        corners_src = estimate_facade_quad_from_vps(width, height, vanishing_points)
-        method = "auto_vanishing_point"
+        horizontal_lines, vertical_lines = classify_line_families(lines)
+        corners_src, method = estimate_facade_quad(
+            width,
+            height,
+            horizontal_lines,
+            vertical_lines,
+            vanishing_points,
+        )
 
     homography, corners_dst, output_size = compute_rectifying_homography(corners_src)
     rectified = warp_image(image, homography, output_size)

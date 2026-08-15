@@ -5,6 +5,8 @@ import math
 import cv2
 import numpy as np
 
+from .facade_quad import estimate_full_image_quad
+
 
 def order_points_clockwise(points: np.ndarray) -> np.ndarray:
     ordered = np.zeros((4, 2), dtype=np.float32)
@@ -18,13 +20,13 @@ def order_points_clockwise(points: np.ndarray) -> np.ndarray:
 
 
 def destination_size(corners: np.ndarray) -> tuple[int, int]:
-    ordered = order_points_clockwise(corners)
-    width_a = np.linalg.norm(ordered[2] - ordered[3])
-    width_b = np.linalg.norm(ordered[1] - ordered[0])
-    height_a = np.linalg.norm(ordered[1] - ordered[2])
-    height_b = np.linalg.norm(ordered[0] - ordered[3])
-    max_width = int(max(width_a, width_b))
-    max_height = int(max(height_a, height_b))
+    # corners: TL, TR, BR, BL
+    top_width = np.linalg.norm(corners[1] - corners[0])
+    bottom_width = np.linalg.norm(corners[2] - corners[3])
+    left_height = np.linalg.norm(corners[3] - corners[0])
+    right_height = np.linalg.norm(corners[2] - corners[1])
+    max_width = int(max(top_width, bottom_width))
+    max_height = int(max(left_height, right_height))
     return max(max_width, 1), max(max_height, 1)
 
 
@@ -35,7 +37,8 @@ def compute_rectifying_homography(
     if len(corners_src) != 4:
         raise ValueError("Exactly four source corners are required")
 
-    src = order_points_clockwise(np.array(corners_src, dtype=np.float32))
+    # Input order: TL, TR, BR, BL (image coordinates, y-down).
+    src = np.array(corners_src, dtype=np.float32)
     if output_size is None:
         width, height = destination_size(src)
     else:
@@ -60,27 +63,9 @@ def estimate_facade_quad_from_vps(
     vanishing_points: list[tuple[float, float] | None],
     margin_ratio: float = 0.03,
 ) -> list[list[float]]:
-    """Estimate facade region from image bounds with a small inset.
-
-    Auto mode keeps most of the photo visible. Aggressive VP-based cropping
-    removed in v0.4.1 — it often cut off rooflines and ground. Use manual
-    corners when the building does not fill the frame.
-    """
-    _ = vanishing_points  # reserved for future perspective-aware quads
-    margin_x = width * margin_ratio
-    margin_y = height * margin_ratio
-
-    left = margin_x
-    right = width - margin_x
-    top = margin_y
-    bottom = height - margin_y
-
-    return [
-        [left, bottom],
-        [right, bottom],
-        [right, top],
-        [left, top],
-    ]
+    """Legacy helper — full-frame inset quad (TL, TR, BR, BL)."""
+    _ = vanishing_points
+    return estimate_full_image_quad(width, height, margin_ratio=margin_ratio)
 
 
 def quad_confidence(

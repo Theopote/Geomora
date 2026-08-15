@@ -52,7 +52,7 @@ def test_auto_rectification_pipeline(tmp_path):
     cv2.imwrite(str(path), image)
 
     result = rectify_image(str(path), output_path=str(output))
-    assert result.method == "auto_vanishing_point"
+    assert result.method in ("auto_line_intersections", "auto_full_frame")
     assert output.exists()
     assert 0.0 < result.confidence <= 1.0
 

@@ -169,8 +169,8 @@
     updateViewer();
   }
 
-  function loadPayload(payload) {
-    els.form.elements.namedItem('project_name').value = payload.project_name || 'Manual Facade';
+  function loadPayload(payload, mode) {
+    els.form.elements.namedItem('project_name').value = payload.project_name || 'Untitled Facade';
     els.form.elements.namedItem('wall_length').value = payload.wall_length || 10000;
     els.form.elements.namedItem('wall_height').value = payload.wall_height || 3300;
     els.form.elements.namedItem('wall_thickness').value = payload.wall_thickness || 240;
@@ -178,9 +178,13 @@
     renderWindows(payload.windows || []);
 
     const door = payload.door || {};
-    els.form.elements.namedItem('door_offset').value = door.offset || 8500;
-    els.form.elements.namedItem('door_width').value = door.width || 900;
+    els.form.elements.namedItem('door_offset').value = door.offset || 0;
+    els.form.elements.namedItem('door_width').value = door.width || 0;
     els.form.elements.namedItem('door_height').value = door.height || 2100;
+
+    state.detection = null;
+    state.overlayImageUrl = null;
+    els.detectMeta.textContent = 'Detection: not run';
 
     if (payload.source_path) {
       setImage('file:///' + payload.source_path.replace(/\\/g, '/'), payload.source_path);
@@ -191,7 +195,11 @@
     }
 
     renderTree();
-    setStatus('', 'Template loaded');
+  if (mode === 'template') {
+      setStatus('', 'Phase 0 template loaded — for testing only');
+    } else {
+      setStatus('', 'Ready — load a photo to begin');
+    }
   }
 
   function setImage(fileUrl, sourcePath) {
@@ -200,10 +208,18 @@
     state.originalImageUrl = fileUrl;
     state.rectifiedImageUrl = null;
     state.rectification = null;
+    state.detection = null;
+    state.overlayImageUrl = null;
     els.sourceMeta.textContent = sourcePath || 'Image loaded';
     els.rectifyMeta.textContent = 'Rectification: not run';
+    els.detectMeta.textContent = 'Detection: not run';
+    renderWindows([]);
+    els.form.elements.namedItem('door_offset').value = 0;
+    els.form.elements.namedItem('door_width').value = 0;
+    els.form.elements.namedItem('project_name').value = 'Untitled Facade';
     setActiveView('original');
     renderTree();
+    setStatus('', 'Photo loaded — run Rectify Facade, then Detect or edit manually');
   }
 
   function setRectifiedImage(fileUrl, result) {
@@ -213,6 +229,21 @@
       'Rectification: ' + result.method + ' | confidence ' + result.confidence +
       ' | lines ' + result.line_count;
     setActiveView('rectified');
+    renderTree();
+  }
+
+  function setDetectionMeta(detection, overlayUrl) {
+    state.detection = detection || null;
+    state.overlayImageUrl = overlayUrl || null;
+    if (state.detection) {
+      els.detectMeta.textContent =
+        'Detection: ' + state.detection.method +
+        ' | ' + state.detection.windows + ' windows, ' + state.detection.doors + ' doors' +
+        ' | confidence ' + state.detection.confidence;
+    }
+    if (overlayUrl) {
+      setActiveView('overlay');
+    }
     renderTree();
   }
 
@@ -245,7 +276,7 @@
       setActiveView('overlay');
     }
     renderTree();
-    setStatus('success', 'Detection applied to form — review values before Generate');
+    setStatus('success', 'Detection applied — review values before Generate');
   }
 
   function setIrPreview(ir) {
@@ -258,6 +289,7 @@
     setImage: setImage,
     setRectifiedImage: setRectifiedImage,
     applyDetection: applyDetection,
+    setDetectionMeta: setDetectionMeta,
     setIrPreview: setIrPreview,
     setStatus: setStatus
   };

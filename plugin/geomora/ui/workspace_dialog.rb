@@ -99,28 +99,39 @@ module Geomora
               overlay_url = path_to_file_url(overlay_path) if overlay_path
             end
 
-            payload = mapped.merge('detection' => result.to_dict)
-            dialog.execute_script(
-              "window.geomora.applyDetection(#{payload.to_json}, #{overlay_url.to_json})"
-            )
-            post_message(
-              dialog,
-              'success',
-              format(
-                'Detected %d windows, %d doors (%.2f %s)',
-                result.to_dict['windows'],
-                result.to_dict['doors'],
-                result.confidence,
-                result.method
+            if result.elements.empty?
+              dialog.execute_script(
+                "window.geomora.setDetectionMeta(#{result.to_dict.to_json}, #{overlay_url.to_json})"
               )
-            )
+              post_message(
+                dialog,
+                'error',
+                'No openings detected. Rectify first, then set wall size manually or edit openings by hand.'
+              )
+            else
+              payload = mapped.merge('detection' => result.to_dict)
+              dialog.execute_script(
+                "window.geomora.applyDetection(#{payload.to_json}, #{overlay_url.to_json})"
+              )
+              post_message(
+                dialog,
+                'success',
+                format(
+                  'Detected %d windows, %d doors (%.2f %s)',
+                  result.to_dict['windows'],
+                  result.to_dict['doors'],
+                  result.confidence,
+                  result.method
+                )
+              )
+            end
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)
           end
 
           dialog.add_action_callback('load_template') do |_ctx, _|
             data = JSON.parse(File.read(Core::Project.fixture_path))
-            dialog.execute_script("window.geomora.loadPayload(#{payload_from_ir(data).to_json})")
+            dialog.execute_script("window.geomora.loadPayload(#{payload_from_ir(data).to_json}, 'template')")
           end
 
           dialog.add_action_callback('validate') do |_ctx, json|
@@ -165,8 +176,20 @@ module Geomora
         end
 
         def default_payload
-          data = JSON.parse(File.read(Core::Project.fixture_path))
-          payload_from_ir(data)
+          empty_manual_payload
+        end
+
+        def empty_manual_payload
+          {
+            'project_name' => 'Untitled Facade',
+            'wall_length' => 10_000,
+            'wall_height' => 3300,
+            'wall_thickness' => 240,
+            'windows' => [],
+            'door' => { 'offset' => 0, 'width' => 0, 'height' => 2100 },
+            'source_path' => nil,
+            'source_id' => nil
+          }
         end
 
         def payload_from_ir(data)

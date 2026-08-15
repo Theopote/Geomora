@@ -138,10 +138,61 @@
   }
 
   function imageDimensions() {
+    const naturalWidth = els.image.naturalWidth;
+    const naturalHeight = els.image.naturalHeight;
+    if (naturalWidth > 0 && naturalHeight > 0) {
+      return { width: naturalWidth, height: naturalHeight };
+    }
+    const rect = els.image.getBoundingClientRect();
     return {
-      width: els.image.naturalWidth || 1,
-      height: els.image.naturalHeight || 1
+      width: rect.width > 0 ? rect.width : 1,
+      height: rect.height > 0 ? rect.height : 1
     };
+  }
+
+  function imagePointFromEvent(event) {
+    const rect = els.image.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+      return { x: 0, y: 0 };
+    }
+    const dims = imageDimensions();
+    return {
+      x: (event.clientX - rect.left) * (dims.width / rect.width),
+      y: (event.clientY - rect.top) * (dims.height / rect.height)
+    };
+  }
+
+  function ensureWindowBboxNorm(win) {
+    if (win.bbox_norm && win.bbox_norm.length === 4) {
+      return win.bbox_norm.slice();
+    }
+    const wallLength = Number(els.form.elements.namedItem('wall_length').value) || 10000;
+    const wallHeight = Number(els.form.elements.namedItem('wall_height').value) || 3300;
+    if (!wallLength || !wallHeight || !win.width || !win.height) {
+      return null;
+    }
+    const x1 = win.offset / wallLength;
+    const x2 = (win.offset + win.width) / wallLength;
+    const y2 = 1 - win.sill_height / wallHeight;
+    const y1 = 1 - (win.sill_height + win.height) / wallHeight;
+    return [x1, y1, x2, y2];
+  }
+
+  function ensureWindowsHaveBbox() {
+    state.windows.forEach(function (win) {
+      const bbox = ensureWindowBboxNorm(win);
+      if (bbox) {
+        win.bbox_norm = bbox;
+      }
+    });
+  }
+
+  function resolveWindowBbox(win) {
+    return ensureWindowBboxNorm(win);
+  }
+
+  function ensureWindowBboxes() {
+    ensureWindowsHaveBbox();
   }
 
   function clamp(value, min, max) {
@@ -246,18 +297,11 @@
     els.btnDrawWindow.classList.toggle('active', enabled);
     els.imageStack.classList.toggle('draw-mode', enabled);
     updateViewerHint();
+    scheduleOverlayRender();
   }
 
   function svgPointFromEvent(event) {
-    const pt = els.overlaySvg.createSVGPoint();
-    pt.x = event.clientX;
-    pt.y = event.clientY;
-    const matrix = els.overlaySvg.getScreenCTM();
-    if (!matrix) {
-      return { x: 0, y: 0 };
-    }
-    const transformed = pt.matrixTransform(matrix.inverse());
-    return { x: transformed.x, y: transformed.y };
+    return imagePointFromEvent(event);
   }
 
   function minBoxPixels() {
@@ -268,8 +312,11 @@
     };
   }
 
-  function interactiveOverlayEnabled() {
-    return overlayEditable();
+  function scheduleOverlayRender() {
+    window.requestAnimationFrame(function () {
+      renderDetectionOverlay();
+      window.requestAnimationFrame(renderDetectionOverlay);
+    });
   }
 
   function renderHandleMarkup(x, y, w, h, kind, index) {
@@ -290,20 +337,36 @@
 
   function renderDetectionOverlay() {
     const svg = els.overlaySvg;
-    if (!overlayEditable() || !els.image.complete || !els.image.naturalWidth) {
+    if (!overlayEditable()) {
       svg.innerHTML = '';
       return;
     }
 
+    if (!els.image.complete) {
+      return;
+    }
+
     const dims = imageDimensions();
+    if (dims.width <= 1 || dims.height <= 1) {
+      return;
+    }
+
     const nw = dims.width;
     const nh = dims.height;
     svg.setAttribute('viewBox', '0 0 ' + nw + ' ' + nh);
+    svg.setAttribute('preserveAspectRatio', 'none');
 
-    let markup = '';
+    ensureWindowBboxes();
+
+    let markup =
+      '<rect class="det-hitlayer" x="0" y="0" width="' + nw + '" height="' + nh + '" />';
+
     state.windows.forEach(function (win, index) {
-      if (!win.bbox_norm || win.bbox_norm.length !== 4) return;
-      const box = bboxPixelsFromNorm(win.bbox_norm);
+      const bbox = resolveWindowBbox(win);
+      if (!bbox || bbox.length !== 4) return;
+      win.bbox_norm = bbox;
+      const box = bboxPixelsFromNorm(bbox);
+      if (box.w < 1 || box.h < 1) return;
       const selected = state.selectedWindowIndex === index && !state.selectedDoor;
       markup +=
         '<rect class="det-box' + (selected ? ' selected' : '') + '" data-kind="window" data-index="' + index +
@@ -338,6 +401,7 @@
 
   function onOverlayMouseDown(event) {
     if (!overlayEditable() || state.drag) return;
+    event.preventDefault();
     const target = event.target;
     if (target.classList.contains('det-handle')) {
       event.preventDefault();
@@ -361,8 +425,9 @@
       }
       return;
     }
-    if (state.drawMode && (target === els.overlaySvg || target.classList.contains('det-preview'))) {
+    if (state.drawMode && (target.classList.contains('det-hitlayer') || target === els.overlaySvg || target.classList.contains('det-preview'))) {
       event.preventDefault();
+      event.stopPropagation();
       startDrawDrag(event);
     }
   }
@@ -415,6 +480,7 @@
 
   function onOverlayMouseMove(event) {
     if (!state.drag) return;
+    event.preventDefault();
     const pt = svgPointFromEvent(event);
     const dims = imageDimensions();
     const min = minBoxPixels();
@@ -742,6 +808,7 @@
       'Rectification: ' + result.method + ' | confidence ' + result.confidence +
       ' | lines ' + result.line_count;
     setActiveView('rectified');
+    scheduleOverlayRender();
     renderTree();
   }
 
@@ -791,6 +858,7 @@
 
     setActiveView('overlay');
     setDrawMode(false);
+    scheduleOverlayRender();
     renderTree();
 
     const doorCount = state.detection ? state.detection.doors : 0;
@@ -865,7 +933,7 @@
   document.addEventListener('mouseup', onOverlayMouseUp);
 
   els.image.addEventListener('load', function () {
-    renderDetectionOverlay();
+    scheduleOverlayRender();
   });
 
   document.addEventListener('keydown', function (event) {

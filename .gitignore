@@ -19,4 +19,6 @@ desktop.ini
 # Logs
 *.log
 
-dist/
+backend/.venv/
+.pytest_tmp/
+plugin/geomora/cache/

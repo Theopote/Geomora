@@ -46,9 +46,34 @@ module Geomora
           dialog.add_action_callback('pick_image') do |_ctx, _|
             path = ::UI.openpanel('Select facade reference image', '', 'Images|*.jpg;*.jpeg;*.png;*.webp;||')
             if path
+              @source_path = path
               file_url = path_to_file_url(path)
               dialog.execute_script("window.geomora.setImage(#{file_url.to_json}, #{path.to_json})")
             end
+          end
+
+          dialog.add_action_callback('rectify') do |_ctx, json|
+            params = JSON.parse(json)
+            source_path = params['source_path']
+            if source_path.nil? || source_path.empty?
+              raise GeomoraError, 'Load a reference image before rectifying.'
+            end
+
+            Logger.info("Rectifying image: #{source_path}")
+            result = Perception::RectifyClient.rectify(source_path)
+            @rectification = result.to_source_metadata(source_path)
+            rectified_url = path_to_file_url(result.rectified_image_path)
+
+            dialog.execute_script(
+              "window.geomora.setRectifiedImage(#{rectified_url.to_json}, #{result.to_dict.to_json})"
+            )
+            post_message(
+              dialog,
+              'success',
+              format('Rectified (confidence %.2f, %s)', result.confidence, result.method)
+            )
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
           end
 
           dialog.add_action_callback('load_template') do |_ctx, _|
@@ -57,7 +82,7 @@ module Geomora
           end
 
           dialog.add_action_callback('validate') do |_ctx, json|
-            params = JSON.parse(json)
+            params = enrich_params(JSON.parse(json))
             ir = Core::Project.build_manual_facade(params)
             Core::Project.validate_data(ir)
             post_message(dialog, 'success', 'Validation passed.')
@@ -67,7 +92,7 @@ module Geomora
           end
 
           dialog.add_action_callback('generate') do |_ctx, json|
-            params = JSON.parse(json)
+            params = enrich_params(JSON.parse(json))
             ir = Core::Project.build_manual_facade(params)
             Core::Project.generate_from_data(ir)
             post_message(dialog, 'success', 'Generation complete.')
@@ -75,6 +100,11 @@ module Geomora
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)
           end
+        end
+
+        def enrich_params(params)
+          params['rectification'] = @rectification if @rectification
+          params
         end
 
         def default_payload

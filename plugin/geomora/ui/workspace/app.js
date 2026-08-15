@@ -2,17 +2,24 @@
   const state = {
     sourcePath: null,
     sourceId: null,
-    windows: []
+    windows: [],
+    originalImageUrl: null,
+    rectifiedImageUrl: null,
+    rectification: null,
+    activeView: 'original'
   };
 
   const els = {
     status: document.getElementById('status'),
     sourceMeta: document.getElementById('source-meta'),
+    rectifyMeta: document.getElementById('rectify-meta'),
     image: document.getElementById('reference-image'),
     placeholder: document.getElementById('viewer-placeholder'),
     tree: document.getElementById('element-tree'),
     form: document.getElementById('facade-form'),
-    windowsContainer: document.getElementById('windows-container')
+    windowsContainer: document.getElementById('windows-container'),
+    btnViewOriginal: document.getElementById('btn-view-original'),
+    btnViewRectified: document.getElementById('btn-view-rectified')
   };
 
   function sketchupCall(name, arg) {
@@ -69,6 +76,13 @@
       'Door: ' + params.door.width + ' × ' + params.door.height + ' mm @ ' + params.door.offset
     ];
 
+    if (state.rectification) {
+      items.push(
+        'Rectified: ' + state.rectification.method +
+        ' (confidence ' + state.rectification.confidence + ')'
+      );
+    }
+
     params.windows.forEach(function (win, index) {
       items.push(
         'Window ' + (index + 1) + ': ' + win.width + '×' + win.height +
@@ -108,6 +122,29 @@
     };
   }
 
+  function updateViewer() {
+    const url = state.activeView === 'rectified' ? state.rectifiedImageUrl : state.originalImageUrl;
+    if (!url) {
+      els.image.hidden = true;
+      els.placeholder.hidden = false;
+      els.placeholder.textContent = state.activeView === 'rectified'
+        ? 'Run Rectify Facade to see corrected image'
+        : 'Load a facade photo for manual reference';
+      return;
+    }
+
+    els.image.src = url;
+    els.image.hidden = false;
+    els.placeholder.hidden = true;
+  }
+
+  function setActiveView(view) {
+    state.activeView = view;
+    els.btnViewOriginal.classList.toggle('active', view === 'original');
+    els.btnViewRectified.classList.toggle('active', view === 'rectified');
+    updateViewer();
+  }
+
   function loadPayload(payload) {
     els.form.elements.namedItem('project_name').value = payload.project_name || 'Manual Facade';
     els.form.elements.namedItem('wall_length').value = payload.wall_length || 10000;
@@ -135,11 +172,23 @@
 
   function setImage(fileUrl, sourcePath) {
     state.sourcePath = sourcePath;
-    state.sourceId = sourcePath ? 'source_image_001' : null;
-    els.image.src = fileUrl;
-    els.image.hidden = false;
-    els.placeholder.hidden = true;
+    state.sourceId = sourcePath ? 'photo_001' : null;
+    state.originalImageUrl = fileUrl;
+    state.rectifiedImageUrl = null;
+    state.rectification = null;
     els.sourceMeta.textContent = sourcePath || 'Image loaded';
+    els.rectifyMeta.textContent = 'Rectification: not run';
+    setActiveView('original');
+    renderTree();
+  }
+
+  function setRectifiedImage(fileUrl, result) {
+    state.rectifiedImageUrl = fileUrl;
+    state.rectification = result;
+    els.rectifyMeta.textContent =
+      'Rectification: ' + result.method + ' | confidence ' + result.confidence +
+      ' | lines ' + result.line_count;
+    setActiveView('rectified');
     renderTree();
   }
 
@@ -151,12 +200,17 @@
   window.geomora = {
     loadPayload: loadPayload,
     setImage: setImage,
+    setRectifiedImage: setRectifiedImage,
     setIrPreview: setIrPreview,
     setStatus: setStatus
   };
 
   document.getElementById('btn-pick-image').addEventListener('click', function () {
     sketchupCall('pick_image');
+  });
+
+  document.getElementById('btn-rectify').addEventListener('click', function () {
+    sketchupCall('rectify', JSON.stringify(collectParams()));
   });
 
   document.getElementById('btn-load-template').addEventListener('click', function () {
@@ -169,6 +223,14 @@
 
   document.getElementById('btn-generate').addEventListener('click', function () {
     sketchupCall('generate', JSON.stringify(collectParams()));
+  });
+
+  els.btnViewOriginal.addEventListener('click', function () {
+    setActiveView('original');
+  });
+
+  els.btnViewRectified.addEventListener('click', function () {
+    setActiveView('rectified');
   });
 
   els.form.addEventListener('change', renderTree);

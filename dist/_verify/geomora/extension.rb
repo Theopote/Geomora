@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
-# Central loader — all paths relative to plugin/geomora/
+require 'sketchup.rb'
+
 module Geomora
   ROOT = File.expand_path(__dir__)
 
-  LOADER_FILES = %w[
+  %w[
     version
     core/errors
     core/logger
@@ -26,23 +27,14 @@ module Geomora
     generators/storey_generator
     generators/building_generator
     generators/project_generator
-    perception/rectification_result
-    perception/rectify_client
-    core/ir_builder
     core/project
-    ui/workspace_dialog
     ui/commands
-  ].freeze
+  ].each do |file|
+    require File.join(ROOT, file)
+  end
 
-  def self.require_all
-    LOADER_FILES.each do |file|
-      path = File.join(ROOT, "#{file}.rb")
-      unless File.exist?(path)
-        raise LoadError, "Geomora missing file: #{path}"
-      end
-      require path
-    end
+  unless file_loaded?(__FILE__)
+    UI::Commands.register
+    file_loaded(__FILE__)
   end
 end
-
-Geomora.require_all

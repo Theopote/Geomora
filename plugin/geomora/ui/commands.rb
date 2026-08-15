@@ -78,7 +78,7 @@ module Geomora
         def show_about
           ::UI.messagebox(
             "Geomora v#{Geomora::VERSION}\n\n" \
-            "Phase 1 — Reconstruction Workspace\n\n" \
+            "Phase 2 — Reconstruction Workspace + Rectification\n\n" \
             "Extensions → Geomora → Open Workspace"
           )
         end

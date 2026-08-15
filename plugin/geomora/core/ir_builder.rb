@@ -171,18 +171,21 @@ module Geomora
       end
 
       def build_sources
+        sources = []
         source_id = @params['source_id']
-        return [] if source_id.nil? || source_id.to_s.empty?
+        return sources if source_id.nil? || source_id.to_s.empty?
 
-        [
-          {
-            'id' => source_id.to_s,
-            'type' => 'image',
-            'metadata' => {
-              'path' => @params['source_path']
-            }.compact
-          }
-        ]
+        metadata = { 'path' => @params['source_path'] }
+        if @params['rectification'].is_a?(Hash)
+          metadata.merge!(@params['rectification'])
+        end
+
+        sources << {
+          'id' => source_id.to_s,
+          'type' => 'image',
+          'metadata' => metadata.compact
+        }
+        sources
       end
 
       def default_windows

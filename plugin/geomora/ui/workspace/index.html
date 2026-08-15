@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">Phase 1 — Manual Facade Definition</div>
+    <div class="subtitle">Phase 2 — Perspective Rectification</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -17,7 +17,13 @@
     <aside class="panel sources">
       <h2>Sources</h2>
       <button id="btn-pick-image" class="btn">Load Reference Image</button>
+      <button id="btn-rectify" class="btn">Rectify Facade</button>
       <button id="btn-load-template" class="btn secondary">Load Phase 0 Template</button>
+      <div class="view-toggle">
+        <button id="btn-view-original" class="btn secondary active" type="button">Original</button>
+        <button id="btn-view-rectified" class="btn secondary" type="button">Rectified</button>
+      </div>
+      <div id="rectify-meta" class="meta">Rectification: not run</div>
       <div id="source-meta" class="meta">No image loaded</div>
     </aside>
 

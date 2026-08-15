@@ -15,7 +15,10 @@
     selectedDoor: false,
     doorBbox: null,
     drawMode: false,
-    drag: null
+    drag: null,
+    corners: null,
+    originalImageSize: null,
+    cornerDrag: null
   };
 
   const els = {
@@ -26,6 +29,7 @@
     imageStack: document.getElementById('image-stack'),
     image: document.getElementById('reference-image'),
     overlaySvg: document.getElementById('detection-overlay'),
+    cornerSvg: document.getElementById('corner-overlay'),
     viewerToolbar: document.getElementById('viewer-toolbar'),
     btnDrawWindow: document.getElementById('btn-draw-window'),
     btnDeleteSelected: document.getElementById('btn-delete-selected'),
@@ -128,6 +132,132 @@
     } else if (state.windows.length > 0) {
       setStatus('', 'Selection updated — Generate when the image looks correct.');
     }
+  }
+
+  const CORNER_LABELS = ['TL', 'TR', 'BR', 'BL'];
+
+  function cornersEditable() {
+    return state.activeView === 'original' && !!state.originalImageUrl;
+  }
+
+  function originalImageDimensions() {
+    if (state.originalImageSize) {
+      return state.originalImageSize;
+    }
+    if (state.activeView === 'original') {
+      return imageDimensions();
+    }
+    return { width: 1, height: 1 };
+  }
+
+  function initDefaultCorners() {
+    const dims = originalImageDimensions();
+    if (!dims.width || !dims.height) return;
+    const mx = dims.width * 0.08;
+    const my = dims.height * 0.08;
+    state.corners = [
+      [mx, my],
+      [dims.width - mx, my],
+      [dims.width - mx, dims.height - my],
+      [mx, dims.height - my]
+    ];
+  }
+
+  function resetCorners() {
+    if (!state.originalImageUrl) return;
+    initDefaultCorners();
+    renderCornerOverlay();
+    setStatus('', 'Corners reset — drag handles to frame the facade, then Rectify');
+  }
+
+  function cornerPointFromEvent(event) {
+    const rect = els.image.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+      return { x: 0, y: 0 };
+    }
+    const dims = originalImageDimensions();
+    return {
+      x: (event.clientX - rect.left) * (dims.width / rect.width),
+      y: (event.clientY - rect.top) * (dims.height / rect.height)
+    };
+  }
+
+  function renderCornerOverlay() {
+    const svg = els.cornerSvg;
+    if (!cornersEditable() || !state.corners || state.corners.length !== 4) {
+      svg.innerHTML = '';
+      return;
+    }
+
+    if (!els.image.complete) {
+      return;
+    }
+
+    const dims = originalImageDimensions();
+    if (dims.width <= 1 || dims.height <= 1) {
+      return;
+    }
+
+    const nw = dims.width;
+    const nh = dims.height;
+    svg.setAttribute('viewBox', '0 0 ' + nw + ' ' + nh);
+    svg.setAttribute('preserveAspectRatio', 'none');
+
+    const points = state.corners.map(function (c) {
+      return c[0] + ',' + c[1];
+    }).join(' ');
+
+    let markup =
+      '<polygon class="corner-line" points="' + points + '" />';
+
+    state.corners.forEach(function (corner, index) {
+      markup +=
+        '<circle class="corner-handle" data-corner="' + index + '" cx="' + corner[0] +
+        '" cy="' + corner[1] + '" r="9" />' +
+        '<text class="corner-label" x="' + (corner[0] + 12) + '" y="' + (corner[1] - 8) +
+        '">' + CORNER_LABELS[index] + '</text>';
+    });
+
+    svg.innerHTML = markup;
+  }
+
+  function onCornerMouseDown(event) {
+    if (!cornersEditable() || state.cornerDrag) return;
+    const target = event.target;
+    if (!target.classList.contains('corner-handle')) return;
+    event.preventDefault();
+    const index = parseInt(target.getAttribute('data-corner'), 10);
+    if (Number.isNaN(index)) return;
+    const pt = cornerPointFromEvent(event);
+    state.cornerDrag = {
+      index: index,
+      startX: pt.x,
+      startY: pt.y,
+      orig: state.corners[index].slice()
+    };
+  }
+
+  function onCornerMouseMove(event) {
+    if (!state.cornerDrag) return;
+    event.preventDefault();
+    const dims = originalImageDimensions();
+    const pt = cornerPointFromEvent(event);
+    const drag = state.cornerDrag;
+    const x = clamp(pt.x, 0, dims.width);
+    const y = clamp(pt.y, 0, dims.height);
+    state.corners[drag.index] = [x, y];
+    renderCornerOverlay();
+  }
+
+  function onCornerMouseUp() {
+    state.cornerDrag = null;
+  }
+
+  function scheduleCornerRender() {
+    window.requestAnimationFrame(function () {
+      renderCornerOverlay();
+      window.requestAnimationFrame(renderCornerOverlay);
+    });
   }
 
   function overlayEditable() {
@@ -560,6 +690,10 @@
   }
 
   function updateViewerHint() {
+    if (cornersEditable()) {
+      els.viewerHint.textContent = 'Drag corner handles to frame facade · then Rectify Facade';
+      return;
+    }
     if (!overlayEditable()) return;
     if (state.drawMode) {
       els.viewerHint.textContent = 'Drag on image to draw a window · Esc to cancel';
@@ -570,9 +704,12 @@
   }
 
   function updateViewerToolbar() {
-    const enabled = overlayEditable();
-    els.viewerToolbar.hidden = !enabled;
-    if (enabled) {
+    const cornerMode = cornersEditable();
+    const overlayMode = overlayEditable();
+    els.viewerToolbar.hidden = !cornerMode && !overlayMode;
+    els.btnDrawWindow.hidden = !overlayMode;
+    els.btnDeleteSelected.hidden = !overlayMode;
+    if (cornerMode || overlayMode) {
       updateViewerHint();
     }
   }
@@ -694,7 +831,10 @@
         height: Number(formData.get('door_height'))
       },
       source_path: state.sourcePath,
-      source_id: state.sourceId
+      source_id: state.sourceId,
+      corners: state.corners && state.corners.length === 4
+        ? state.corners.map(function (c) { return [c[0], c[1]]; })
+        : null
     };
   }
 
@@ -711,6 +851,7 @@
       els.viewerToolbar.hidden = true;
       els.placeholder.hidden = false;
       els.overlaySvg.innerHTML = '';
+      els.cornerSvg.innerHTML = '';
       if (state.activeView === 'overlay') {
         els.placeholder.textContent = 'Rectify then use Overlay to edit boxes on image';
       } else if (state.activeView === 'rectified') {
@@ -728,7 +869,13 @@
     }
     updateViewerToolbar();
     if (els.image.complete) {
-      renderDetectionOverlay();
+      if (state.activeView === 'original') {
+        renderCornerOverlay();
+        els.overlaySvg.innerHTML = '';
+      } else {
+        els.cornerSvg.innerHTML = '';
+        renderDetectionOverlay();
+      }
     }
   }
 
@@ -757,6 +904,9 @@
     state.overlayImageUrl = null;
     state.doorBbox = null;
     state.drag = null;
+    state.corners = null;
+    state.originalImageSize = null;
+    state.cornerDrag = null;
     setDrawMode(false);
     clearSelection();
     els.detectMeta.textContent = 'Detection: not run';
@@ -787,6 +937,9 @@
     state.overlayImageUrl = null;
     state.doorBbox = null;
     state.drag = null;
+    state.corners = null;
+    state.originalImageSize = null;
+    state.cornerDrag = null;
     setDrawMode(false);
     clearSelection();
     els.sourceMeta.textContent = sourcePath || 'Image loaded';
@@ -798,7 +951,7 @@
     els.form.elements.namedItem('project_name').value = 'Untitled Facade';
     setActiveView('original');
     renderTree();
-    setStatus('', 'Photo loaded — run Rectify Facade, then Detect or edit manually');
+    setStatus('', 'Photo loaded — drag corners to frame facade, then Rectify');
   }
 
   function setRectifiedImage(fileUrl, result) {
@@ -893,6 +1046,10 @@
     sketchupCall('pick_image');
   });
 
+  document.getElementById('btn-reset-corners').addEventListener('click', function () {
+    resetCorners();
+  });
+
   document.getElementById('btn-rectify').addEventListener('click', function () {
     sketchupCall('rectify', JSON.stringify(collectParams()));
   });
@@ -928,12 +1085,28 @@
     setDrawMode(!state.drawMode);
   });
 
+  els.cornerSvg.addEventListener('mousedown', onCornerMouseDown);
+  document.addEventListener('mousemove', onCornerMouseMove);
+  document.addEventListener('mouseup', onCornerMouseUp);
+
   els.overlaySvg.addEventListener('mousedown', onOverlayMouseDown);
   document.addEventListener('mousemove', onOverlayMouseMove);
   document.addEventListener('mouseup', onOverlayMouseUp);
 
   els.image.addEventListener('load', function () {
-    scheduleOverlayRender();
+    if (state.activeView === 'original' && state.originalImageUrl && els.image.src === state.originalImageUrl) {
+      state.originalImageSize = {
+        width: els.image.naturalWidth,
+        height: els.image.naturalHeight
+      };
+      if (!state.corners) {
+        initDefaultCorners();
+      }
+      renderCornerOverlay();
+      updateViewerToolbar();
+    } else {
+      scheduleOverlayRender();
+    }
   });
 
   document.addEventListener('keydown', function (event) {

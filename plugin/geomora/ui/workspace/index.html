@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">Phase 3 — Semantic Detection</div>
+    <div class="subtitle">v0.5.0 — Rectify + Detect</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -17,6 +17,7 @@
     <aside class="panel sources">
       <h2>Sources</h2>
       <button id="btn-pick-image" class="btn">Load Reference Image</button>
+      <button id="btn-reset-corners" class="btn secondary">Reset Corners</button>
       <button id="btn-rectify" class="btn">Rectify Facade</button>
       <button id="btn-detect" class="btn">Detect Elements</button>
       <button id="btn-load-template" class="btn secondary">Load Phase 0 Template</button>
@@ -35,6 +36,7 @@
       <div class="viewer-frame" id="viewer-frame">
         <div id="image-stack" class="image-stack" hidden>
           <img id="reference-image" alt="Reference facade image" draggable="false">
+          <svg id="corner-overlay" class="corner-overlay" aria-hidden="true"></svg>
           <svg id="detection-overlay" class="detection-overlay" aria-hidden="true"></svg>
         </div>
         <div id="viewer-toolbar" class="viewer-toolbar" hidden>

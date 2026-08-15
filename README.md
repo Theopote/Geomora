@@ -6,7 +6,11 @@ Phase 0 implements the **Architectural IR** and **SketchUp Native Geometry Kerne
 
 **Phase 1** adds the **Reconstruction Workspace** (HtmlDialog + manual facade definition). See [PHASE_1.md](docs/PHASE_1.md) — **complete**.
 
-**Phase 2** (core complete): perspective rectification — see [PHASE_2.md](docs/PHASE_2.md). Requires local Python backend (`backend/start_server.bat`).
+**Phase 2** (core complete): perspective rectification + manual 4-corner UI — see [PHASE_2.md](docs/PHASE_2.md). Requires local Python backend (`backend/start_server.bat`).
+
+**Phase 3** (in progress): semantic detection bootstrap + overlay editing — see [PHASE_3.md](docs/PHASE_3.md) and [ACCEPTANCE.md](docs/ACCEPTANCE.md).
+
+Test images: see [examples/README.md](examples/README.md).
 
 ## Pipeline
 

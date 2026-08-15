@@ -61,7 +61,12 @@ module Geomora
             end
 
             Logger.info("Rectifying image: #{source_path}")
-            result = Perception::RectifyClient.rectify(source_path)
+            corners = params['corners']
+            if corners.is_a?(Array) && corners.length == 4
+              result = Perception::RectifyClient.rectify(source_path, corners: corners)
+            else
+              result = Perception::RectifyClient.rectify(source_path)
+            end
             @rectification = result.to_source_metadata(source_path)
             @rectified_image_path = result.rectified_image_path
             rectified_url = path_to_file_url(result.rectified_image_path)

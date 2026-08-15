@@ -1,6 +1,6 @@
 # Geomora Phase 3 — Semantic Reconstruction
 
-**Status:** Core bootstrap **IN PROGRESS** (v0.4.0)
+**Status:** Core bootstrap **IN PROGRESS** (v0.5.0)
 
 | Step | Status |
 |---|---|
@@ -9,7 +9,7 @@
 | 3.3 Ruby DetectClient + DetectionMapper | ✅ |
 | 3.4 Workspace UI (Detect + Overlay) | ✅ |
 | 3.5 YOLO / SAM integration | ⏳ deferred |
-| 3.6 Real-photo tuning + fixtures | ⏳ deferred |
+| 3.6 Real-photo tuning + fixtures | ✅ Stage A (`examples/`, `ACCEPTANCE.md`) |
 
 ### Quick start
 
@@ -23,7 +23,7 @@ cd F:\development\Geomora
 .\build_rbz.ps1
 ```
 
-Then in SketchUp: **Open Workspace → Load Image → Rectify Facade → Detect Elements → review form → Generate**
+Then in SketchUp: **Open Workspace → Load Image → adjust corners → Rectify → Detect Elements → review overlay → Generate**
 
 ---
 

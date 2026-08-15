@@ -122,6 +122,40 @@ body {
   -webkit-user-drag: none;
 }
 
+.corner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.corner-overlay .corner-line {
+  fill: none;
+  stroke: #8ab4f8;
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.corner-overlay .corner-handle {
+  fill: #8ab4f8;
+  stroke: #fff;
+  stroke-width: 2;
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.corner-overlay .corner-label {
+  fill: #8ab4f8;
+  font-size: 12px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: 700;
+  pointer-events: none;
+}
+
 .detection-overlay {
   position: absolute;
   top: 0;

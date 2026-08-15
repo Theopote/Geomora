@@ -6,7 +6,7 @@
 |---|---|
 | 2.1–2.5 Backend pipeline + API | ✅ |
 | 2.6–2.7 Ruby client + Workspace UI | ✅ |
-| 2.8 Manual 4-corner UI | ⏳ deferred |
+| 2.8 Manual 4-corner UI | ✅ v0.5.0 |
 | 2.9–2.11 Integration gate | ✅ core path verified |
 
 ### Quick start
@@ -21,7 +21,7 @@ cd F:\development\Geomora
 .\build_rbz.ps1
 ```
 
-Then in SketchUp: **Open Workspace → Load Image → Rectify Facade → Original/Rectified toggle**
+Then in SketchUp: **Open Workspace → Load Image → drag corners on Original → Rectify Facade → Original/Rectified toggle**
 
 ---
 

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geomora Workspace</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Geomora Workspace</div>
+    <div class="subtitle">Phase 1 — Manual Facade Definition</div>
+    <div id="status" class="status">Ready</div>
+  </header>
+
+  <main class="layout">
+    <aside class="panel sources">
+      <h2>Sources</h2>
+      <button id="btn-pick-image" class="btn">Load Reference Image</button>
+      <button id="btn-load-template" class="btn secondary">Load Phase 0 Template</button>
+      <div id="source-meta" class="meta">No image loaded</div>
+    </aside>
+
+    <section class="panel viewer">
+      <h2>Image Viewer</h2>
+      <div class="viewer-frame">
+        <img id="reference-image" alt="Reference facade image" hidden>
+        <div id="viewer-placeholder" class="placeholder">Load a facade photo for manual reference</div>
+      </div>
+    </section>
+
+    <section class="panel elements">
+      <h2>Elements</h2>
+      <ul id="element-tree" class="tree"></ul>
+    </section>
+
+    <section class="panel inspector">
+      <h2>Inspector</h2>
+      <form id="facade-form" class="form">
+        <label>Project name<input name="project_name" type="text"></label>
+        <label>Wall length (mm)<input name="wall_length" type="number" step="1"></label>
+        <label>Wall height (mm)<input name="wall_height" type="number" step="1"></label>
+        <label>Wall thickness (mm)<input name="wall_thickness" type="number" step="1"></label>
+
+        <div class="section-title">Windows</div>
+        <div id="windows-container"></div>
+
+        <div class="section-title">Door</div>
+        <label>Door offset (mm)<input name="door_offset" type="number" step="1"></label>
+        <label>Door width (mm)<input name="door_width" type="number" step="1"></label>
+        <label>Door height (mm)<input name="door_height" type="number" step="1"></label>
+      </form>
+    </section>
+  </main>
+
+  <footer class="actions">
+    <button id="btn-validate" class="btn">Validate</button>
+    <button id="btn-generate" class="btn primary">Generate</button>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

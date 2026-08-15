@@ -1,0 +1,52 @@
+{
+  "schema_version": "0.1",
+  "project": {
+    "id": "project_001",
+    "name": "Duplicate ID Test",
+    "unit": "mm",
+    "coordinate_system": "z_up",
+    "default_wall_thickness": 240
+  },
+  "buildings": [
+    {
+      "id": "building_001",
+      "name": "Main Building",
+      "storeys": [
+        {
+          "id": "storey_01",
+          "name": "Ground Floor",
+          "elevation": 0,
+          "height": 3300,
+          "elements": [
+            {
+              "id": "wall_001",
+              "type": "wall",
+              "storey_id": "storey_01",
+              "geometry": {
+                "baseline": [[0, 0, 0], [10000, 0, 0]],
+                "height": 3300,
+                "thickness": 240
+              },
+              "opening_ids": []
+            },
+            {
+              "id": "wall_001",
+              "type": "wall",
+              "storey_id": "storey_01",
+              "geometry": {
+                "baseline": [[0, 5000, 0], [10000, 5000, 0]],
+                "height": 3300,
+                "thickness": 240
+              },
+              "opening_ids": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "openings": [],
+  "components": [],
+  "constraints": [],
+  "sources": []
+}

@@ -1,0 +1,172 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://geomora.dev/schemas/geomora-ir-v0.1.schema.json",
+  "title": "Geomora Architectural IR v0.1",
+  "type": "object",
+  "required": ["schema_version", "project", "buildings"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["0.1"]
+    },
+    "project": {
+      "type": "object",
+      "required": ["id", "name", "unit"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "unit": { "type": "string", "enum": ["mm"] },
+        "coordinate_system": { "type": "string", "enum": ["z_up"] },
+        "default_wall_thickness": { "type": "number", "minimum": 0 }
+      }
+    },
+    "buildings": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/building" }
+    },
+    "openings": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/opening" }
+    },
+    "components": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/component" }
+    },
+    "constraints": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/constraint" }
+    },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/source" }
+    }
+  },
+  "definitions": {
+    "building": {
+      "type": "object",
+      "required": ["id", "name", "storeys"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "storeys": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/storey" }
+        }
+      }
+    },
+    "storey": {
+      "type": "object",
+      "required": ["id", "name", "elevation", "height", "elements"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "elevation": { "type": "number" },
+        "height": { "type": "number", "minimum": 0 },
+        "elements": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/wall" }
+        }
+      }
+    },
+    "wall": {
+      "type": "object",
+      "required": ["id", "type", "storey_id", "geometry"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["wall"] },
+        "storey_id": { "type": "string" },
+        "geometry": {
+          "type": "object",
+          "required": ["baseline", "height", "thickness"],
+          "properties": {
+            "baseline": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": { "type": "number" }
+              }
+            },
+            "height": { "type": "number", "exclusiveMinimum": 0 },
+            "thickness": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        "semantic": { "type": "object" },
+        "opening_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "confidence": { "type": "number" }
+      }
+    },
+    "opening": {
+      "type": "object",
+      "required": ["id", "type", "parent_id", "geometry"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["window", "door", "opening"] },
+        "parent_id": { "type": "string" },
+        "geometry": {
+          "type": "object",
+          "required": ["offset", "width", "height"],
+          "properties": {
+            "offset": { "type": "number", "minimum": 0 },
+            "sill_height": { "type": "number", "minimum": 0 },
+            "width": { "type": "number", "exclusiveMinimum": 0 },
+            "height": { "type": "number", "exclusiveMinimum": 0 },
+            "depth": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        "component": {
+          "type": "object",
+          "properties": {
+            "definition_id": { "type": "string" }
+          }
+        },
+        "confidence": { "type": "number" },
+        "source": { "type": "object" }
+      }
+    },
+    "component": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string" },
+        "parameters": { "type": "object" }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "required": ["id", "type", "targets"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "parallel", "perpendicular", "coplanar", "horizontal", "vertical",
+            "equal_width", "equal_height", "equal_spacing", "symmetry", "align",
+            "fixed_dimension", "grid"
+          ]
+        },
+        "targets": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "priority": { "type": "string", "enum": ["hard", "soft"] }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string" },
+        "metadata": { "type": "object" }
+      }
+    }
+  }
+}

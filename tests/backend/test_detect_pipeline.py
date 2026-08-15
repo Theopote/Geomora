@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import cv2
 import numpy as np
+import pytest
 
 from geomora_detect.pipeline import detect_facade
+from geomora_detect.yolo_detector import model_available
 
 
 def _synthetic_rectified_facade(width: int = 800, height: int = 600) -> np.ndarray:
@@ -28,7 +30,7 @@ def test_detect_facade_finds_windows_and_door(tmp_path):
     path = tmp_path / "rectified.jpg"
     cv2.imwrite(str(path), image)
 
-    result = detect_facade(str(path))
+    result = detect_facade(str(path), method="contour_v1")
 
     assert result.method == "contour_v1"
     assert result.image_width == 800
@@ -45,8 +47,36 @@ def test_detect_facade_finds_windows_and_door(tmp_path):
 
 def test_detect_facade_rejects_missing_file(tmp_path):
     missing = tmp_path / "missing.jpg"
-    try:
+    with pytest.raises(ValueError, match="not found"):
         detect_facade(str(missing))
-        assert False, "expected ValueError"
-    except ValueError as error:
-        assert "not found" in str(error).lower()
+
+
+def test_detect_facade_rejects_invalid_method(tmp_path):
+    image = _synthetic_rectified_facade()
+    path = tmp_path / "rectified.jpg"
+    cv2.imwrite(str(path), image)
+
+    with pytest.raises(ValueError, match="Unsupported detection method"):
+        detect_facade(str(path), method="sam_v1")
+
+
+@pytest.mark.skipif(not model_available(), reason="YOLO ONNX model not built")
+def test_detect_facade_yolo_on_synthetic(tmp_path):
+    image = _synthetic_rectified_facade()
+    path = tmp_path / "rectified.jpg"
+    cv2.imwrite(str(path), image)
+
+    result = detect_facade(str(path), method="yolo_v1")
+    assert result.method == "yolo_v1"
+    assert len(result.elements) >= 3
+    assert result.overlay_base64
+
+
+@pytest.mark.skipif(not model_available(), reason="YOLO ONNX model not built")
+def test_detect_facade_auto_prefers_yolo(tmp_path):
+    image = _synthetic_rectified_facade()
+    path = tmp_path / "rectified.jpg"
+    cv2.imwrite(str(path), image)
+
+    result = detect_facade(str(path), method="auto")
+    assert result.method == "yolo_v1"

@@ -1,0 +1,3 @@
+# Dev dependencies — not required for production inference (ONNX runtime only).
+ultralytics>=8.1.0
+onnx>=1.15.0

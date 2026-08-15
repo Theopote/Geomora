@@ -1,6 +1,6 @@
 # Geomora Phase 3 — Semantic Reconstruction
 
-**Status:** Core bootstrap **IN PROGRESS** (v0.5.0)
+**Status:** Core bootstrap **IN PROGRESS** (v0.6.0)
 
 | Step | Status |
 |---|---|
@@ -8,8 +8,8 @@
 | 3.2 Classical CV detector (`contour_v1`) | ✅ |
 | 3.3 Ruby DetectClient + DetectionMapper | ✅ |
 | 3.4 Workspace UI (Detect + Overlay) | ✅ |
-| 3.5 YOLO / SAM integration | ⏳ deferred |
-| 3.6 Real-photo tuning + fixtures | ✅ Stage A (`examples/`, `ACCEPTANCE.md`) |
+| 3.5 YOLO ONNX (`yolo_v1`) | ✅ bootstrap — train via `backend/scripts/train_yolo_facade.py` |
+| 3.6 SAM refinement | ⏳ deferred |
 
 ### Quick start
 
@@ -123,6 +123,7 @@ POST /detect
 Content-Type: multipart/form-data
 
 image: <file>   # rectified facade recommended
+method: auto | yolo_v1 | contour_v1   # optional, default auto
 ```
 
 **Response:**
@@ -177,7 +178,7 @@ tests/backend/
 | **3.2** | `geomora_detect` + `/detect` | pytest synthetic facade |
 | **3.3** | Ruby client + mapper | Unit smoke in SketchUp |
 | **3.4** | Workspace UI | Detect → form populated |
-| **3.5** | YOLO ONNX (optional) | Real photo benchmark |
+| **3.5** | YOLO ONNX (`yolo_v1`) | Train script + pytest when model present |
 | **3.6** | SAM refinement (optional) | Mask → tighter bbox |
 
 ---

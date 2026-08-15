@@ -40,7 +40,8 @@
     windowsContainer: document.getElementById('windows-container'),
     btnViewOriginal: document.getElementById('btn-view-original'),
     btnViewRectified: document.getElementById('btn-view-rectified'),
-    btnViewOverlay: document.getElementById('btn-view-overlay')
+    btnViewOverlay: document.getElementById('btn-view-overlay'),
+    detectMethod: document.getElementById('detect-method')
   };
 
   function sketchupCall(name, arg) {
@@ -834,7 +835,8 @@
       source_id: state.sourceId,
       corners: state.corners && state.corners.length === 4
         ? state.corners.map(function (c) { return [c[0], c[1]]; })
-        : null
+        : null,
+      detection_method: els.detectMethod ? els.detectMethod.value : 'auto'
     };
   }
 

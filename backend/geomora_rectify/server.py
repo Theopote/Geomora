@@ -70,7 +70,10 @@ async def rectify(
 
 
 @app.post("/detect")
-async def detect(image: UploadFile = File(...)) -> JSONResponse:
+async def detect(
+    image: UploadFile = File(...),
+    method: str = Form(default="auto"),
+) -> JSONResponse:
     if not is_image_upload(image):
         raise HTTPException(status_code=400, detail="Upload must be an image file")
 
@@ -80,7 +83,7 @@ async def detect(image: UploadFile = File(...)) -> JSONResponse:
         input_path.write_bytes(await image.read())
 
         try:
-            result = detect_facade(str(input_path), return_overlay=True)
+            result = detect_facade(str(input_path), method=method, return_overlay=True)
         except ValueError as error:
             raise HTTPException(status_code=400, detail=str(error)) from error
         except Exception as error:  # pragma: no cover - safety net

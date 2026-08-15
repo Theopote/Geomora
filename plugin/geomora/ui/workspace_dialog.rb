@@ -90,8 +90,12 @@ module Geomora
               raise GeomoraError, 'Load an image (and rectified view recommended) before detecting.'
             end
 
-            Logger.info("Detecting facade elements: #{image_path}")
-            result = Perception::DetectClient.detect(image_path)
+            detection_method = params['detection_method']
+            detection_method = detection_method.to_s.strip
+            detection_method = 'auto' if detection_method.empty?
+
+            Logger.info("Detecting facade elements: #{image_path} (method=#{detection_method})")
+            result = Perception::DetectClient.detect(image_path, method: detection_method)
             mapped = Core::DetectionMapper.to_facade_params(
               result,
               wall_length: params['wall_length'],

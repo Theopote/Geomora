@@ -1,0 +1,6 @@
+path: F:/development/Geomora/backend/data/facade_yolo
+train: train/images
+val: val/images
+names:
+  0: window
+  1: door

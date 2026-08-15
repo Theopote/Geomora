@@ -8,7 +8,7 @@ Phase 0 implements the **Architectural IR** and **SketchUp Native Geometry Kerne
 
 **Phase 2** (core complete): perspective rectification + manual 4-corner UI — see [PHASE_2.md](docs/PHASE_2.md). Requires local Python backend (`backend/start_server.bat`).
 
-**Phase 3** (in progress): semantic detection bootstrap + overlay editing — see [PHASE_3.md](docs/PHASE_3.md) and [ACCEPTANCE.md](docs/ACCEPTANCE.md).
+**Phase 3** (in progress): semantic detection — `contour_v1` + **YOLO ONNX (`yolo_v1`)** — see [PHASE_3.md](docs/PHASE_3.md). Train model: `backend/scripts/train_yolo_facade.py`.
 
 Test images: see [examples/README.md](examples/README.md).
 

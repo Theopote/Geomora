@@ -43,9 +43,19 @@ POST /detect
 Content-Type: multipart/form-data
 
 image: <file>
+method: auto | yolo_v1 | contour_v1   # optional
 ```
 
-Response includes `elements[]`, `confidence`, `overlay_base64`.
+Response includes `elements[]`, `confidence`, `overlay_base64`, `method`.
+
+## YOLO model (Phase 3.5)
+
+```powershell
+pip install -r requirements-dev.txt
+python scripts/train_yolo_facade.py
+```
+
+See `models/README.md`. Without `facade_yolo_v1.onnx`, `method=auto` uses `contour_v1`.
 
 ## Tests
 
@@ -58,6 +68,5 @@ py -m pytest tests/backend -q
 ## Notes
 
 - Phase 2: auto rectify uses line detection + vanishing points + estimated facade quad.
-- Phase 3: `contour_v1` detects dark rectangular openings on rectified images.
+- Phase 3: `contour_v1` (OpenCV) or `yolo_v1` (ONNX) — `method=auto` prefers YOLO when model exists.
 - For best results, **rectify first**, then detect. Use manual 4 corners when auto rectify fails.
-- v0.4.0 uses OpenCV only; YOLO/SAM planned for Phase 3.5+.

@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.5.0 — Rectify + Detect</div>
+    <div class="subtitle">v0.6.0 — YOLO Detection</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -20,6 +20,12 @@
       <button id="btn-reset-corners" class="btn secondary">Reset Corners</button>
       <button id="btn-rectify" class="btn">Rectify Facade</button>
       <button id="btn-detect" class="btn">Detect Elements</button>
+      <label class="detect-method-label" for="detect-method">Detection</label>
+      <select id="detect-method" class="detect-method">
+        <option value="auto" selected>Auto (YOLO if available)</option>
+        <option value="yolo_v1">YOLO</option>
+        <option value="contour_v1">Contour (fallback)</option>
+      </select>
       <button id="btn-load-template" class="btn secondary">Load Phase 0 Template</button>
       <div class="view-toggle">
         <button id="btn-view-original" class="btn secondary active" type="button">Original</button>

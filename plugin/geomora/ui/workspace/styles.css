@@ -88,6 +88,25 @@ body {
   word-break: break-all;
 }
 
+.detect-method-label {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #9aa0a6;
+}
+
+.detect-method {
+  width: 100%;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #3c4043;
+  background: #2d2f34;
+  color: #ececec;
+  font-size: 13px;
+}
+
 .viewer-frame {
   position: relative;
   min-height: 420px;

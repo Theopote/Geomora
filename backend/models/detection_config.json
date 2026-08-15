@@ -1,0 +1,7 @@
+{
+  "model_file": "facade_yolo_v1.onnx",
+  "input_size": 640,
+  "class_names": ["window", "door"],
+  "confidence_threshold": 0.25,
+  "iou_threshold": 0.45
+}

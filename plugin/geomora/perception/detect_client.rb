@@ -14,10 +14,15 @@ module Geomora
       DEFAULT_TIMEOUT = 60
 
       class << self
-        def detect(image_path, host: DEFAULT_HOST, port: DEFAULT_PORT)
+        def detect(image_path, method: 'auto', host: DEFAULT_HOST, port: DEFAULT_PORT)
           raise GeomoraError, "Image not found: #{image_path}" unless File.exist?(image_path)
 
-          response = post_multipart(host: host, port: port, image_path: image_path)
+          response = post_multipart(
+            host: host,
+            port: port,
+            image_path: image_path,
+            method: method
+          )
 
           unless response.is_a?(Net::HTTPSuccess)
             raise GeometryGenerationError, parse_error_message(response)
@@ -33,9 +38,9 @@ module Geomora
 
         private
 
-        def post_multipart(host:, port:, image_path:)
+        def post_multipart(host:, port:, image_path:, method:)
           boundary = "----Geomora#{rand(1_000_000)}"
-          body = build_body(boundary, image_path)
+          body = build_body(boundary, image_path, method)
 
           uri = URI("http://#{host}:#{port}/detect")
           request = Net::HTTP::Post.new(uri)
@@ -47,13 +52,17 @@ module Geomora
           end
         end
 
-        def build_body(boundary, image_path)
+        def build_body(boundary, image_path, method)
           content_type = image_content_type(image_path)
           parts = []
           parts << "--#{boundary}\r\n"
           parts << "Content-Disposition: form-data; name=\"image\"; filename=\"#{File.basename(image_path)}\"\r\n"
           parts << "Content-Type: #{content_type}\r\n\r\n"
           parts << File.binread(image_path)
+          parts << "\r\n"
+          parts << "--#{boundary}\r\n"
+          parts << "Content-Disposition: form-data; name=\"method\"\r\n\r\n"
+          parts << method.to_s
           parts << "\r\n"
           parts << "--#{boundary}--\r\n"
           parts.join

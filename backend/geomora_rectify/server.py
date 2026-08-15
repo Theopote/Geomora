@@ -26,12 +26,22 @@ def health() -> dict[str, str]:
     return {"status": "ok", "service": "geomora-rectify"}
 
 
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}
+
+
+def is_image_upload(upload: UploadFile) -> bool:
+    if upload.content_type and upload.content_type.startswith("image/"):
+        return True
+    suffix = Path(upload.filename or "").suffix.lower()
+    return suffix in IMAGE_EXTENSIONS
+
+
 @app.post("/rectify")
 async def rectify(
     image: UploadFile = File(...),
     corners: str | None = Form(default=None),
 ) -> JSONResponse:
-    if not image.content_type or not image.content_type.startswith("image/"):
+    if not is_image_upload(image):
         raise HTTPException(status_code=400, detail="Upload must be an image file")
 
     suffix = Path(image.filename or "upload.jpg").suffix or ".jpg"

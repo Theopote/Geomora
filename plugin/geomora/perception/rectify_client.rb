@@ -61,10 +61,11 @@ module Geomora
         end
 
         def build_body(boundary, image_path, corners)
+          content_type = image_content_type(image_path)
           parts = []
           parts << "--#{boundary}\r\n"
           parts << "Content-Disposition: form-data; name=\"image\"; filename=\"#{File.basename(image_path)}\"\r\n"
-          parts << "Content-Type: application/octet-stream\r\n\r\n"
+          parts << "Content-Type: #{content_type}\r\n\r\n"
           parts << File.binread(image_path)
           parts << "\r\n"
 
@@ -77,6 +78,17 @@ module Geomora
 
           parts << "--#{boundary}--\r\n"
           parts.join
+        end
+
+        def image_content_type(path)
+          case File.extname(path).downcase
+          when '.jpg', '.jpeg' then 'image/jpeg'
+          when '.png' then 'image/png'
+          when '.webp' then 'image/webp'
+          when '.bmp' then 'image/bmp'
+          when '.gif' then 'image/gif'
+          else 'image/jpeg'
+          end
         end
 
         def save_rectified_image(data)

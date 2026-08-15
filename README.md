@@ -4,7 +4,9 @@ Architectural geometry reconstruction system for SketchUp.
 
 Phase 0 implements the **Architectural IR** and **SketchUp Native Geometry Kernel**.
 
-**Phase 1** adds the **Reconstruction Workspace** (HtmlDialog + manual facade definition). See [PHASE_1.md](docs/PHASE_1.md).
+**Phase 1** adds the **Reconstruction Workspace** (HtmlDialog + manual facade definition). See [PHASE_1.md](docs/PHASE_1.md) — **complete**.
+
+**Phase 2** (planning): **Perspective Rectification** — see [PHASE_2.md](docs/PHASE_2.md).
 
 ## Pipeline
 
@@ -94,7 +96,8 @@ ruby tests/run_tests.rb
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - [IR.md](docs/IR.md)
 - [PHASE_0.md](docs/PHASE_0.md)
-- [PHASE_1.md](docs/PHASE_1.md)
+- [PHASE_1.md](docs/PHASE_1.md) — complete
+- [PHASE_2.md](docs/PHASE_2.md) — planning
 
 ## License
 

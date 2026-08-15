@@ -41,7 +41,7 @@ examples/facade_phase0.json
         └── ComponentManager
 ```
 
-## Why AI Is Absent
+## Why AI Is Absent (Phase 0–1)
 
 Phase 0 proves the pipeline:
 
@@ -56,6 +56,17 @@ The SketchUp Generator has **no knowledge** of:
 - whether data originated from a photograph
 
 This boundary ensures AI can be swapped, upgraded, or run offline without touching the geometry kernel.
+
+## Phase Roadmap
+
+| Phase | Status | Focus |
+|---|---|---|
+| 0 | Complete | IR + SketchUp geometry kernel |
+| 1 | Complete | HtmlDialog workspace + manual facade definition |
+| 2 | Planning | Perspective rectification (OpenCV, local Python) |
+| 3+ | Future | Semantic detection, rationalization, AI |
+
+See `docs/PHASE_0.md`, `PHASE_1.md`, `PHASE_2.md`.
 
 ## Key Design Decisions (ADRs)
 

@@ -24,7 +24,8 @@
     secondarySourcePath: null,
     secondarySourceId: null,
     secondaryImageUrl: null,
-    multiview: null
+    multiview: null,
+    fusion: null
   };
 
   const els = {
@@ -840,6 +841,14 @@
       );
     }
 
+    if (state.fusion) {
+      items.push(
+        'Fusion: ' + state.fusion.fusion_method +
+        ' — ' + (state.fusion.fused_elements || []).length + ' openings (' +
+        state.fusion.fusion_confidence + ')'
+      );
+    }
+
     if (state.pattern) {
       items.push(
         'Pattern: ' + state.pattern.type +
@@ -899,7 +908,8 @@
       detection_method: els.detectMethod ? els.detectMethod.value : 'auto',
       rationalization: state.rationalization,
       pattern: state.pattern,
-      multiview: state.multiview
+      multiview: state.multiview,
+      fusion: state.fusion
     };
   }
 
@@ -1007,6 +1017,7 @@
     state.secondarySourceId = null;
     state.secondaryImageUrl = null;
     state.multiview = null;
+    state.fusion = null;
     state.overlayImageUrl = null;
     state.doorBbox = null;
     state.drag = null;
@@ -1077,6 +1088,18 @@
       setActiveView('overlay');
     }
     renderTree();
+  }
+
+  function applyFusion(payload, overlayUrl) {
+    applyDetection(payload, overlayUrl);
+    state.fusion = payload.fusion || null;
+    renderTree();
+    if (state.fusion) {
+      setStatus(
+        'success',
+        'Fused openings from two views — review overlay, then Rationalize or Generate.'
+      );
+    }
   }
 
   function applyDetection(payload, overlayUrl) {
@@ -1201,6 +1224,7 @@
     setMultiviewRegistration: setMultiviewRegistration,
     setRectifiedImage: setRectifiedImage,
     applyDetection: applyDetection,
+    applyFusion: applyFusion,
     applyRationalization: applyRationalization,
     applyPattern: applyPattern,
     setDetectionMeta: setDetectionMeta,
@@ -1214,6 +1238,18 @@
 
   document.getElementById('btn-pick-secondary').addEventListener('click', function () {
     sketchupCall('pick_secondary_image');
+  });
+
+  document.getElementById('btn-fuse-views').addEventListener('click', function () {
+    if (!state.sourcePath) {
+      setStatus('error', 'Load a primary image first.');
+      return;
+    }
+    if (!state.secondarySourcePath) {
+      setStatus('error', 'Load a secondary image first.');
+      return;
+    }
+    sketchupCall('fuse_views', JSON.stringify(collectParams()));
   });
 
   document.getElementById('btn-register-views').addEventListener('click', function () {

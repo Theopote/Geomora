@@ -39,6 +39,7 @@ module Geomora
           'multiview_confidence' => confidence,
           'multiview_match_count' => match_count,
           'multiview_inlier_count' => inlier_count,
+          'homography' => homography,
           'views' => views
         }
       end

@@ -276,6 +276,7 @@ module Geomora
         metadata['rationalization'] = @params['rationalization'] if @params['rationalization'].is_a?(Hash)
         metadata['pattern'] = @params['pattern'] if @params['pattern'].is_a?(Hash)
         metadata['multiview'] = @params['multiview'] if @params['multiview'].is_a?(Hash)
+        metadata['fusion'] = @params['fusion'] if @params['fusion'].is_a?(Hash)
 
         sources << {
           'id' => source_id.to_s,

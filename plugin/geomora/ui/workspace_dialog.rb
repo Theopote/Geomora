@@ -55,6 +55,69 @@ module Geomora
             end
           end
 
+          dialog.add_action_callback('fuse_views') do |_ctx, json|
+            params = JSON.parse(json)
+            primary_path = fusion_primary_path(params)
+            secondary_path = params['secondary_source_path']
+            if primary_path.nil? || primary_path.empty?
+              raise GeomoraError, 'Load and rectify a primary image first.'
+            end
+            if secondary_path.nil? || secondary_path.empty?
+              raise GeomoraError, 'Load a secondary image before fusing views.'
+            end
+
+            homography = params.dig('multiview', 'homography') || params['homography']
+            detection_method = params['detection_method'].to_s.strip
+            detection_method = 'auto' if detection_method.empty?
+
+            Logger.info("Fusing openings: #{primary_path} + #{secondary_path}")
+            result = Perception::MultiviewClient.fuse(
+              primary_path,
+              secondary_path,
+              homography: homography,
+              method: detection_method
+            )
+            @fusion = result.to_source_metadata
+            if result.registration
+              @multiview = Perception::MultiviewResult.from_hash(result.registration).to_source_metadata
+            end
+
+            detection = result.to_detection_result
+            mapped = Core::DetectionMapper.to_facade_params(
+              detection,
+              wall_length: params['wall_length'],
+              wall_height: params['wall_height'],
+              wall_thickness: params['wall_thickness']
+            )
+            @detection = detection.to_source_metadata.merge('fusion' => @fusion)
+
+            overlay_url = nil
+            if detection.overlay_base64 && !detection.overlay_base64.empty?
+              overlay_path = save_overlay_from_result(detection)
+              overlay_url = path_to_file_url(overlay_path) if overlay_path
+            end
+
+            payload = mapped.merge(
+              'detection' => detection.to_dict,
+              'fusion' => @fusion
+            )
+            dialog.execute_script(
+              "window.geomora.applyFusion(#{payload.to_json}, #{overlay_url.to_json})"
+            )
+            post_message(
+              dialog,
+              'success',
+              format(
+                'Fused %d openings from two views (%.2f %s)',
+                detection.elements.length,
+                result.confidence,
+                result.method
+              )
+            )
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
           dialog.add_action_callback('register_views') do |_ctx, json|
             params = JSON.parse(json)
             primary_path = params['source_path']
@@ -280,7 +343,14 @@ module Geomora
           params['rectification'] = @rectification if @rectification
           params['detection'] = @detection if @detection
           params['multiview'] = @multiview if @multiview
+          params['fusion'] = @fusion if @fusion
           params
+        end
+
+        def fusion_primary_path(params)
+          return @rectified_image_path if @rectified_image_path && File.exist?(@rectified_image_path)
+
+          params['source_path']
         end
 
         def detection_image_path(params)

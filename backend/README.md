@@ -67,6 +67,18 @@ secondary: <file>
 
 Returns homography mapping secondary → primary pixels, match/inlier counts, and view metadata.
 
+```http
+POST /multiview/fuse
+Content-Type: multipart/form-data
+
+primary: <file>
+secondary: <file>
+homography: optional JSON 3x3 matrix
+method: auto | yolo_v1 | contour_v1
+```
+
+Detects openings on both views, warps secondary boxes to primary, fuses with depth-weighted NMS (`multiview_fusion_v1`).
+
 ## Tests
 
 From repository root:

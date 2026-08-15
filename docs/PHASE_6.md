@@ -1,6 +1,6 @@
 # Geomora Phase 6 — Multi-view Reconstruction
 
-**Status:** Core bootstrap **COMPLETE** (v0.9.0)
+**Status:** Phase 6 **COMPLETE** (v0.9.0) · Phase 6.5 **COMPLETE** (v0.10.0)
 
 | Step | Status |
 |---|---|
@@ -8,7 +8,7 @@
 | 6.2 Feature matching + planar homography (`feature_homography_v1`) | ✅ |
 | 6.3 `POST /multiview/register` + Ruby client | ✅ |
 | 6.4 Workspace secondary image + Register Views | ✅ |
-| 6.5 Depth / COLMAP / opening fusion | ⏳ deferred |
+| 6.5 Depth proxy + opening fusion (`multiview_fusion_v1`) | ✅ |
 
 ---
 
@@ -108,4 +108,38 @@ tests/backend/
 
 ## 6. Gate to Phase 7
 
-Phase 6 links multiple **photos** to one facade session. Phase 7 extends geometry to full building elements (floor, roof, stair, etc.).
+Phase 6 links multiple **photos** to one facade session. See **Phase 6.5** below and [PHASE_6.md](PHASE_6.md) for fusion.
+
+---
+
+## Phase 6.5 — Opening Fusion + Depth (v0.10.0)
+
+| Step | Status |
+|---|---|
+| 6.5.1 Gradient depth proxy (`gradient_laplacian_v1`) | ✅ |
+| 6.5.2 Transform secondary detections via homography | ✅ |
+| 6.5.3 IoU fusion + depth-weighted confidence | ✅ |
+| 6.5.4 `POST /multiview/fuse` + Workspace **Fuse Openings** | ✅ |
+| 6.5.5 MiDaS / COLMAP depth | ⏳ deferred |
+
+### Workflow
+
+```text
+Load Primary + Secondary → Register Views (optional)
+      ↓
+Rectify primary (recommended)
+      ↓
+Fuse Openings  ← detects both views, merges into primary frame
+      ↓
+Rationalize → Apply Pattern → Generate
+```
+
+### API
+
+```http
+POST /multiview/fuse
+primary: <file>
+secondary: <file>
+homography: optional JSON 3x3 matrix
+method: auto | yolo_v1 | contour_v1
+```

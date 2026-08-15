@@ -32,6 +32,7 @@ module Geomora
     perception/detect_client
     perception/multiview_result
     perception/multiview_client
+    perception/fusion_result
     core/detection_mapper
     core/rationalizer
     core/pattern_analyzer

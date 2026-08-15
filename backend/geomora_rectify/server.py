@@ -7,11 +7,11 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 
 from geomora_detect.pipeline import detect_facade
-from geomora_multiview.pipeline import register_views
+from geomora_multiview.pipeline import fuse_openings, register_views
 
 from .pipeline import parse_corners, rectify_image
 
-app = FastAPI(title="Geomora Perception", version="0.9.0")
+app = FastAPI(title="Geomora Perception", version="0.10.0")
 
 
 @app.get("/")
@@ -23,6 +23,7 @@ def root() -> dict[str, str]:
         "rectify": "POST /rectify",
         "detect": "POST /detect",
         "multiview_register": "POST /multiview/register",
+        "multiview_fuse": "POST /multiview/fuse",
     }
 
 
@@ -110,6 +111,38 @@ async def multiview_register(
 
         try:
             result = register_views(str(primary_path), str(secondary_path))
+        except ValueError as error:
+            raise HTTPException(status_code=400, detail=str(error)) from error
+        except Exception as error:  # pragma: no cover - safety net
+            raise HTTPException(status_code=500, detail=str(error)) from error
+
+        return JSONResponse(result.to_dict())
+
+
+@app.post("/multiview/fuse")
+async def multiview_fuse(
+    primary: UploadFile = File(...),
+    secondary: UploadFile = File(...),
+    homography: str | None = Form(default=None),
+    method: str = Form(default="auto"),
+) -> JSONResponse:
+    if not is_image_upload(primary) or not is_image_upload(secondary):
+        raise HTTPException(status_code=400, detail="Upload must be image files")
+
+    with tempfile.TemporaryDirectory(prefix="geomora_multiview_fuse_") as temp_dir:
+        primary_path = Path(temp_dir) / "primary.jpg"
+        secondary_path = Path(temp_dir) / "secondary.jpg"
+        primary_path.write_bytes(await primary.read())
+        secondary_path.write_bytes(await secondary.read())
+
+        try:
+            result = fuse_openings(
+                str(primary_path),
+                str(secondary_path),
+                homography=homography,
+                detect_method=method,
+                return_overlay=True,
+            )
         except ValueError as error:
             raise HTTPException(status_code=400, detail=str(error)) from error
         except Exception as error:  # pragma: no cover - safety net

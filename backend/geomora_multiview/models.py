@@ -25,6 +25,41 @@ class ViewRegistration:
 
 
 @dataclass
+class FusionResult:
+    method: str
+    confidence: float
+    image_width: int
+    image_height: int
+    elements: list = field(default_factory=list)
+    overlay_base64: str | None = None
+    registration: dict[str, Any] | None = None
+    homography: list[list[float]] | None = None
+    debug: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        from geomora_detect.models import DetectedElement
+
+        element_dicts = []
+        for element in self.elements:
+            if isinstance(element, DetectedElement):
+                element_dicts.append(element.to_dict())
+            else:
+                element_dicts.append(element)
+
+        return {
+            "method": self.method,
+            "confidence": round(self.confidence, 4),
+            "image_width": self.image_width,
+            "image_height": self.image_height,
+            "elements": element_dicts,
+            "overlay_base64": self.overlay_base64,
+            "registration": self.registration,
+            "homography": self.homography,
+            "debug": self.debug,
+        }
+
+
+@dataclass
 class MultiviewResult:
     method: str
     confidence: float

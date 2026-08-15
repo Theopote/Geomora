@@ -33,11 +33,34 @@ module Geomora
                 'Perception service is not running. Start backend: backend/start_server.bat'
         end
 
+        def fuse(primary_path, secondary_path, homography: nil, method: 'auto', host: DEFAULT_HOST, port: DEFAULT_PORT)
+          raise GeomoraError, "Primary image not found: #{primary_path}" unless File.exist?(primary_path)
+          raise GeomoraError, "Secondary image not found: #{secondary_path}" unless File.exist?(secondary_path)
+
+          response = post_fuse_multipart(
+            host: host,
+            port: port,
+            primary_path: primary_path,
+            secondary_path: secondary_path,
+            homography: homography,
+            method: method
+          )
+
+          unless response.is_a?(Net::HTTPSuccess)
+            raise GeometryGenerationError, parse_error_message(response)
+          end
+
+          FusionResult.from_hash(JSON.parse(response.body))
+        rescue Errno::ECONNREFUSED, SocketError
+          raise GeometryGenerationError,
+                'Perception service is not running. Start backend: backend/start_server.bat'
+        end
+
         private
 
         def post_multipart(host:, port:, primary_path:, secondary_path:)
           boundary = "----Geomora#{rand(1_000_000)}"
-          body = build_body(boundary, primary_path, secondary_path)
+          body = build_register_body(boundary, primary_path, secondary_path)
 
           uri = URI("http://#{host}:#{port}/multiview/register")
           request = Net::HTTP::Post.new(uri)
@@ -49,10 +72,42 @@ module Geomora
           end
         end
 
-        def build_body(boundary, primary_path, secondary_path)
+        def build_register_body(boundary, primary_path, secondary_path)
           parts = []
           parts << file_part(boundary, 'primary', primary_path)
           parts << file_part(boundary, 'secondary', secondary_path)
+          parts << "--#{boundary}--\r\n"
+          parts.join
+        end
+
+        def post_fuse_multipart(host:, port:, primary_path:, secondary_path:, homography:, method:)
+          boundary = "----Geomora#{rand(1_000_000)}"
+          body = build_fuse_body(boundary, primary_path, secondary_path, homography, method)
+
+          uri = URI("http://#{host}:#{port}/multiview/fuse")
+          request = Net::HTTP::Post.new(uri)
+          request['Content-Type'] = "multipart/form-data; boundary=#{boundary}"
+          request.body = body
+
+          Net::HTTP.start(host, port, read_timeout: DEFAULT_TIMEOUT, open_timeout: 5) do |http|
+            http.request(request)
+          end
+        end
+
+        def build_fuse_body(boundary, primary_path, secondary_path, homography, method)
+          parts = []
+          parts << file_part(boundary, 'primary', primary_path)
+          parts << file_part(boundary, 'secondary', secondary_path)
+          if homography
+            parts << "--#{boundary}\r\n"
+            parts << "Content-Disposition: form-data; name=\"homography\"\r\n\r\n"
+            parts << homography.is_a?(String) ? homography : homography.to_json
+            parts << "\r\n"
+          end
+          parts << "--#{boundary}\r\n"
+          parts << "Content-Disposition: form-data; name=\"method\"\r\n\r\n"
+          parts << method.to_s
+          parts << "\r\n"
           parts << "--#{boundary}--\r\n"
           parts.join
         end

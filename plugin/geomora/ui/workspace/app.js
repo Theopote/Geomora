@@ -6,6 +6,8 @@
     originalImageUrl: null,
     rectifiedImageUrl: null,
     rectification: null,
+    detection: null,
+    overlayImageUrl: null,
     activeView: 'original'
   };
 
@@ -13,13 +15,15 @@
     status: document.getElementById('status'),
     sourceMeta: document.getElementById('source-meta'),
     rectifyMeta: document.getElementById('rectify-meta'),
+    detectMeta: document.getElementById('detect-meta'),
     image: document.getElementById('reference-image'),
     placeholder: document.getElementById('viewer-placeholder'),
     tree: document.getElementById('element-tree'),
     form: document.getElementById('facade-form'),
     windowsContainer: document.getElementById('windows-container'),
     btnViewOriginal: document.getElementById('btn-view-original'),
-    btnViewRectified: document.getElementById('btn-view-rectified')
+    btnViewRectified: document.getElementById('btn-view-rectified'),
+    btnViewOverlay: document.getElementById('btn-view-overlay')
   };
 
   function sketchupCall(name, arg) {
@@ -76,6 +80,13 @@
       'Door: ' + params.door.width + ' × ' + params.door.height + ' mm @ ' + params.door.offset
     ];
 
+    if (state.detection) {
+      items.push(
+        'Detection: ' + state.detection.method +
+        ' (' + state.detection.element_count + ' elements, confidence ' + state.detection.confidence + ')'
+      );
+    }
+
     if (state.rectification) {
       items.push(
         'Rectified: ' + state.rectification.method +
@@ -123,13 +134,25 @@
   }
 
   function updateViewer() {
-    const url = state.activeView === 'rectified' ? state.rectifiedImageUrl : state.originalImageUrl;
+    let url = null;
+    if (state.activeView === 'overlay' && state.overlayImageUrl) {
+      url = state.overlayImageUrl;
+    } else if (state.activeView === 'rectified') {
+      url = state.rectifiedImageUrl;
+    } else {
+      url = state.originalImageUrl;
+    }
+
     if (!url) {
       els.image.hidden = true;
       els.placeholder.hidden = false;
-      els.placeholder.textContent = state.activeView === 'rectified'
-        ? 'Run Rectify Facade to see corrected image'
-        : 'Load a facade photo for manual reference';
+      if (state.activeView === 'overlay') {
+        els.placeholder.textContent = 'Run Detect Elements to see overlay';
+      } else if (state.activeView === 'rectified') {
+        els.placeholder.textContent = 'Run Rectify Facade to see corrected image';
+      } else {
+        els.placeholder.textContent = 'Load a facade photo for manual reference';
+      }
       return;
     }
 
@@ -142,6 +165,7 @@
     state.activeView = view;
     els.btnViewOriginal.classList.toggle('active', view === 'original');
     els.btnViewRectified.classList.toggle('active', view === 'rectified');
+    els.btnViewOverlay.classList.toggle('active', view === 'overlay');
     updateViewer();
   }
 
@@ -192,6 +216,38 @@
     renderTree();
   }
 
+  function applyDetection(payload, overlayUrl) {
+    const windows = (payload.windows || []).map(function (win) {
+      return {
+        offset: Number(win.offset),
+        width: Number(win.width),
+        height: Number(win.height),
+        sill_height: Number(win.sill_height)
+      };
+    });
+    renderWindows(windows);
+
+    const door = payload.door || {};
+    els.form.elements.namedItem('door_offset').value = door.offset || 0;
+    els.form.elements.namedItem('door_width').value = door.width || 900;
+    els.form.elements.namedItem('door_height').value = door.height || 2100;
+
+    state.detection = payload.detection || null;
+    state.overlayImageUrl = overlayUrl || null;
+    if (state.detection) {
+      els.detectMeta.textContent =
+        'Detection: ' + state.detection.method +
+        ' | ' + state.detection.windows + ' windows, ' + state.detection.doors + ' doors' +
+        ' | confidence ' + state.detection.confidence;
+    }
+
+    if (overlayUrl) {
+      setActiveView('overlay');
+    }
+    renderTree();
+    setStatus('success', 'Detection applied to form — review values before Generate');
+  }
+
   function setIrPreview(ir) {
     if (!ir || !ir.openings) return;
     renderTree();
@@ -201,6 +257,7 @@
     loadPayload: loadPayload,
     setImage: setImage,
     setRectifiedImage: setRectifiedImage,
+    applyDetection: applyDetection,
     setIrPreview: setIrPreview,
     setStatus: setStatus
   };
@@ -211,6 +268,10 @@
 
   document.getElementById('btn-rectify').addEventListener('click', function () {
     sketchupCall('rectify', JSON.stringify(collectParams()));
+  });
+
+  document.getElementById('btn-detect').addEventListener('click', function () {
+    sketchupCall('detect', JSON.stringify(collectParams()));
   });
 
   document.getElementById('btn-load-template').addEventListener('click', function () {
@@ -231,6 +292,10 @@
 
   els.btnViewRectified.addEventListener('click', function () {
     setActiveView('rectified');
+  });
+
+  document.getElementById('btn-view-overlay').addEventListener('click', function () {
+    setActiveView('overlay');
   });
 
   els.form.addEventListener('change', renderTree);

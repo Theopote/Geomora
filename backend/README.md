@@ -1,6 +1,6 @@
-# Geomora Rectify Service (Phase 2)
+# Geomora Perception Service (Phase 2 + 3)
 
-Local Python service for perspective facade rectification.
+Local Python service for facade rectification and element detection.
 
 ## Setup
 
@@ -38,6 +38,15 @@ corners: optional JSON string [[x,y],...]  (4 points)
 
 Response includes `rectified_image_base64`, `homography`, `vanishing_points`, `confidence`.
 
+```http
+POST /detect
+Content-Type: multipart/form-data
+
+image: <file>
+```
+
+Response includes `elements[]`, `confidence`, `overlay_base64`.
+
 ## Tests
 
 From repository root:
@@ -48,6 +57,7 @@ py -m pytest tests/backend -q
 
 ## Notes
 
-- Auto mode uses line detection + vanishing points + estimated facade quad.
-- For best results, use **manual 4 corners** until auto mode is tuned on real photos.
-- No AI models. OpenCV only.
+- Phase 2: auto rectify uses line detection + vanishing points + estimated facade quad.
+- Phase 3: `contour_v1` detects dark rectangular openings on rectified images.
+- For best results, **rectify first**, then detect. Use manual 4 corners when auto rectify fails.
+- v0.4.0 uses OpenCV only; YOLO/SAM planned for Phase 3.5+.

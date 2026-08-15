@@ -62,6 +62,7 @@ module Geomora
             Logger.info("Rectifying image: #{source_path}")
             result = Perception::RectifyClient.rectify(source_path)
             @rectification = result.to_source_metadata(source_path)
+            @rectified_image_path = result.rectified_image_path
             rectified_url = path_to_file_url(result.rectified_image_path)
 
             dialog.execute_script(
@@ -71,6 +72,47 @@ module Geomora
               dialog,
               'success',
               format('Rectified (confidence %.2f, %s)', result.confidence, result.method)
+            )
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
+          dialog.add_action_callback('detect') do |_ctx, json|
+            params = JSON.parse(json)
+            image_path = detection_image_path(params)
+            if image_path.nil? || image_path.empty?
+              raise GeomoraError, 'Load an image (and rectified view recommended) before detecting.'
+            end
+
+            Logger.info("Detecting facade elements: #{image_path}")
+            result = Perception::DetectClient.detect(image_path)
+            mapped = Core::DetectionMapper.to_facade_params(
+              result,
+              wall_length: params['wall_length'],
+              wall_height: params['wall_height'],
+              wall_thickness: params['wall_thickness']
+            )
+            @detection = result.to_source_metadata
+            overlay_url = nil
+            if result.overlay_base64 && !result.overlay_base64.empty?
+              overlay_path = save_overlay_from_result(result)
+              overlay_url = path_to_file_url(overlay_path) if overlay_path
+            end
+
+            payload = mapped.merge('detection' => result.to_dict)
+            dialog.execute_script(
+              "window.geomora.applyDetection(#{payload.to_json}, #{overlay_url.to_json})"
+            )
+            post_message(
+              dialog,
+              'success',
+              format(
+                'Detected %d windows, %d doors (%.2f %s)',
+                result.to_dict['windows'],
+                result.to_dict['doors'],
+                result.confidence,
+                result.method
+              )
             )
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)
@@ -104,7 +146,22 @@ module Geomora
 
         def enrich_params(params)
           params['rectification'] = @rectification if @rectification
+          params['detection'] = @detection if @detection
           params
+        end
+
+        def detection_image_path(params)
+          return @rectified_image_path if @rectified_image_path && File.exist?(@rectified_image_path)
+
+          params['source_path']
+        end
+
+        def save_overlay_from_result(result)
+          cache_dir = File.join(Core::Project.plugin_root, 'cache')
+          path = File.join(cache_dir, "detect_overlay_#{Time.now.to_i}.jpg")
+          require 'base64'
+          File.binwrite(path, Base64.decode64(result.overlay_base64))
+          path
         end
 
         def default_payload

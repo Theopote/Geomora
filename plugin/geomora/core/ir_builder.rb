@@ -179,6 +179,9 @@ module Geomora
         if @params['rectification'].is_a?(Hash)
           metadata.merge!(@params['rectification'])
         end
+        if @params['detection'].is_a?(Hash)
+          metadata.merge!(@params['detection'])
+        end
 
         sources << {
           'id' => source_id.to_s,

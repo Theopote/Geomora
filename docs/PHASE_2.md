@@ -312,7 +312,7 @@ Phase 2 is complete when:
 - [x] `docs/PHASE_2.md` updated with results
 - [x] README documents how to start backend
 
-**Recommendation:** Phase 2 **core complete** — ready for Phase 3 planning. Step 2.8 (manual corners UI) can ship as patch.
+Phase 2 **core complete** — Phase 3 detection bootstrap started (v0.4.0). Step 2.8 (manual corners UI) can ship as patch.
 
 ---
 

@@ -28,6 +28,9 @@ module Geomora
     generators/project_generator
     perception/rectification_result
     perception/rectify_client
+    perception/detection_result
+    perception/detect_client
+    core/detection_mapper
     core/ir_builder
     core/project
     ui/workspace_dialog

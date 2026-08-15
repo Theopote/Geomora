@@ -7,6 +7,7 @@ module Geomora
     class WorkspaceDialog
       WORKSPACE_DIR = File.join(Core::Project.plugin_root, 'ui', 'workspace')
       HTML_PATH = File.join(WORKSPACE_DIR, 'index.html')
+      REVIEW_WINDOW_LIMIT = Core::DetectionMapper::REVIEW_WINDOW_LIMIT
 
       class << self
         def show
@@ -113,17 +114,39 @@ module Geomora
               dialog.execute_script(
                 "window.geomora.applyDetection(#{payload.to_json}, #{overlay_url.to_json})"
               )
-              post_message(
-                dialog,
-                'success',
-                format(
-                  'Detected %d windows, %d doors (%.2f %s)',
-                  result.to_dict['windows'],
-                  result.to_dict['doors'],
-                  result.confidence,
-                  result.method
+              window_count = result.to_dict['windows']
+              door_count = result.to_dict['doors']
+              if window_count > REVIEW_WINDOW_LIMIT
+                post_message(
+                  dialog,
+                  'error',
+                  format(
+                    'Detected %d windows — check Overlay, remove false positives in Inspector, then Generate.',
+                    window_count
+                  )
                 )
-              )
+              elsif door_count.zero?
+                post_message(
+                  dialog,
+                  'success',
+                  format(
+                    'Detected %d windows, no door (door fields cleared). Review before Generate.',
+                    window_count
+                  )
+                )
+              else
+                post_message(
+                  dialog,
+                  'success',
+                  format(
+                    'Detected %d windows, %d doors (%.2f %s). Review before Generate.',
+                    window_count,
+                    door_count,
+                    result.confidence,
+                    result.method
+                  )
+                )
+              end
             end
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)
@@ -146,6 +169,12 @@ module Geomora
 
           dialog.add_action_callback('generate') do |_ctx, json|
             params = enrich_params(JSON.parse(json))
+            windows = params['windows']
+            if windows.is_a?(Array) && windows.length > REVIEW_WINDOW_LIMIT
+              raise GeomoraError,
+                    "Too many windows (#{windows.length}). Remove false positives in Inspector (max #{REVIEW_WINDOW_LIMIT}), then Generate again."
+            end
+
             ir = Core::Project.build_manual_facade(params)
             Core::Project.generate_from_data(ir)
             post_message(dialog, 'success', 'Generation complete.')

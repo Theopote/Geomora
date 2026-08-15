@@ -1,4 +1,6 @@
 (function () {
+  const REVIEW_WINDOW_LIMIT = 8;
+
   const state = {
     sourcePath: null,
     sourceId: null,
@@ -48,7 +50,10 @@
       const row = document.createElement('div');
       row.className = 'window-row';
       row.innerHTML =
+        '<div class="window-row-header">' +
         '<h3>Window ' + (index + 1) + '</h3>' +
+        '<button type="button" class="btn-link" data-remove-win="' + index + '">Remove</button>' +
+        '</div>' +
         '<label>Offset (mm)<input data-win="' + index + '" data-field="offset" type="number" step="1" value="' + win.offset + '"></label>' +
         '<label>Width (mm)<input data-win="' + index + '" data-field="width" type="number" step="1" value="' + win.width + '"></label>' +
         '<label>Height (mm)<input data-win="' + index + '" data-field="height" type="number" step="1" value="' + win.height + '"></label>' +
@@ -60,7 +65,26 @@
       input.addEventListener('change', onWindowFieldChange);
     });
 
+    els.windowsContainer.querySelectorAll('[data-remove-win]').forEach(function (button) {
+      button.addEventListener('click', onRemoveWindow);
+    });
+
     renderTree();
+  }
+
+  function onRemoveWindow(event) {
+    const index = parseInt(event.target.dataset.removeWin, 10);
+    if (Number.isNaN(index)) return;
+    state.windows.splice(index, 1);
+    renderWindows(state.windows);
+    if (state.windows.length <= REVIEW_WINDOW_LIMIT) {
+      setStatus('', 'Window removed — you can Generate when the list looks correct.');
+    } else {
+      setStatus(
+        'error',
+        'Still ' + state.windows.length + ' windows — remove more false positives before Generate.'
+      );
+    }
   }
 
   function onWindowFieldChange(event) {
@@ -195,7 +219,7 @@
     }
 
     renderTree();
-  if (mode === 'template') {
+    if (mode === 'template') {
       setStatus('', 'Phase 0 template loaded — for testing only');
     } else {
       setStatus('', 'Ready — load a photo to begin');
@@ -259,9 +283,10 @@
     renderWindows(windows);
 
     const door = payload.door || {};
+    const doorWidth = Number(door.width) || 0;
     els.form.elements.namedItem('door_offset').value = door.offset || 0;
-    els.form.elements.namedItem('door_width').value = door.width || 900;
-    els.form.elements.namedItem('door_height').value = door.height || 2100;
+    els.form.elements.namedItem('door_width').value = doorWidth;
+    els.form.elements.namedItem('door_height').value = doorWidth > 0 ? (door.height || 2100) : 0;
 
     state.detection = payload.detection || null;
     state.overlayImageUrl = overlayUrl || null;
@@ -276,7 +301,18 @@
       setActiveView('overlay');
     }
     renderTree();
-    setStatus('success', 'Detection applied — review values before Generate');
+
+    const doorCount = state.detection ? state.detection.doors : 0;
+    if (windows.length > REVIEW_WINDOW_LIMIT || payload.review_required) {
+      setStatus(
+        'error',
+        'Detected ' + windows.length + ' windows — check Overlay, remove false positives (Remove), then Generate.'
+      );
+    } else if (doorCount === 0) {
+      setStatus('success', 'No door detected — door fields cleared. Review windows before Generate.');
+    } else {
+      setStatus('success', 'Detection applied — review values before Generate.');
+    }
   }
 
   function setIrPreview(ir) {
@@ -315,6 +351,13 @@
   });
 
   document.getElementById('btn-generate').addEventListener('click', function () {
+    if (state.windows.length > REVIEW_WINDOW_LIMIT) {
+      setStatus(
+        'error',
+        'Too many windows (' + state.windows.length + '). Remove false positives in Inspector, then Generate again.'
+      );
+      return;
+    }
     sketchupCall('generate', JSON.stringify(collectParams()));
   });
 

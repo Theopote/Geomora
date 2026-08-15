@@ -5,6 +5,7 @@ module Geomora
     class DetectionMapper
       MIN_GAP_MM = 50.0
       MIN_OPENING_WIDTH_MM = 300.0
+      REVIEW_WINDOW_LIMIT = 8
 
       def self.to_facade_params(detection, wall_length:, wall_height:, wall_thickness: 240)
         new(detection, wall_length: wall_length, wall_height: wall_height, wall_thickness: wall_thickness).to_params
@@ -37,7 +38,8 @@ module Geomora
 
         {
           'windows' => windows.map { |item| stringify(item) },
-          'door' => stringify(door || default_door)
+          'door' => door ? stringify(door) : empty_door,
+          'review_required' => windows.length > REVIEW_WINDOW_LIMIT
         }
       end
 
@@ -118,12 +120,12 @@ module Geomora
         }.compact
       end
 
-      def default_door
+      def empty_door
         {
-          offset: (@wall_length * 0.75).round(1),
-          width: 900.0,
-          height: 2100.0,
-          confidence: 0.0
+          'offset' => 0,
+          'width' => 0,
+          'height' => 0,
+          'confidence' => 0.0
         }
       end
     end

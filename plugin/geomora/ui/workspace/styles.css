@@ -174,6 +174,34 @@ body {
   color: #f28b82;
 }
 
+.status.warning {
+  color: #fdd663;
+}
+
+.window-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.window-row-header h3 {
+  margin: 0;
+}
+
+.btn-link {
+  border: none;
+  background: none;
+  color: #f28b82;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
 .view-toggle {
   display: flex;
   gap: 6px;

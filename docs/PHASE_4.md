@@ -109,4 +109,4 @@ tests/ir/rationalizer_test.rb
 
 ## 7. Gate to Phase 5
 
-Phase 4 produces **regularized single-facade openings**. Phase 5 adds pattern intelligence (grid bays, storey repetition, component reuse strategies).
+Phase 4 produces **regularized single-facade openings**. See [PHASE_5.md](PHASE_5.md) for pattern intelligence (bay detection, shared components).

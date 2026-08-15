@@ -34,10 +34,12 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | # | Step | Expected |
 |---|---|---|
 | 4.0 | **Rationalize** (≥1 window) | Equal widths/heights/sills; even spacing; overlay boxes update |
-| 4.1 | Door width = 0 | No door in element tree / IR when no door on facade |
-| 4.2 | Validate | Passes with consistent openings |
-| 4.3 | Generate | SketchUp geometry created in one undo step |
-| 4.4 | Ctrl+Z | Entire generation reverts |
+| 4.1 | **Apply Pattern** (≥2 windows, after Rationalize) | Element tree shows `translation_grid`; shared `window_bay_WxH` |
+| 4.2 | Door width = 0 | No door in element tree / IR when no door on facade |
+| 4.3 | Validate | Passes with consistent openings |
+| 4.4 | Generate | SketchUp geometry created in one undo step |
+| 4.5 | Generate (after Apply Pattern) | Single shared window ComponentDefinition in Components panel |
+| 4.6 | Ctrl+Z | Entire generation reverts |
 
 ## Known limitations (acceptable for Stage A)
 

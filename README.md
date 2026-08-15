@@ -8,7 +8,7 @@ Phase 0 implements the **Architectural IR** and **SketchUp Native Geometry Kerne
 
 **Phase 2** (core complete): perspective rectification + manual 4-corner UI — see [PHASE_2.md](docs/PHASE_2.md). Requires local Python backend (`backend/start_server.bat`).
 
-**Phase 4** (core complete): geometry rationalization — see [PHASE_4.md](docs/PHASE_4.md).
+**Phase 5** (core complete): pattern intelligence — see [PHASE_5.md](docs/PHASE_5.md).
 
 Test images: see [examples/README.md](examples/README.md).
 

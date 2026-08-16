@@ -174,6 +174,16 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 17.4 | Preview catalog diff | Summary of added/changed sets |
 | 17.5 | Export LOD Capture HTML | HTML with embedded viewport images |
 
+## Phase 18 — GIF export + editor polish
+
+| # | Step | Expected |
+|---|---|---|
+| 18.1 | Export LOD Tour GIF | `.gif` file with animated LOD frames |
+| 18.2 | Catalog palette drag-drop | New item appears on plan canvas |
+| 18.3 | storey_count = 2, layout editor | Storey selector with per-floor rooms |
+| 18.4 | Rotate selected 90° | Item rotation updates in serialized layout |
+| 18.5 | 3D preview canvas | Isometric boxes update while dragging |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos

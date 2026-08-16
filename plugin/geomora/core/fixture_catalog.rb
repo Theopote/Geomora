@@ -139,6 +139,35 @@ module Geomora
           }.compact
         end.compact
       end
+
+      def self.palette(params)
+        items = {}
+        if enabled?(params)
+          catalog = load_catalog(params)
+          (catalog['sets'] || {}).each_value do |set_items|
+            normalize_items(set_items).each do |item|
+              items[item[:kind]] ||= palette_entry(item)
+            end
+          end
+        end
+        FixtureLibrary::SETS.each_value do |set_items|
+          set_items.each do |item|
+            items[item[:kind]] ||= palette_entry(item)
+          end
+        end
+        items.values.sort_by { |entry| entry[:kind] }
+      end
+
+      def self.palette_entry(item)
+        {
+          kind: item[:kind].to_s,
+          width: item[:width].to_f,
+          depth: item[:depth].to_f,
+          height: item[:height].to_f,
+          category: item[:category] || 'furniture',
+          label: item[:kind].to_s.tr('_', ' ')
+        }
+      end
     end
   end
 end

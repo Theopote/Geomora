@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.26.0 — Layout Editor + LOD Capture</div>
+    <div class="subtitle">v0.27.0 — GIF Export + Layout Palette</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -154,18 +154,28 @@
           <button type="button" id="btn-preview-catalog-diff" class="btn-link">Preview catalog diff</button>
         </div>
 
-        <div class="section-title">Layout Editor (Phase 17)</div>
+        <div class="section-title">Layout Editor (Phase 17–18)</div>
         <label class="checkbox-label"><input name="include_furniture_wall_align" type="checkbox"> Wall-aligned furniture placement</label>
         <div class="inline-actions">
           <button type="button" id="btn-open-layout-editor" class="btn-link">Open layout editor</button>
           <button type="button" id="btn-sync-layout-field" class="btn-link">Apply editor to layouts field</button>
+          <button type="button" id="btn-rotate-selected" class="btn-link">Rotate selected 90°</button>
         </div>
         <div id="layout-editor-panel" class="layout-editor-panel" hidden>
-          <label>Room
-            <select id="layout-editor-room"></select>
-          </label>
-          <canvas id="layout-editor-canvas" width="320" height="220" aria-label="Room layout editor"></canvas>
-          <div class="layout-editor-hint">Drag furniture blocks. Positions are in millimetres.</div>
+          <div class="layout-editor-row">
+            <label>Storey
+              <select id="layout-editor-storey"></select>
+            </label>
+            <label>Room
+              <select id="layout-editor-room"></select>
+            </label>
+          </div>
+          <div id="layout-catalog-palette" class="layout-catalog-palette" aria-label="Fixture catalog palette"></div>
+          <div class="layout-editor-split">
+            <canvas id="layout-editor-canvas" width="320" height="220" aria-label="Room layout editor"></canvas>
+            <canvas id="layout-preview-3d-canvas" width="220" height="220" aria-label="Isometric furniture preview"></canvas>
+          </div>
+          <div class="layout-editor-hint">Drag palette items onto the plan or click to add. 3D preview updates live.</div>
         </div>
         <div id="catalog-diff-preview" class="meta">Catalog diff: not checked</div>
 

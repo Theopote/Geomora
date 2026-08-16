@@ -49,6 +49,7 @@ module Geomora
           lod_menu.add_item('Export LOD Tour HTML...') { export_lod_tour_html }
           lod_menu.add_item('Export LOD Capture HTML...') { export_lod_tour_capture_html }
           lod_menu.add_item('Export LOD Tour Frames...') { export_lod_tour_frames }
+          lod_menu.add_item('Export LOD Tour GIF...') { export_lod_tour_gif }
           lod_menu.add_item('Play LOD Tour') { play_lod_tour }
           lod_menu.add_separator
           lod_menu.add_item('Reload Fixture Catalog') { reload_fixture_catalog }
@@ -93,6 +94,16 @@ module Geomora
           ::UI.messagebox("LOD frames exported:\n\n#{names}")
         rescue GeomoraError => e
           ::UI.messagebox("LOD frame export failed:\n\n#{e.message}")
+        end
+
+        def export_lod_tour_gif
+          path = ::UI.savepanel('Export LOD tour GIF', '', 'geomora_lod_tour.gif')
+          return unless path
+
+          saved = Core::Project.export_lod_tour_gif(path)
+          ::UI.messagebox("LOD tour GIF exported:\n\n#{saved}")
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD GIF export failed:\n\n#{e.message}")
         end
 
         def reload_fixture_catalog

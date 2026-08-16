@@ -3,6 +3,22 @@
 module Geomora
   module Core
     class RoomLayoutEditor
+      def self.preview_all_storeys(params)
+        count = (params['storey_count'] || params[:storey_count] || 1).to_i
+        count = 1 if count < 1
+        (0...count).map do |index|
+          {
+            'storey_index' => index,
+            'label' => storey_label(index),
+            'rooms' => preview(params, storey_index: index)
+          }
+        end
+      end
+
+      def self.storey_label(index)
+        index.zero? ? 'Ground' : format('Floor %d', index + 1)
+      end
+
       def self.preview(params, storey_index: 0)
         wall_length = (params['wall_length'] || params[:wall_length] || 10_000).to_f
         building_depth = (params['building_depth'] || params[:building_depth] || 6000).to_f

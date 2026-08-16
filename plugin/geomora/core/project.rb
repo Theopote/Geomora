@@ -111,7 +111,16 @@ module Geomora
       end
 
       def self.preview_room_layout(params)
-        RoomLayoutEditor.preview(params)
+        RoomLayoutEditor.preview_all_storeys(params)
+      end
+
+      def self.layout_catalog_palette(params = {})
+        FixtureCatalog.palette(params)
+      end
+
+      def self.export_lod_tour_gif(path, delay_centiseconds: 20)
+        model = Sketchup.active_model
+        LodPresentation.export_tour_gif(model, path, delay_centiseconds: delay_centiseconds)
       end
 
       def self.reload_fixture_catalog(params = {})

@@ -91,12 +91,14 @@ tests/core/fixture_catalog_diff_test.rb
 
 ---
 
-## 7. Deferred (Phase 18+)
+## 7. Deferred (Phase 18 — delivered in v0.27.0)
 
-- True GIF/video encoder from captured frames
-- Full drag-and-drop catalog item palette in editor
-- Multi-storey layout editor tabs
-- Live 3D furniture preview in Workspace
+See `docs/PHASE_18.md` for GIF export, catalog palette, multi-storey tabs, and 3D preview.
+
+Remaining for Phase 19+:
+
+- MP4/WebM video export
+- SketchUp live viewport embed in Workspace
 
 ---
 

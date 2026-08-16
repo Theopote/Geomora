@@ -71,6 +71,8 @@ module Geomora
     core/room_overrides
     core/structural_constraint_solver
     core/lod_presentation
+    core/png_reader
+    core/gif_encoder
     core/lod_capture
     core/constraint_solver
     core/lod_scenes

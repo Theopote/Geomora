@@ -432,6 +432,45 @@ body {
   background: #202124;
 }
 
+.layout-editor-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.layout-editor-row label {
+  flex: 1;
+}
+
+.layout-editor-split {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 8px;
+}
+
+.layout-catalog-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+  max-height: 72px;
+  overflow-y: auto;
+}
+
+.layout-palette-chip {
+  border: 1px solid #5f6368;
+  background: #303134;
+  color: #e8eaed;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: grab;
+}
+
+.layout-palette-chip:hover {
+  background: #3c4043;
+}
+
 .layout-editor-panel canvas {
   display: block;
   width: 100%;

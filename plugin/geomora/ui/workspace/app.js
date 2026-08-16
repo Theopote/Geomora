@@ -1572,6 +1572,7 @@
     applyPattern: applyPattern,
     applyRoomLayoutSuggestion: applyRoomLayoutSuggestion,
     setRoomLayoutPreview: setRoomLayoutPreview,
+    setLayoutCatalogPalette: setLayoutCatalogPalette,
     setCatalogDiffPreview: setCatalogDiffPreview,
     setDetectionMeta: setDetectionMeta,
     onDetectionEmpty: onDetectionEmpty,
@@ -1583,6 +1584,9 @@
     requestPreview: function () {
       sketchupCall('preview_room_layout', JSON.stringify(collectParams()));
     },
+    requestPalette: function () {
+      sketchupCall('layout_catalog_palette', JSON.stringify(collectParams()));
+    },
     requestCatalogDiff: function () {
       sketchupCall('preview_fixture_catalog_diff', JSON.stringify(collectParams()));
     },
@@ -1593,9 +1597,15 @@
     setStatus: setStatus
   };
 
-  function setRoomLayoutPreview(rooms) {
+  function setRoomLayoutPreview(storeys) {
     if (window.geomoraLayoutEditor) {
-      window.geomoraLayoutEditor.setPreview(rooms);
+      window.geomoraLayoutEditor.setPreview(storeys);
+    }
+  }
+
+  function setLayoutCatalogPalette(items) {
+    if (window.geomoraLayoutEditor) {
+      window.geomoraLayoutEditor.setPalette(items);
     }
   }
 

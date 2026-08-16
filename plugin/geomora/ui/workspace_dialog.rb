@@ -410,9 +410,19 @@ module Geomora
 
           dialog.add_action_callback('preview_room_layout') do |_ctx, json|
             params = enrich_params(JSON.parse(json))
-            rooms = Core::RoomLayoutEditor.preview(params)
-            dialog.execute_script("window.geomora.setRoomLayoutPreview(#{rooms.to_json})")
-            post_message(dialog, 'success', format('Layout editor loaded (%d rooms).', rooms.length))
+            storeys = Core::RoomLayoutEditor.preview_all_storeys(params)
+            dialog.execute_script("window.geomora.setRoomLayoutPreview(#{storeys.to_json})")
+            room_count = storeys.sum { |storey| storey['rooms'].length }
+            post_message(dialog, 'success', format('Layout editor loaded (%d storeys, %d rooms).', storeys.length, room_count))
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
+          dialog.add_action_callback('layout_catalog_palette') do |_ctx, json|
+            params = enrich_params(JSON.parse(json))
+            palette = Core::FixtureCatalog.palette(params)
+            dialog.execute_script("window.geomora.setLayoutCatalogPalette(#{palette.to_json})")
+            post_message(dialog, 'success', format('Catalog palette loaded (%d items).', palette.length))
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)
           end

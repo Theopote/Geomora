@@ -88,6 +88,32 @@ module Geomora
         FileUtils.mkdir_p(dir)
         dir
       end
+
+      def self.frame_rgb(path)
+        PngReader.read_rgb(path)
+      rescue GeomoraError, StandardError => e
+        Logger.warn("LOD frame RGB decode failed: #{e.message}")
+        placeholder_rgb(DEFAULT_WIDTH, DEFAULT_HEIGHT)
+      end
+
+      def self.placeholder_rgb(width, height)
+        rgb = +''
+        height.times do |y|
+          width.times do |x|
+            rgb << ((x * 255) / [width, 1].max).chr
+            rgb << ((y * 255) / [height, 1].max).chr
+            rgb << 120.chr
+          end
+        end
+        { 'width' => width, 'height' => height, 'rgb' => rgb }
+      end
+
+      def self.export_gif(model, path, delay_centiseconds: 20, width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT)
+        frames = capture_pages(model, width: width, height: height).map do |frame|
+          frame_rgb(frame['path'])
+        end
+        GifEncoder.encode(frames, path, delay_centiseconds: delay_centiseconds)
+      end
     end
   end
 end

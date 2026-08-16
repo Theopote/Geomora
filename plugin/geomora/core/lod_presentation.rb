@@ -184,6 +184,10 @@ module Geomora
         LodCapture.export_frames(model, directory, width: width, height: height)
       end
 
+      def self.export_tour_gif(model, path, delay_centiseconds: 20, width: LodCapture::DEFAULT_WIDTH, height: LodCapture::DEFAULT_HEIGHT)
+        LodCapture.export_gif(model, path, delay_centiseconds: delay_centiseconds, width: width, height: height)
+      end
+
       def self.escape_html(text)
         text.to_s
             .gsub('&', '&amp;')

@@ -19,6 +19,13 @@ module Geomora
         opening_ids = windows.map { |w| w['id'] }
         opening_ids << door['id'] if door
         openings = windows + (door ? [door] : [])
+        building_elements = Core::BuildingComposer.compose(
+          @params,
+          wall_length: wall_length,
+          wall_height: wall_height,
+          wall_thickness: wall_thickness,
+          storey_id: storey_id
+        )
 
         {
           'schema_version' => Geomora::SCHEMA_VERSION,
@@ -53,7 +60,7 @@ module Geomora
                       'opening_ids' => opening_ids,
                       'confidence' => 1.0
                     }
-                  ]
+                  ] + building_elements
                 }
               ]
             }

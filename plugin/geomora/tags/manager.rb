@@ -6,7 +6,11 @@ module Geomora
       Geomora_Walls
       Geomora_Windows
       Geomora_Doors
+      Geomora_Floors
       Geomora_Roofs
+      Geomora_Columns
+      Geomora_Beams
+      Geomora_Stairs
       Geomora_Reference
     ].freeze
 

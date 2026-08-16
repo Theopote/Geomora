@@ -89,7 +89,20 @@ module Geomora
           @errors << "Negative storey height: #{storey.id}" if storey.height.to_f.negative?
 
           storey.elements.each do |element|
-            validate_wall(element, storey)
+            case element.type
+            when 'wall'
+              validate_wall(element, storey)
+            when 'floor', 'roof'
+              validate_polygon_element(element, storey)
+            when 'column'
+              validate_column(element, storey)
+            when 'beam'
+              validate_beam(element, storey)
+            when 'stair'
+              validate_stair(element, storey)
+            else
+              @errors << "Unsupported element type: #{element.type}"
+            end
           end
         end
       end
@@ -227,6 +240,49 @@ module Geomora
         @doc.components.each do |comp|
           @errors << "Missing component type: #{comp.id}" if comp.type.nil?
         end
+      end
+
+      def validate_polygon_element(element, storey)
+        validate_storey_reference(element, storey)
+        polygon = element.geometry[:polygon]
+        @errors << "Invalid polygon for #{element.id}" if polygon.nil? || polygon.length < 3
+        thickness = element.geometry[:thickness]
+        @errors << "Zero thickness on #{element.id}" if thickness.to_f.zero?
+      end
+
+      def validate_column(element, storey)
+        validate_storey_reference(element, storey)
+        %i[width depth height].each do |dim|
+          val = element.geometry[dim]
+          @errors << "Zero #{dim} on #{element.id}" if val.to_f.zero?
+        end
+      end
+
+      def validate_beam(element, storey)
+        validate_storey_reference(element, storey)
+        baseline = element.geometry[:baseline]
+        @errors << "Invalid baseline for #{element.id}" if baseline.nil? || baseline.length != 2
+        %i[width height].each do |dim|
+          val = element.geometry[dim]
+          @errors << "Zero #{dim} on #{element.id}" if val.to_f.zero?
+        end
+      end
+
+      def validate_stair(element, storey)
+        validate_storey_reference(element, storey)
+        %i[width run rise steps].each do |dim|
+          val = element.geometry[dim]
+          @errors << "Zero #{dim} on #{element.id}" if val.to_f.zero?
+        end
+      end
+
+      def validate_storey_reference(element, storey)
+        unless @ids[element.storey_id]
+          @errors << "Invalid storey_id for #{element.id}: #{element.storey_id}"
+        end
+        return if element.storey_id == storey.id
+
+        @errors << "Element #{element.id} storey_id does not match parent storey"
       end
     end
   end

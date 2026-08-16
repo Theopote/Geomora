@@ -397,3 +397,16 @@ body {
 #rectify-meta {
   margin-top: 8px;
 }
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+  font-size: 13px;
+  color: #c9cdd3;
+}
+
+.checkbox-label input {
+  accent-color: #3367d6;
+}

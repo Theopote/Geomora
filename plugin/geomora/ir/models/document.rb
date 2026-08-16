@@ -40,6 +40,12 @@ module Geomora
         end
       end
 
+      Floor = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
+      Roof = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
+      Column = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
+      Beam = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
+      Stair = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
+
       Opening = Struct.new(
         :id, :type, :parent_id, :geometry, :component, :confidence, :source,
         keyword_init: true

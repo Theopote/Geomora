@@ -821,6 +821,15 @@
       'Door: ' + params.door.width + ' × ' + params.door.height + ' mm @ ' + params.door.offset
     ];
 
+    if (params.building_elements) {
+      const enabled = Object.keys(params.building_elements).filter(function (key) {
+        return params.building_elements[key];
+      });
+      if (enabled.length > 0) {
+        items.push('Building: ' + enabled.join(', ') + ' (depth ' + params.building_depth + ' mm)');
+      }
+    }
+
     if (state.detection) {
       items.push(
         'Detection: ' + state.detection.method +
@@ -894,6 +903,14 @@
       wall_length: Number(formData.get('wall_length')),
       wall_height: Number(formData.get('wall_height')),
       wall_thickness: Number(formData.get('wall_thickness')),
+      building_depth: Number(formData.get('building_depth') || 6000),
+      building_elements: {
+        floor: formData.get('include_floor') === 'on',
+        roof: formData.get('include_roof') === 'on',
+        columns: formData.get('include_columns') === 'on',
+        beam: formData.get('include_beam') === 'on',
+        stair: formData.get('include_stair') === 'on'
+      },
       windows: windows,
       door: {
         offset: Number(formData.get('door_offset')),

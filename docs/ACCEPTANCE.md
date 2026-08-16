@@ -5,7 +5,7 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 ## Prerequisites
 
 - [ ] Python backend responds at `http://127.0.0.1:8765/health`
-- [ ] SketchUp extension **Geomora** enabled (v0.13.0+)
+- [ ] SketchUp extension **Geomora** enabled (v0.14.0+)
 - [ ] Fixture available: `examples/facade_perspective_synthetic.jpg`
 
 ## Phase 2 — Rectification
@@ -57,6 +57,15 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 6.10 | Registration = COLMAP dense | Method `colmap_dense_v1`; `dense_vertices` in debug |
 | 6.11 | Depth = DA2 Q4 (if downloaded) | Fusion debug `depth_method: depth_anything_v2_small_q4_v1` |
 | 6.12 | GPU ONNX (`GEOMORA_ONNX_DEVICE=cuda`) | `/multiview/capabilities` shows non-CPU `active_provider` |
+
+## Phase 7 — Full building elements
+
+| # | Step | Expected |
+|---|---|---|
+| 7.1 | Enable Floor + Roof (default) → Generate | `Geomora_Floors` / `Geomora_Roofs` tags in model |
+| 7.2 | Enable Columns + Beam + Stair → Generate | Tagged groups under storey |
+| 7.3 | Element tree | Shows enabled building elements before Generate |
+| 7.4 | Validate | Passes with floor/roof in IR |
 
 ## Known limitations (acceptable for Stage A)
 

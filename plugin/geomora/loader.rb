@@ -20,6 +20,12 @@ module Geomora
     components/component_manager
     tags/manager
     generators/wall_generator
+    generators/element_support
+    generators/floor_generator
+    generators/roof_generator
+    generators/column_generator
+    generators/beam_generator
+    generators/stair_generator
     generators/opening_generator
     generators/window_generator
     generators/door_generator
@@ -36,6 +42,7 @@ module Geomora
     core/detection_mapper
     core/rationalizer
     core/pattern_analyzer
+    core/building_composer
     core/ir_builder
     core/project
     ui/workspace_dialog

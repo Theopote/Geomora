@@ -4,6 +4,11 @@ require_relative 'wall_generator'
 require_relative 'opening_generator'
 require_relative 'window_generator'
 require_relative 'door_generator'
+require_relative 'floor_generator'
+require_relative 'roof_generator'
+require_relative 'column_generator'
+require_relative 'beam_generator'
+require_relative 'stair_generator'
 require_relative '../metadata/attributes'
 
 module Geomora
@@ -33,6 +38,36 @@ module Geomora
           project_id: context[:project_id],
           schema_version: context[:schema_version]
         )
+        @floor_gen = FloorGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version]
+        )
+        @roof_gen = RoofGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version]
+        )
+        @column_gen = ColumnGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version]
+        )
+        @beam_gen = BeamGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version]
+        )
+        @stair_gen = StairGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version]
+        )
       end
 
       def generate(storey, building_group, document)
@@ -52,6 +87,16 @@ module Geomora
           case element.type
           when 'wall'
             generate_wall(element, storey, storey_group, document)
+          when 'floor'
+            @floor_gen.generate(element, storey.elevation, storey_group.entities)
+          when 'roof'
+            @roof_gen.generate(element, storey.elevation, storey_group.entities)
+          when 'column'
+            @column_gen.generate(element, storey.elevation, storey_group.entities)
+          when 'beam'
+            @beam_gen.generate(element, storey.elevation, storey_group.entities)
+          when 'stair'
+            @stair_gen.generate(element, storey.elevation, storey_group.entities)
           end
         end
 

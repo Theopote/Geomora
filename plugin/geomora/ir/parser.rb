@@ -6,6 +6,7 @@ module Geomora
   module IR
     class Parser
       OPENING_TYPES = %w[window door opening].freeze
+      ELEMENT_TYPES = %w[wall floor roof column beam stair].freeze
 
       def self.parse(data)
         new(data).parse
@@ -59,8 +60,12 @@ module Geomora
 
       def parse_element(e)
         case e['type']
-        when 'wall'
-          parse_wall(e)
+        when 'wall' then parse_wall(e)
+        when 'floor' then parse_floor(e)
+        when 'roof' then parse_roof(e)
+        when 'column' then parse_column(e)
+        when 'beam' then parse_beam(e)
+        when 'stair' then parse_stair(e)
         else
           raise UnsupportedSchemaError, "Unsupported element type: #{e['type']}"
         end
@@ -75,6 +80,61 @@ module Geomora
           semantic: w['semantic'] || {},
           opening_ids: w['opening_ids'] || [],
           confidence: w['confidence']
+        )
+      end
+
+      def parse_floor(e)
+        Models::Floor.new(
+          id: e['id'],
+          type: e['type'],
+          storey_id: e['storey_id'],
+          geometry: symbolize_geometry(e['geometry']),
+          semantic: e['semantic'] || {},
+          confidence: e['confidence']
+        )
+      end
+
+      def parse_roof(e)
+        Models::Roof.new(
+          id: e['id'],
+          type: e['type'],
+          storey_id: e['storey_id'],
+          geometry: symbolize_geometry(e['geometry']),
+          semantic: e['semantic'] || {},
+          confidence: e['confidence']
+        )
+      end
+
+      def parse_column(e)
+        Models::Column.new(
+          id: e['id'],
+          type: e['type'],
+          storey_id: e['storey_id'],
+          geometry: symbolize_geometry(e['geometry']),
+          semantic: e['semantic'] || {},
+          confidence: e['confidence']
+        )
+      end
+
+      def parse_beam(e)
+        Models::Beam.new(
+          id: e['id'],
+          type: e['type'],
+          storey_id: e['storey_id'],
+          geometry: symbolize_geometry(e['geometry']),
+          semantic: e['semantic'] || {},
+          confidence: e['confidence']
+        )
+      end
+
+      def parse_stair(e)
+        Models::Stair.new(
+          id: e['id'],
+          type: e['type'],
+          storey_id: e['storey_id'],
+          geometry: symbolize_geometry(e['geometry']),
+          semantic: e['semantic'] || {},
+          confidence: e['confidence']
         )
       end
 
@@ -130,7 +190,12 @@ module Geomora
           width: geo['width'],
           depth: geo['depth'],
           polygon: geo['polygon'],
-          elevation: geo['elevation']
+          elevation: geo['elevation'],
+          position: geo['position'],
+          origin: geo['origin'],
+          run: geo['run'],
+          rise: geo['rise'],
+          steps: geo['steps']
         }.compact
       end
     end

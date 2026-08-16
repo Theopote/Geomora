@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.13.0 — COLMAP Dense + GPU ONNX</div>
+    <div class="subtitle">v0.14.0 — Full Building Elements</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -88,6 +88,14 @@
         <label>Wall length (mm)<input name="wall_length" type="number" step="1"></label>
         <label>Wall height (mm)<input name="wall_height" type="number" step="1"></label>
         <label>Wall thickness (mm)<input name="wall_thickness" type="number" step="1"></label>
+
+        <div class="section-title">Building Elements (Phase 7)</div>
+        <label class="checkbox-label"><input name="include_floor" type="checkbox" checked> Floor slab</label>
+        <label class="checkbox-label"><input name="include_roof" type="checkbox" checked> Roof slab</label>
+        <label class="checkbox-label"><input name="include_columns" type="checkbox"> Columns</label>
+        <label class="checkbox-label"><input name="include_beam" type="checkbox"> Beam</label>
+        <label class="checkbox-label"><input name="include_stair" type="checkbox"> Stair</label>
+        <label>Building depth (mm)<input name="building_depth" type="number" step="1" value="6000"></label>
 
         <div class="section-title">Windows</div>
         <div id="windows-container"></div>

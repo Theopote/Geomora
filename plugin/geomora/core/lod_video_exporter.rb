@@ -19,9 +19,15 @@ module Geomora
         elsif format.to_s.downcase == 'mp4'
           avi_path = path.sub(/\.mp4\z/i, '.avi')
           rgb_frames = frames.map { |frame| LodCapture.frame_rgb(frame['path']) }
-          AviEncoder.encode(rgb_frames, avi_path, fps: fps)
-          Logger.warn("ffmpeg not found; exported native AVI: #{avi_path}")
-          avi_path
+          begin
+            Mp4Encoder.encode(rgb_frames, path, fps: fps)
+            Logger.info("Native MP4 exported: #{path}")
+            path
+          rescue StandardError => e
+            Logger.warn("Native MP4 failed (#{e.message}); falling back to AVI")
+            AviEncoder.encode(rgb_frames, avi_path, fps: fps)
+            avi_path
+          end
         else
           script_path = write_encode_script(frames, path, format: format, fps: fps)
           Logger.warn("ffmpeg not found; wrote encoder script: #{script_path}")
@@ -29,8 +35,12 @@ module Geomora
         end
       end
 
-      def self.export_native_avi(model, path, fps: DEFAULT_FPS, width: LodCapture::DEFAULT_WIDTH, height: LodCapture::DEFAULT_HEIGHT)
-        LodCapture.export_avi(model, path, fps: fps, width: width, height: height)
+      def self.export_native_mp4(model, path, fps: DEFAULT_FPS, width: LodCapture::DEFAULT_WIDTH, height: LodCapture::DEFAULT_HEIGHT)
+        frames = LodCapture.capture_pages(model, width: width, height: height).map do |frame|
+          LodCapture.frame_rgb(frame['path'])
+        end
+        Mp4Encoder.encode(frames, path, fps: fps)
+      end
 
       def self.ffmpeg_path
         FFMPEG_NAMES.each do |name|

@@ -205,6 +205,16 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 20.4 | Layout Undo / Redo | Prior positions restored |
 | 20.5 | Export layout report | HTML with SVG per room |
 
+## Phase 21 — Native MP4 + PDF + shortcuts
+
+| # | Step | Expected |
+|---|---|---|
+| 21.1 | Export LOD Tour MP4 (native) | `.mp4` without ffmpeg |
+| 21.2 | Export layout PDF | Valid `%PDF-1.4` file |
+| 21.3 | Ctrl+Z / Ctrl+Y in editor | Undo / redo positions |
+| 21.4 | Del with item selected | Item removed |
+| 21.5 | Live stream + blur window | Stream pauses |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos

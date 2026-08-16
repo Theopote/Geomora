@@ -73,6 +73,9 @@ module Geomora
     core/lod_presentation
     core/png_reader
     core/gif_encoder
+    core/jpeg_frame_encoder
+    core/mp4_encoder
+    core/pdf_report_exporter
     core/avi_encoder
     core/viewport_stream
     core/layout_report_exporter

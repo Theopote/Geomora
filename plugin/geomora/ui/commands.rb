@@ -52,6 +52,7 @@ module Geomora
           lod_menu.add_item('Export LOD Tour GIF...') { export_lod_tour_gif }
           lod_menu.add_item('Export LOD Tour MP4...') { export_lod_tour_mp4 }
           lod_menu.add_item('Export LOD Tour WebM...') { export_lod_tour_webm }
+          lod_menu.add_item('Export LOD Tour MP4 (native)...') { export_lod_tour_mp4_native }
           lod_menu.add_item('Export LOD Tour AVI (native)...') { export_lod_tour_avi }
           lod_menu.add_item('Play LOD Tour') { play_lod_tour }
           lod_menu.add_separator
@@ -139,6 +140,16 @@ module Geomora
           ::UI.messagebox("LOD tour AVI exported (no ffmpeg required):\n\n#{saved}")
         rescue GeomoraError => e
           ::UI.messagebox("LOD AVI export failed:\n\n#{e.message}")
+        end
+
+        def export_lod_tour_mp4_native
+          path = ::UI.savepanel('Export LOD tour MP4 (native)', '', 'geomora_lod_tour.mp4')
+          return unless path
+
+          saved = Core::Project.export_lod_tour_mp4_native(path)
+          ::UI.messagebox("LOD tour MP4 exported (no ffmpeg required):\n\n#{saved}")
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD MP4 export failed:\n\n#{e.message}")
         end
 
         def reload_fixture_catalog

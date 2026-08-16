@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.29.0 — Stream + Layout Report</div>
+    <div class="subtitle">v0.30.0 — Native MP4 + PDF Report</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -164,7 +164,7 @@
           <button type="button" id="btn-preview-catalog-diff" class="btn-link">Preview catalog diff</button>
         </div>
 
-        <div class="section-title">Layout Editor (Phase 17–20)</div>
+        <div class="section-title">Layout Editor (Phase 17–21)</div>
         <label class="checkbox-label"><input name="include_furniture_wall_align" type="checkbox"> Wall-aligned furniture placement</label>
         <label class="checkbox-label"><input id="layout-snap-grid" type="checkbox" checked> Snap to grid (100 mm)</label>
         <label class="checkbox-label"><input id="layout-wall-magnet" type="checkbox" checked> Wall magnet</label>
@@ -174,8 +174,10 @@
           <button type="button" id="btn-rotate-selected" class="btn-link">Rotate selected 90°</button>
           <button type="button" id="btn-layout-undo" class="btn-link">Undo</button>
           <button type="button" id="btn-layout-redo" class="btn-link">Redo</button>
-          <button type="button" id="btn-export-layout-report" class="btn-link">Export layout report</button>
+          <button type="button" id="btn-export-layout-report" class="btn-link">Export layout report (HTML)</button>
+          <button type="button" id="btn-export-layout-pdf" class="btn-link">Export layout PDF</button>
         </div>
+        <div class="layout-editor-hint">Shortcuts: Ctrl+Z undo · Ctrl+Y redo · R rotate · Del remove</div>
         <div id="layout-editor-panel" class="layout-editor-panel" hidden>
           <div class="layout-editor-row">
             <label>Storey

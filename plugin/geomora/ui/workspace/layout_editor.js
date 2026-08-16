@@ -666,8 +666,48 @@
     window.geomoraLayoutEditor = {
       setPreview: setPreview,
       setPalette: setPalette,
-      setCatalogDiff: setCatalogDiff
+      setCatalogDiff: setCatalogDiff,
+      undo: undo,
+      redo: redo,
+      removeSelected: removeSelected,
+      rotateSelected: function () {
+        const item = getSelectedItem();
+        if (!item) return;
+        item.rotation = ((item.rotation || 0) + 90) % 360;
+        commitHistory();
+      },
+      isPanelOpen: function () {
+        return panel && !panel.hidden;
+      }
     };
+
+    document.addEventListener('keydown', function (event) {
+      if (!panel || panel.hidden) return;
+      const tag = (event.target && event.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (event.ctrlKey && event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        undo();
+      } else if (event.ctrlKey && event.key.toLowerCase() === 'y') {
+        event.preventDefault();
+        redo();
+      } else if (!event.ctrlKey && event.key.toLowerCase() === 'r') {
+        event.preventDefault();
+        window.geomoraLayoutEditor.rotateSelected();
+      } else if (event.key === 'Delete' || event.key === 'Backspace') {
+        event.preventDefault();
+        removeSelected();
+      }
+    });
+
+    function removeSelected() {
+      const room = currentRoom();
+      if (!room || state.selectedItemIndex === null) return;
+      room.items.splice(state.selectedItemIndex, 1);
+      state.selectedItemIndex = null;
+      updateItemSizePanel();
+      commitHistory();
+    }
   }
 
   document.addEventListener('DOMContentLoaded', function () {

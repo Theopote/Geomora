@@ -137,6 +137,23 @@ module Geomora
         LayoutReportExporter.export_html(params, path)
       end
 
+      def self.export_layout_report_pdf(path, params)
+        LayoutReportExporter.export_pdf(params, path)
+      end
+
+      def self.export_lod_tour_mp4_native(path)
+        model = Sketchup.active_model
+        LodPresentation.export_tour_mp4_native(model, path)
+      end
+
+      def self.pause_viewport_stream
+        ViewportStream.pause
+      end
+
+      def self.resume_viewport_stream(interval: 1.0)
+        ViewportStream.resume(interval: interval)
+      end
+
       def self.start_viewport_stream(dialog, interval: 1.0)
         ViewportStream.start(dialog, interval: interval)
       end

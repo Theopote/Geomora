@@ -75,15 +75,17 @@ tests/core/viewport_stream_test.rb
 
 ---
 
-## 7. Deferred (Phase 21+)
+## 7. Deferred (Phase 21 — delivered in v0.30.0)
 
-- True MP4 mux without ffmpeg
-- Layout editor keyboard shortcuts
-- PDF export without browser print
-- Viewport stream pause on dialog blur
+See `docs/PHASE_21.md` for native MP4, PDF export, keyboard shortcuts, and viewport pause.
+
+Remaining for Phase 22+:
+
+- H.264 MP4 for broader player compatibility
+- Auto-resume viewport stream on focus
 
 ---
 
 ## 8. Gate to Phase 21
 
-Streaming viewport and native video close the presentation loop for offline client deliverables.
+Native MP4 and PDF deliverables complete the offline presentation package.

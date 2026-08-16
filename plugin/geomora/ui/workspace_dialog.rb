@@ -34,6 +34,7 @@ module Geomora
           )
 
           register_callbacks(dialog)
+          dialog.set_on_closed { Core::ViewportStream.stop } if dialog.respond_to?(:set_on_closed)
           dialog.set_file(HTML_PATH)
           dialog
         end
@@ -459,6 +460,18 @@ module Geomora
             post_message(dialog, 'success', 'Viewport stream stopped.')
           end
 
+          dialog.add_action_callback('pause_viewport_stream') do |_ctx, _json|
+            Core::ViewportStream.pause
+            post_message(dialog, 'success', 'Viewport stream paused.')
+          end
+
+          dialog.add_action_callback('resume_viewport_stream') do |_ctx, json|
+            payload = JSON.parse(json || '{}')
+            interval = payload['interval'] || 1.0
+            Core::ViewportStream.resume(interval: interval)
+            post_message(dialog, 'success', format('Viewport stream resumed (%ss).', interval))
+          end
+
           dialog.add_action_callback('export_layout_report') do |_ctx, json|
             params = enrich_params(JSON.parse(json))
             path = ::UI.savepanel('Export layout report', '', 'geomora_layout_report.html')
@@ -466,6 +479,17 @@ module Geomora
 
             saved = Core::LayoutReportExporter.export_html(params, path)
             post_message(dialog, 'success', "Layout report exported:\n#{saved}")
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
+          dialog.add_action_callback('export_layout_report_pdf') do |_ctx, json|
+            params = enrich_params(JSON.parse(json))
+            path = ::UI.savepanel('Export layout report PDF', '', 'geomora_layout_report.pdf')
+            return unless path
+
+            saved = Core::LayoutReportExporter.export_pdf(params, path)
+            post_message(dialog, 'success', "Layout PDF exported:\n#{saved}")
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)
           end

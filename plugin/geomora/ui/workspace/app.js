@@ -1659,6 +1659,32 @@
   window.geomora.startViewportStreamFallback = startViewportStreamFallback;
   window.geomora.stopViewportStreamFallback = stopViewportStreamFallback;
 
+  function pauseViewportStream() {
+    sketchupCall('pause_viewport_stream');
+    stopViewportStreamFallback();
+    const live = document.getElementById('viewport-live-stream');
+    if (live) live.checked = false;
+  }
+
+  function resumeViewportStream() {
+    const live = document.getElementById('viewport-live-stream');
+    if (live) live.checked = true;
+    startViewportStream(1.0);
+  }
+
+  window.geomora.pauseViewportStream = pauseViewportStream;
+  window.geomora.resumeViewportStream = resumeViewportStream;
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      pauseViewportStream();
+    }
+  });
+
+  window.addEventListener('blur', function () {
+    pauseViewportStream();
+  });
+
   document.getElementById('btn-pick-image').addEventListener('click', function () {
     sketchupCall('pick_image');
   });
@@ -1775,6 +1801,10 @@
 
   document.getElementById('btn-export-layout-report').addEventListener('click', function () {
     sketchupCall('export_layout_report', JSON.stringify(collectParams()));
+  });
+
+  document.getElementById('btn-export-layout-pdf').addEventListener('click', function () {
+    sketchupCall('export_layout_report_pdf', JSON.stringify(collectParams()));
   });
 
   els.btnDeleteSelected.addEventListener('click', function () {

@@ -2,9 +2,9 @@ task: detect
 mode: train
 model: yolov8n.pt
 data: F:\development\Geomora\backend\data\facade_yolo\facade.yaml
-epochs: 40
+epochs: 50
 time: null
-patience: 10
+patience: 15
 batch: 16
 imgsz: 640
 save: true
@@ -18,7 +18,7 @@ exist_ok: true
 pretrained: true
 cls_remap: true
 optimizer: auto
-verbose: false
+verbose: true
 seed: 0
 deterministic: true
 single_cls: false

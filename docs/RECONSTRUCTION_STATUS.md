@@ -73,7 +73,7 @@ Synthetic acceptance assets:
 
 | Priority | Item |
 |----------|------|
-| P0 | Train `yolo_v1` on real rectified facades (`backend/scripts/train_yolo_facade.py`) |
+| P0 | Fine-tune `yolo_v1` on **real** rectified facades (`docs/YOLO_TRAINING.md`, `backend/data/facade_yolo_custom/`) |
 | P0 | User acceptance on **real building photos** |
 | P1 | SAM mask refinement (Phase 3.6) |
 | P1 | Video metadata in IR `sources[]` (video_id, frame_index, timestamp) |

@@ -5,17 +5,18 @@
 | File | Description |
 |---|---|
 | `detection_config.json` | Class names, thresholds, input size |
-| `facade_yolo_v1.onnx` | YOLOv8n facade detector (window + door) — **build via training script** |
+| `facade_yolo_v1.onnx` | YOLOv8n facade detector (window + door) — build via `docs/YOLO_TRAINING.md` |
 
 ## Build YOLO model
+
+See **`docs/YOLO_TRAINING.md`** for dataset layout, custom photos, and validation.
 
 ```powershell
 cd F:\development\Geomora\backend
 .\.venv\Scripts\pip install -r requirements-dev.txt
 .\.venv\Scripts\python scripts\train_yolo_facade.py
+.\.venv\Scripts\python scripts\validate_yolo_facade.py
 ```
-
-This generates synthetic training data, fine-tunes `yolov8n`, and exports `facade_yolo_v1.onnx` here.
 
 ## Override model path
 

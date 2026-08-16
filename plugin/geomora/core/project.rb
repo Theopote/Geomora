@@ -62,6 +62,14 @@ module Geomora
         hash = data.is_a?(String) ? JSON.parse(data) : data
         IR::Parser.parse(hash)
       end
+
+      def self.audit_geometry(options = {})
+        GeometryDoctor.audit(options: options)
+      end
+
+      def self.repair_geometry(options = {})
+        GeometryDoctor.repair(options: options)
+      end
     end
   end
 end

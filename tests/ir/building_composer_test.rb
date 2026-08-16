@@ -75,4 +75,30 @@ class BuildingComposerTest < Minitest::Test
     assert_equal 1200, balcony['geometry']['position'][0]
     assert_equal 1800, balcony['geometry']['width']
   end
+
+  def test_roof_only_on_top_storey
+    params = { 'building_elements' => { 'floor' => true, 'roof' => true } }
+
+    ground = Geomora::Core::BuildingComposer.compose(
+      params,
+      wall_length: 10_000,
+      wall_height: 3300,
+      wall_thickness: 240,
+      storey_id: 'storey_01',
+      storey_index: 0,
+      top_storey: false
+    )
+    top = Geomora::Core::BuildingComposer.compose(
+      params,
+      wall_length: 10_000,
+      wall_height: 3300,
+      wall_thickness: 240,
+      storey_id: 'storey_02',
+      storey_index: 1,
+      top_storey: true
+    )
+
+    assert_equal %w[floor], ground.map { |element| element['type'] }
+    assert_includes top.map { |element| element['type'] }, 'roof'
+  end
 end

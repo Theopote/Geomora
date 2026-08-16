@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.15.0 — Balcony / Parapet / Cornice</div>
+    <div class="subtitle">v0.17.0 — Multi-Storey + Wall Joins</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -100,6 +100,23 @@
         <label class="checkbox-label"><input name="include_cornice" type="checkbox"> Cornice</label>
         <label>Building depth (mm)<input name="building_depth" type="number" step="1" value="6000"></label>
 
+        <div class="section-title">Multi-Storey (Phase 9)</div>
+        <label>Storey count<input name="storey_count" type="number" min="1" step="1" value="1"></label>
+        <label>Storey height (mm)<input name="storey_height" type="number" step="1" placeholder="same as wall height"></label>
+        <label class="checkbox-label"><input name="repeat_openings" type="checkbox" checked> Repeat openings on upper floors</label>
+        <label class="checkbox-label"><input name="include_perimeter_walls" type="checkbox"> Perimeter walls + corner joins</label>
+
+        <div class="section-title">Geometry Doctor (Phase 8)</div>
+        <label class="checkbox-label"><input name="doctor_tiny_edges" type="checkbox" checked> Remove tiny edges</label>
+        <label class="checkbox-label"><input name="doctor_tiny_faces" type="checkbox" checked> Remove tiny faces</label>
+        <label class="checkbox-label"><input name="doctor_coplanar_merge" type="checkbox" checked> Merge coplanar faces</label>
+        <label class="checkbox-label"><input name="doctor_duplicate_faces" type="checkbox" checked> Remove duplicate faces</label>
+        <label class="checkbox-label"><input name="doctor_duplicate_instances" type="checkbox" checked> Remove duplicate components</label>
+        <label class="checkbox-label"><input name="doctor_normal_repair" type="checkbox" checked> Repair face normals</label>
+        <label class="checkbox-label"><input name="doctor_alignment_repair" type="checkbox"> Snap vertices to grid</label>
+        <label class="checkbox-label"><input name="doctor_opening_repair" type="checkbox" checked> Audit opening gaps</label>
+        <label>Doctor grid (mm)<input name="doctor_grid_mm" type="number" step="1" value="10"></label>
+
         <div class="section-title">Windows</div>
         <div id="windows-container"></div>
 
@@ -116,6 +133,7 @@
     <button id="btn-apply-pattern" class="btn">Apply Pattern</button>
     <button id="btn-validate" class="btn">Validate</button>
     <button id="btn-generate" class="btn primary">Generate</button>
+    <button id="btn-repair-geometry" class="btn secondary">Repair Geometry</button>
   </footer>
 
   <script src="app.js"></script>

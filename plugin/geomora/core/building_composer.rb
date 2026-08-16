@@ -5,29 +5,32 @@ module Geomora
     class BuildingComposer
       SUPPORTED_ELEMENTS = %w[floor roof column beam stair balcony parapet cornice].freeze
 
-      def self.compose(params, wall_length:, wall_height:, wall_thickness:, storey_id:)
+      def self.compose(params, wall_length:, wall_height:, wall_thickness:, storey_id:, storey_index: 0, top_storey: true)
         new(params, wall_length: wall_length, wall_height: wall_height,
-            wall_thickness: wall_thickness, storey_id: storey_id).compose
+            wall_thickness: wall_thickness, storey_id: storey_id,
+            storey_index: storey_index, top_storey: top_storey).compose
       end
 
-      def initialize(params, wall_length:, wall_height:, wall_thickness:, storey_id:)
+      def initialize(params, wall_length:, wall_height:, wall_thickness:, storey_id:, storey_index: 0, top_storey: true)
         @params = params.is_a?(Hash) ? params : {}
         @wall_length = wall_length
         @wall_height = wall_height
         @wall_thickness = wall_thickness
         @storey_id = storey_id
+        @storey_index = storey_index
+        @top_storey = top_storey
       end
 
       def compose
         elements = []
         elements << floor_element if enabled?(:floor)
-        elements << roof_element if enabled?(:roof)
+        elements << roof_element if enabled?(:roof) && @top_storey
         elements.concat(column_elements) if enabled?(:columns)
         elements << beam_element if enabled?(:beam)
-        elements << stair_element if enabled?(:stair)
-        elements << balcony_element if enabled?(:balcony)
-        elements << parapet_element if enabled?(:parapet)
-        elements << cornice_element if enabled?(:cornice)
+        elements << stair_element if enabled?(:stair) && stair_for_storey?
+        elements << balcony_element if enabled?(:balcony) && facade_storey?
+        elements << parapet_element if enabled?(:parapet) && @top_storey
+        elements << cornice_element if enabled?(:cornice) && facade_storey?
         elements
       end
 
@@ -67,6 +70,32 @@ module Geomora
         value.nil? ? default : value.to_f
       end
 
+      def int_param(key, default)
+        value = @params[key]
+        value.nil? ? default : value.to_i
+      end
+
+      def element_id(prefix)
+        format('%s_%02d', prefix, @storey_index + 1)
+      end
+
+      def facade_storey?
+        @storey_index.zero?
+      end
+
+      def stair_for_storey?
+        storey_count <= 1 || @storey_index < storey_count - 1
+      end
+
+      def storey_count
+        count = int_param('storey_count', 1)
+        count < 1 ? 1 : count
+      end
+
+      def perimeter_walls_enabled?
+        enabled?(:perimeter_walls)
+      end
+
       def footprint_polygon
         half_depth = building_depth / 2.0
         [
@@ -79,7 +108,7 @@ module Geomora
 
       def floor_element
         {
-          'id' => 'floor_001',
+          'id' => element_id('floor'),
           'type' => 'floor',
           'storey_id' => @storey_id,
           'geometry' => {
@@ -94,7 +123,7 @@ module Geomora
 
       def roof_element
         {
-          'id' => 'roof_001',
+          'id' => element_id('roof'),
           'type' => 'roof',
           'storey_id' => @storey_id,
           'geometry' => {
@@ -109,10 +138,23 @@ module Geomora
 
       def column_elements
         size = column_size
-        [
-          column_at('column_001', 0, 0, size),
-          column_at('column_002', @wall_length - size, 0, size)
-        ]
+        if perimeter_walls_enabled?
+          half_depth = building_depth / 2.0
+          y_front = 0
+          y_back = building_depth - size
+          x_right = @wall_length - size
+          [
+            column_at(element_id('column_a'), 0, y_front, size),
+            column_at(element_id('column_b'), x_right, y_front, size),
+            column_at(element_id('column_c'), 0, y_back, size),
+            column_at(element_id('column_d'), x_right, y_back, size)
+          ]
+        else
+          [
+            column_at(element_id('column_a'), 0, 0, size),
+            column_at(element_id('column_b'), @wall_length - size, 0, size)
+          ]
+        end
       end
 
       def column_at(id, x, y, size)
@@ -133,7 +175,7 @@ module Geomora
 
       def beam_element
         {
-          'id' => 'beam_001',
+          'id' => element_id('beam'),
           'type' => 'beam',
           'storey_id' => @storey_id,
           'geometry' => {
@@ -148,13 +190,13 @@ module Geomora
 
       def stair_element
         run = float_param('stair_run', 3000)
-        rise = float_param('stair_rise', @wall_height / 2.0)
+        rise = storey_count > 1 ? @wall_height : float_param('stair_rise', @wall_height / 2.0)
         width = float_param('stair_width', 1200)
         steps = int_param('stair_steps', 12)
         origin_x = [@wall_length - run, 0].max
 
         {
-          'id' => 'stair_001',
+          'id' => element_id('stair'),
           'type' => 'stair',
           'storey_id' => @storey_id,
           'geometry' => {
@@ -167,11 +209,6 @@ module Geomora
           'semantic' => { 'circulation' => true },
           'confidence' => 1.0
         }
-      end
-
-      def int_param(key, default)
-        value = @params[key]
-        value.nil? ? default : value.to_i
       end
 
       def first_window
@@ -190,7 +227,7 @@ module Geomora
         thickness = float_param('balcony_thickness', 150)
 
         {
-          'id' => 'balcony_001',
+          'id' => element_id('balcony'),
           'type' => 'balcony',
           'storey_id' => @storey_id,
           'geometry' => {
@@ -212,7 +249,7 @@ module Geomora
         thickness = float_param('parapet_thickness', 200)
 
         {
-          'id' => 'parapet_001',
+          'id' => element_id('parapet'),
           'type' => 'parapet',
           'storey_id' => @storey_id,
           'geometry' => {
@@ -231,7 +268,7 @@ module Geomora
         z = @wall_height - cornice_height
 
         {
-          'id' => 'cornice_001',
+          'id' => element_id('cornice'),
           'type' => 'cornice',
           'storey_id' => @storey_id,
           'geometry' => {

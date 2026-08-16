@@ -80,7 +80,22 @@ module Geomora
 
       def validate_buildings
         @doc.buildings.each do |building|
+          validate_storey_stack(building)
           validate_storeys(building)
+        end
+      end
+
+      def validate_storey_stack(building)
+        storeys = building.storeys
+        return if storeys.empty?
+
+        expected_elevation = 0.0
+        storeys.each do |storey|
+          elevation = storey.elevation.to_f
+          if elevation != expected_elevation
+            @errors << "Storey elevation mismatch for #{storey.id}: expected #{expected_elevation}, got #{elevation}"
+          end
+          expected_elevation += storey.height.to_f
         end
       end
 

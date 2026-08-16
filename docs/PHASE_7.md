@@ -78,14 +78,13 @@ Geomora_Cornices
 
 ---
 
-## 5. Deferred (Phase 8+)
+## 5. Deferred (Phase 9+)
 
-- Multi-storey stacks
-- Wall joins and structural grids
+- Structural grids (beyond corner columns)
 - LOD 200/300 semantic refinement
 
 ---
 
-## 6. Gate to Phase 8
+## 6. Gate to Phase 9
 
-Phase 7+ completes exterior shell elements. Phase 8 (Geometry Doctor) can clean and repair generated shells.
+Phase 7+ completes exterior shell elements. **Phase 9** adds multi-storey stacks and perimeter wall joins — see `docs/PHASE_9.md`.

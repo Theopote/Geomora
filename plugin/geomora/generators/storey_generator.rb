@@ -12,6 +12,7 @@ require_relative 'stair_generator'
 require_relative 'balcony_generator'
 require_relative 'parapet_generator'
 require_relative 'cornice_generator'
+require_relative 'wall_join_processor'
 require_relative '../metadata/attributes'
 
 module Geomora
@@ -104,10 +105,13 @@ module Geomora
           project_id: @context[:project_id]
         })
 
+        joinable_wall_groups = []
+
         storey.elements.each do |element|
           case element.type
           when 'wall'
-            generate_wall(element, storey, storey_group, document)
+            wall_group = generate_wall(element, storey, storey_group, document)
+            joinable_wall_groups << wall_group if wall_joinable?(element)
           when 'floor'
             @floor_gen.generate(element, storey.elevation, storey_group.entities)
           when 'roof'
@@ -127,10 +131,22 @@ module Geomora
           end
         end
 
+        if joinable_wall_groups.length > 1
+          WallJoinProcessor.join_walls(joinable_wall_groups, storey_group)
+        end
+
         storey_group
       end
 
       private
+
+      def wall_joinable?(wall)
+        semantic = wall.semantic
+        return false unless semantic.is_a?(Hash)
+
+        group = semantic['join_group'] || semantic[:join_group]
+        !group.nil? && !group.to_s.empty?
+      end
 
       def generate_wall(wall, storey, storey_group, document)
         wall_group = @wall_gen.generate(wall, storey.elevation, storey_group.entities)
@@ -146,6 +162,8 @@ module Geomora
             @door_gen.generate(opening, wall, storey.elevation, storey_group.entities)
           end
         end
+
+        wall_group
       end
     end
   end

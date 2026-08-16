@@ -817,6 +817,7 @@
     const items = [
       'Project: ' + params.project_name,
       'Wall: ' + params.wall_length + ' × ' + params.wall_height + ' × ' + params.wall_thickness + ' mm',
+      'Storeys: ' + params.storey_count + (params.storey_height ? ' @ ' + params.storey_height + ' mm' : ''),
       'Windows: ' + params.windows.length,
       'Door: ' + params.door.width + ' × ' + params.door.height + ' mm @ ' + params.door.offset
     ];
@@ -912,7 +913,22 @@
         stair: formData.get('include_stair') === 'on',
         balcony: formData.get('include_balcony') === 'on',
         parapet: formData.get('include_parapet') === 'on',
-        cornice: formData.get('include_cornice') === 'on'
+        cornice: formData.get('include_cornice') === 'on',
+        perimeter_walls: formData.get('include_perimeter_walls') === 'on'
+      },
+      storey_count: Number(formData.get('storey_count') || 1),
+      storey_height: formData.get('storey_height') ? Number(formData.get('storey_height')) : null,
+      repeat_openings: formData.get('repeat_openings') === 'on',
+      geometry_doctor: {
+        tiny_edges: formData.get('doctor_tiny_edges') === 'on',
+        tiny_faces: formData.get('doctor_tiny_faces') === 'on',
+        coplanar_merge: formData.get('doctor_coplanar_merge') === 'on',
+        duplicate_faces: formData.get('doctor_duplicate_faces') === 'on',
+        duplicate_instances: formData.get('doctor_duplicate_instances') === 'on',
+        normal_repair: formData.get('doctor_normal_repair') === 'on',
+        alignment_repair: formData.get('doctor_alignment_repair') === 'on',
+        opening_repair: formData.get('doctor_opening_repair') === 'on',
+        grid_mm: Number(formData.get('doctor_grid_mm') || 10)
       },
       windows: windows,
       door: {
@@ -1333,6 +1349,10 @@
       return;
     }
     sketchupCall('generate', JSON.stringify(collectParams()));
+  });
+
+  document.getElementById('btn-repair-geometry').addEventListener('click', function () {
+    sketchupCall('repair_geometry', JSON.stringify(collectParams()));
   });
 
   els.btnDeleteSelected.addEventListener('click', function () {

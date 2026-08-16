@@ -48,4 +48,49 @@ class IRBuilderTest < Minitest::Test
     assert_includes types, 'floor'
     assert_includes types, 'roof'
   end
+
+  def test_builds_multi_storey_stack
+    params = {
+      'project_name' => 'Multi Storey',
+      'wall_length' => 10_000,
+      'wall_height' => 3300,
+      'wall_thickness' => 240,
+      'storey_count' => 2,
+      'storey_height' => 3000,
+      'repeat_openings' => true,
+      'windows' => [
+        { 'offset' => 500, 'width' => 1500, 'height' => 1500, 'sill_height' => 900 }
+      ],
+      'door' => { 'offset' => 8500, 'width' => 900, 'height' => 2100 }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    doc = Geomora::IR::Parser.parse(ir)
+
+    assert Geomora::IR::Validator.validate(doc)
+    assert_equal 2, ir['buildings'][0]['storeys'].length
+    assert_equal 0, ir['buildings'][0]['storeys'][0]['elevation']
+    assert_equal 3000, ir['buildings'][0]['storeys'][1]['elevation']
+    assert_equal 2, ir['openings'].count { |opening| opening['type'] == 'window' }
+    assert_equal 1, ir['openings'].count { |opening| opening['type'] == 'door' }
+  end
+
+  def test_builds_perimeter_walls_when_enabled
+    params = {
+      'project_name' => 'Perimeter',
+      'wall_length' => 8000,
+      'wall_height' => 3000,
+      'wall_thickness' => 240,
+      'building_depth' => 6000,
+      'building_elements' => { 'perimeter_walls' => true },
+      'windows' => [],
+      'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    walls = ir['buildings'][0]['storeys'][0]['elements'].select { |e| e['type'] == 'wall' }
+
+    assert_equal 4, walls.length
+    assert_equal 'perimeter', walls.first['semantic']['join_group']
+  end
 end

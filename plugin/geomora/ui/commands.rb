@@ -27,6 +27,7 @@ module Geomora
           menu.add_separator
           menu.add_item('Generate Phase 0 Fixture') { run_generate }
           menu.add_item('Validate Phase 0 Fixture') { run_validate }
+          menu.add_item('Repair Geometry') { run_repair_geometry }
           menu.add_separator
           menu.add_item('About Geomora') { show_about }
         end
@@ -73,6 +74,17 @@ module Geomora
           ::UI.messagebox("Validation passed.\n\nFixture: #{path}")
         rescue GeomoraError => e
           ::UI.messagebox("Validation failed:\n\n#{e.message}")
+        end
+
+        def run_repair_geometry
+          report = Core::Project.repair_geometry
+          summary = report.select { |k, v| v.is_a?(Numeric) && v.positive? }
+                          .map { |k, v| "#{k}: #{v}" }
+                          .join("\n")
+          message = summary.empty? ? 'No geometry issues repaired.' : summary
+          ::UI.messagebox("Geometry doctor complete.\n\n#{message}")
+        rescue GeomoraError => e
+          ::UI.messagebox("Geometry doctor failed:\n\n#{e.message}")
         end
 
         def show_about

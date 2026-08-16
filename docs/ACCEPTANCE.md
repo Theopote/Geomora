@@ -5,7 +5,7 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 ## Prerequisites
 
 - [ ] Python backend responds at `http://127.0.0.1:8765/health`
-- [ ] SketchUp extension **Geomora** enabled (v0.15.0+)
+- [ ] SketchUp extension **Geomora** enabled (v0.17.0+)
 - [ ] Fixture available: `examples/facade_perspective_synthetic.jpg`
 
 ## Phase 2 — Rectification
@@ -74,6 +74,25 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 7.5 | Enable Balcony → Generate | `Geomora_Balconies` tag; slab at first window sill |
 | 7.6 | Enable Parapet + Cornice → Generate | `Geomora_Parapets` / `Geomora_Cornices` tags |
 | 7.7 | Element tree | Shows balcony, parapet, cornice when enabled |
+
+## Phase 8 — Geometry Doctor
+
+| # | Step | Expected |
+|---|---|---|
+| 8.1 | Generate model → **Repair Geometry** | Status lists repairs or “no changes needed” |
+| 8.2 | Inspector toggles (tiny edges, coplanar, normals) | Repair respects enabled options |
+| 8.3 | Extensions → Geomora → Repair Geometry | Same repair on active model; one undo step |
+| 8.4 | Ctrl+Z after repair | Repair changes revert |
+
+## Phase 9 — Multi-storey + wall joins
+
+| # | Step | Expected |
+|---|---|---|
+| 9.1 | Storey count = 2 → Generate | Two storey groups; elevations 0 and storey height |
+| 9.2 | Repeat openings on | Windows on both floors; door only on ground |
+| 9.3 | Perimeter walls on | Four walls per storey; corners intersect |
+| 9.4 | Roof / parapet | Only on top storey |
+| 9.5 | Validate | Passes with cumulative storey elevations |
 
 ## Known limitations (acceptable for Stage A)
 

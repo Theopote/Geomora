@@ -12,20 +12,11 @@ module Geomora
       end
 
       def build
-        wall_id = 'wall_001'
-        storey_id = 'storey_01'
-        windows = build_windows(wall_id)
-        door = build_door(wall_id)
-        opening_ids = windows.map { |w| w['id'] }
-        opening_ids << door['id'] if door
-        openings = windows + (door ? [door] : [])
-        building_elements = Core::BuildingComposer.compose(
-          @params,
-          wall_length: wall_length,
-          wall_height: wall_height,
-          wall_thickness: wall_thickness,
-          storey_id: storey_id
-        )
+        storey_payloads = build_storey_payloads
+        storeys = storey_payloads.map { |payload| payload[:storey] }
+        openings = storey_payloads.flat_map { |payload| payload[:openings] }
+        windows = openings.select { |opening| opening['type'] == 'window' }
+        door = openings.find { |opening| opening['type'] == 'door' }
 
         {
           'schema_version' => Geomora::SCHEMA_VERSION,
@@ -40,29 +31,7 @@ module Geomora
             {
               'id' => 'building_001',
               'name' => 'Main Building',
-              'storeys' => [
-                {
-                  'id' => storey_id,
-                  'name' => 'Ground Floor',
-                  'elevation' => 0,
-                  'height' => wall_height,
-                  'elements' => [
-                    {
-                      'id' => wall_id,
-                      'type' => 'wall',
-                      'storey_id' => storey_id,
-                      'geometry' => {
-                        'baseline' => [[0, 0, 0], [wall_length, 0, 0]],
-                        'height' => wall_height,
-                        'thickness' => wall_thickness
-                      },
-                      'semantic' => { 'exterior' => true },
-                      'opening_ids' => opening_ids,
-                      'confidence' => 1.0
-                    }
-                  ] + building_elements
-                }
-              ]
+              'storeys' => storeys
             }
           ],
           'openings' => openings,
@@ -73,6 +42,153 @@ module Geomora
       end
 
       private
+
+      def build_storey_payloads
+        elevations = storey_elevations
+        payloads = []
+
+        storey_count.times do |index|
+          payloads << build_storey_payload(index, elevations[index])
+        end
+
+        payloads
+      end
+
+      def build_storey_payload(index, elevation)
+        storey_id = format('storey_%02d', index + 1)
+        height = storey_height
+        facade_wall_id = format('wall_%02d_01', index + 1)
+        walls, openings = build_storey_walls(
+          storey_id: storey_id,
+          storey_index: index,
+          facade_wall_id: facade_wall_id,
+          height: height
+        )
+        building_elements = Core::BuildingComposer.compose(
+          @params,
+          wall_length: wall_length,
+          wall_height: height,
+          wall_thickness: wall_thickness,
+          storey_id: storey_id,
+          storey_index: index,
+          top_storey: index == storey_count - 1
+        )
+
+        {
+          storey: {
+            'id' => storey_id,
+            'name' => storey_name(index),
+            'elevation' => elevation,
+            'height' => height,
+            'elements' => walls + building_elements
+          },
+          openings: openings
+        }
+      end
+
+      def build_storey_walls(storey_id:, storey_index:, facade_wall_id:, height:)
+        openings = []
+        opening_ids = []
+
+        if repeat_openings_for_storey?(storey_index)
+          windows = build_windows(facade_wall_id, storey_index)
+          openings.concat(windows)
+          opening_ids.concat(windows.map { |window| window['id'] })
+        end
+
+        if storey_index.zero?
+          door = build_door(facade_wall_id)
+          if door
+            openings << door
+            opening_ids << door['id']
+          end
+        end
+
+        if perimeter_walls_enabled?
+          walls = Core::WallEnclosure.perimeter_walls(
+            wall_length: wall_length,
+            wall_thickness: wall_thickness,
+            building_depth: building_depth,
+            storey_id: storey_id,
+            storey_index: storey_index,
+            wall_height: height,
+            facade_wall_id: facade_wall_id,
+            facade_semantic: facade_semantic_with_openings(opening_ids)
+          )
+          walls[0]['opening_ids'] = opening_ids
+          return [walls, openings]
+        end
+
+        [
+          [
+            {
+              'id' => facade_wall_id,
+              'type' => 'wall',
+              'storey_id' => storey_id,
+              'geometry' => {
+                'baseline' => [[0, 0, 0], [wall_length, 0, 0]],
+                'height' => height,
+                'thickness' => wall_thickness
+              },
+              'semantic' => { 'exterior' => true },
+              'opening_ids' => opening_ids,
+              'confidence' => 1.0
+            }
+          ],
+          openings
+        ]
+      end
+
+      def facade_semantic_with_openings(opening_ids)
+        semantic = { 'exterior' => true, 'join_group' => 'perimeter', 'join_role' => 'facade' }
+        semantic['opening_ids'] = opening_ids unless opening_ids.empty?
+        semantic
+      end
+
+      def storey_elevations
+        elevations = []
+        storey_count.times do |index|
+          elevations << index * storey_height
+        end
+        elevations
+      end
+
+      def storey_name(index)
+        index.zero? ? 'Ground Floor' : format('Floor %d', index + 1)
+      end
+
+      def storey_count
+        count = int_param('storey_count', 1)
+        count < 1 ? 1 : count
+      end
+
+      def storey_height
+        value = @params['storey_height']
+        value.nil? ? wall_height : value.to_f
+      end
+
+      def building_depth
+        float_param('building_depth', 6000)
+      end
+
+      def perimeter_walls_enabled?
+        Core::WallEnclosure.enabled?(@params)
+      end
+
+      def repeat_openings_for_storey?(index)
+        index.zero? || repeat_openings?
+      end
+
+      def repeat_openings?
+        option_enabled('repeat_openings', true)
+      end
+
+      def option_enabled(key, default)
+        value = @params[key]
+        return default if value.nil?
+
+        value == true || value.to_s == 'true' || value == 'on' || value == 1 || value == '1'
+      end
 
       def wall_length
         float_param('wall_length', 10_000)
@@ -91,7 +207,12 @@ module Geomora
         value.nil? ? default : value.to_f
       end
 
-      def build_windows(wall_id)
+      def int_param(key, default)
+        value = @params[key]
+        value.nil? ? default : value.to_i
+      end
+
+      def build_windows(wall_id, storey_index)
         raw = @params['windows']
         return [] unless raw.is_a?(Array)
         return [] if raw.empty?
@@ -100,7 +221,7 @@ module Geomora
           width = (win['width'] || 1500).to_f
           height = (win['height'] || 1500).to_f
           {
-            'id' => format('window_%03d', index + 1),
+            'id' => format('window_%02d_%02d', storey_index + 1, index + 1),
             'type' => 'window',
             'parent_id' => wall_id,
             'geometry' => {
@@ -310,19 +431,6 @@ module Geomora
 
       def view_metadata(data)
         data.is_a?(Hash) ? data : {}
-      end
-
-      def default_windows
-        [
-          { 'offset' => 500, 'width' => 1500, 'height' => 1500, 'sill_height' => 900 },
-          { 'offset' => 2500, 'width' => 1500, 'height' => 1500, 'sill_height' => 900 },
-          { 'offset' => 4500, 'width' => 1500, 'height' => 1500, 'sill_height' => 900 },
-          { 'offset' => 6500, 'width' => 1500, 'height' => 1500, 'sill_height' => 900 }
-        ]
-      end
-
-      def default_door
-        { 'offset' => 8500, 'width' => 900, 'height' => 2100 }
       end
     end
   end

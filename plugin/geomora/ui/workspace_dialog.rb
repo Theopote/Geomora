@@ -349,6 +349,20 @@ module Geomora
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)
           end
+
+          dialog.add_action_callback('repair_geometry') do |_ctx, json|
+            params = enrich_params(JSON.parse(json))
+            openings = params['windows'] || []
+            door = params['door'] || {}
+            expected_openings = openings.length + (door['width'].to_f.positive? ? 1 : 0)
+            doctor_opts = params['geometry_doctor'] || {}
+            doctor_opts['expected_openings'] = expected_openings
+
+            report = Core::Project.repair_geometry(doctor_opts)
+            post_message(dialog, 'success', format_repair_report(report))
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
         end
 
         def enrich_params(params)
@@ -444,6 +458,27 @@ module Geomora
         def path_to_file_url(path)
           normalized = path.gsub('\\', '/')
           "file:///#{normalized}"
+        end
+
+        def format_repair_report(report)
+          parts = []
+          %w[
+            tiny_edges_removed tiny_faces_removed coplanar_edges_merged
+            duplicate_faces_removed duplicate_instances_removed normals_reversed
+            vertices_snapped empty_groups_removed opening_gaps_found
+          ].each do |key|
+            value = report[key]
+            next unless value.is_a?(Numeric) && value.positive?
+
+            parts << "#{key.tr('_', ' ')}: #{value}"
+          end
+
+          components = report['components'] || {}
+          if components.any?
+            parts << "components: #{components.map { |k, v| "#{k}(#{v})" }.join(', ')}"
+          end
+
+          parts.empty? ? 'Geometry doctor complete (no changes needed).' : "Geometry doctor: #{parts.join('; ')}"
         end
 
         def post_message(dialog, level, message)

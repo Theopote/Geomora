@@ -33,6 +33,7 @@ module Geomora
     generators/window_generator
     generators/door_generator
     generators/storey_generator
+    generators/wall_join_processor
     generators/building_generator
     generators/project_generator
     perception/rectification_result
@@ -46,6 +47,8 @@ module Geomora
     core/rationalizer
     core/pattern_analyzer
     core/building_composer
+    core/wall_enclosure
+    core/geometry_doctor
     core/ir_builder
     core/project
     ui/workspace_dialog

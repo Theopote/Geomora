@@ -11,7 +11,7 @@ from geomora_multiview.pipeline import fuse_openings, multiview_capabilities, re
 
 from .pipeline import parse_corners, rectify_image
 
-app = FastAPI(title="Geomora Perception", version="0.15.0")
+app = FastAPI(title="Geomora Perception", version="0.17.0")
 
 
 @app.get("/")

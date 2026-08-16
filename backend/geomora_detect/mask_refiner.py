@@ -10,13 +10,14 @@ import numpy as np
 
 from .models import DetectedElement, DetectionResult
 from .overlays import draw_overlay, encode_overlay_jpeg
+from .sam_onnx import MobileSamOnnxRunner, mobile_sam_available
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG_PATH = BACKEND_ROOT / "models" / "sam_config.json"
 
 INNER_MARGIN = 0.06
 MIN_AREA_RATIO = 0.10
-MAX_AREA_RATIO = 0.96
+MAX_AREA_RATIO = 1.08
 MIN_IOU_WITH_PROMPT = 0.35
 
 
@@ -38,25 +39,13 @@ def load_sam_config(config_path: str | None = None) -> dict:
 
 
 def sam_model_available(config_path: str | None = None) -> bool:
-    try:
-        return resolve_sam_model_path(load_sam_config(config_path)).exists()
-    except FileNotFoundError:
-        return False
+    return mobile_sam_available(config_path)
 
 
 def resolve_sam_model_path(config: dict) -> Path:
-    env_path = os.environ.get("GEOMORA_SAM_MODEL")
-    if env_path:
-        path = Path(env_path)
-        if path.exists():
-            return path
+    from .sam_onnx import resolve_encoder_path
 
-    model_file = config.get("model_file", "mobile_sam_v1.onnx")
-    path = BACKEND_ROOT / "models" / model_file
-    if path.exists():
-        return path
-
-    raise FileNotFoundError(f"SAM ONNX model not found: {path}")
+    return resolve_encoder_path(config)
 
 
 def bbox_area(bbox: list[float]) -> float:
@@ -129,8 +118,12 @@ def _score_candidate(prompt: list[float], candidate: list[float]) -> float:
     iou = bbox_iou(prompt, candidate)
     if iou < MIN_IOU_WITH_PROMPT:
         return -1.0
-    tightness_bonus = 1.0 - abs(1.0 - area_ratio)
-    return iou * 0.45 + tightness_bonus * 0.55
+    # Prefer overlapping, tighter boxes; slight expansion is penalized but allowed.
+    if area_ratio <= 1.0:
+        tightness = 1.0 - area_ratio
+    else:
+        tightness = max(0.0, 1.08 - area_ratio)
+    return iou * 0.55 + tightness * 0.45
 
 
 def refine_bbox_grabcut(
@@ -221,10 +214,18 @@ def refine_bbox(
     *,
     element_type: str,
     config: dict | None = None,
+    sam_runner: MobileSamOnnxRunner | None = None,
 ) -> tuple[list[float], str, np.ndarray | None]:
     config = config or load_sam_config()
     prompt = clamp_bbox(bbox_norm)
     candidates: list[tuple[list[float], str, np.ndarray | None, float]] = []
+
+    if mobile_sam_available() and sam_runner is not None:
+        sam_bbox, sam_mask = sam_runner.refine_bbox(bgr, prompt)
+        if sam_bbox:
+            score = _score_candidate(prompt, sam_bbox)
+            if score >= 0:
+                candidates.append((sam_bbox, "mobile_sam_v1", sam_mask, score + 0.08))
 
     grabcut_bbox, grabcut_mask = refine_bbox_grabcut(
         bgr,
@@ -246,8 +247,11 @@ def refine_bbox(
     if not candidates:
         return prompt, "prompt_only", None
 
-    best_bbox, backend, mask, _ = max(candidates, key=lambda item: item[3])
-    if _score_candidate(prompt, best_bbox) <= _score_candidate(prompt, prompt):
+    best_bbox, backend, mask, best_score = max(candidates, key=lambda item: item[3])
+    prompt_score = _score_candidate(prompt, prompt)
+    if backend == "mobile_sam_v1" and mask is not None and best_score > 0:
+        return best_bbox, backend, mask
+    if best_score <= prompt_score:
         return prompt, "prompt_only", None
 
     return best_bbox, backend, mask
@@ -265,12 +269,18 @@ def refine_elements(
     changed = 0
     backends: set[str] = set()
 
+    sam_runner: MobileSamOnnxRunner | None = None
+    if mobile_sam_available(config_path):
+        sam_runner = MobileSamOnnxRunner.from_config(config)
+        sam_runner.encode(bgr)
+
     for element in elements:
         new_bbox, backend, mask = refine_bbox(
             bgr,
             element.bbox_norm,
             element_type=element.type,
             config=config,
+            sam_runner=sam_runner,
         )
         backends.add(backend)
         if new_bbox != clamp_bbox(element.bbox_norm):
@@ -285,13 +295,12 @@ def refine_elements(
         masks.append(mask)
 
     backend_label = sorted(backends)[0] if len(backends) == 1 else "hybrid_v1"
-    if sam_model_available(config_path):
-        backend_label = f"{backend_label}+onnx_ready"
 
     return refined, masks, {
         "refine_backend": backend_label,
         "refined_count": changed,
         "element_count": len(refined),
+        "mobile_sam_onnx": mobile_sam_available(config_path),
     }
 
 

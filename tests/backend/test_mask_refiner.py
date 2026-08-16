@@ -31,7 +31,7 @@ def test_refine_bbox_stays_inside_prompt():
     image = _synthetic_rectified()
     prompt = [0.10, 0.23, 0.25, 0.53]
     refined, backend, _ = refine_bbox(image, prompt, element_type="window")
-    assert backend in {"grabcut_v1", "threshold_v1", "prompt_only"}
+    assert backend in {"mobile_sam_v1", "grabcut_v1", "threshold_v1", "prompt_only"}
     assert bbox_iou(prompt, refined) >= 0.35
 
 

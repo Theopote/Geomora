@@ -110,13 +110,14 @@ async def detect(
 @app.get("/detect/capabilities")
 def detect_capabilities() -> dict[str, object]:
     from geomora_detect.mask_refiner import sam_model_available
+    from geomora_detect.sam_onnx import mobile_sam_available
     from geomora_detect.yolo_detector import model_available
 
     return {
         "methods": list(SUPPORTED_METHODS),
         "yolo_available": model_available(),
         "sam_available": True,
-        "sam_onnx_available": sam_model_available(),
+        "sam_onnx_available": mobile_sam_available(),
         "sam_refine": "sam_v1 (auto detect + mask refine)",
         "scale_hint": True,
         "recommended_workflow": [

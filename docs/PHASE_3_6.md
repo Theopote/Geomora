@@ -1,68 +1,65 @@
 # Phase 3.6 — SAM / Mask Refinement
 
-**Status:** ✅ v0.35.0 (GrabCut + threshold bootstrap; optional MobileSAM ONNX path)
+**Status:** ✅ v0.35.1 (MobileSAM ONNX + GrabCut fallback)
 
 ## Goal
 
-Tighten window/door bounding boxes after YOLO / row / contour detection using **mask-based refinement** before Overlay review and IR mapping.
+Tighten window/door bounding boxes after detection using mask segmentation.
 
-```text
-Base detect (auto / yolo / row / contour)
-      ↓
-Mask refine (GrabCut + Otsu inside each prompt box)
-      ↓
-Tighter bbox_norm + optional green mask tint on overlay
+## Backends (priority)
+
+| Backend | Model required | Notes |
+|---------|----------------|-------|
+| `mobile_sam_v1` | Encoder + decoder ONNX | Best quality; ~43 MB download |
+| `grabcut_v1` | No | CPU fallback |
+| `threshold_v1` | No | Otsu inside ROI |
+
+## Download MobileSAM ONNX
+
+```powershell
+cd F:\development\Geomora\backend
+.\.venv\Scripts\python scripts\download_mobile_sam_onnx.py
 ```
 
-## Workspace usage
+Files land in `backend/models/`:
 
-1. Rectify facade
-2. Detection → **SAM refine (Auto + mask)**
-3. Overlay view shows refined boxes + light green mask tint
-4. Review → Rationalize → Generate
+| File | Role |
+|------|------|
+| `mobile_sam_image_encoder.onnx` | ViT-T encoder (~27 MB) |
+| `sam_mask_decoder_single.onnx` | Mask decoder (~16 MB) |
+
+Source: [Heliosoph/sam-onnx](https://huggingface.co/Heliosoph/sam-onnx) (Apache-2.0)
+
+Config: `backend/models/sam_config.json`
+
+## Workspace
+
+Detection → **SAM refine (Auto + mask)**
 
 ## API
 
 `POST /detect` with `method=sam_v1`
 
-Response `method` is `sam_v1`. Debug fields:
+`GET /detect/capabilities` → `sam_onnx_available: true` when both ONNX files exist.
 
-| Field | Meaning |
-|-------|---------|
-| `base_method` | Detector used before refine (`yolo_v1`, `facade_row_v1`, …) |
-| `refine_backend` | `grabcut_v1`, `threshold_v1`, or `prompt_only` |
-| `refined_count` | Boxes changed vs prompt |
+Debug fields: `base_method`, `refine_backend`, `mobile_sam_onnx`, `refined_count`.
 
-`GET /detect/capabilities` includes `sam_available: true`.
-
-## Backends
-
-| Backend | Requires model | Notes |
-|---------|----------------|-------|
-| `grabcut_v1` | No | Default; works on CPU |
-| `threshold_v1` | No | Otsu inside ROI for dark windows / doors |
-| `mobile_sam_v1.onnx` | Optional | Place in `backend/models/` or set `GEOMORA_SAM_MODEL` (future ONNX hook) |
-
-Config: `backend/models/sam_config.json`
-
-## CLI test
+## Verify
 
 ```powershell
-cd F:\development\Geomora\backend
-.\.venv\Scripts\python -m pytest ..\tests\backend\test_mask_refiner.py -q
+.\.venv\Scripts\python -c "from geomora_detect.sam_onnx import mobile_sam_available; print(mobile_sam_available())"
+.\.venv\Scripts\python -m pytest ..\tests\backend\test_sam_onnx.py -q
+.\.venv\Scripts\python scripts\validate_yolo_facade.py
 ```
 
-## Files
+## Architecture
 
-| Path | Role |
-|------|------|
-| `geomora_detect/mask_refiner.py` | GrabCut + threshold refine |
-| `geomora_detect/pipeline.py` | `sam_v1` method |
-| `models/sam_config.json` | Refine parameters |
-
-## Gate
-
-- [x] `sam_v1` returns elements on synthetic rectified facade
-- [x] Overlay includes mask tint
-- [x] Workspace detection dropdown includes SAM refine
-- [ ] Optional MobileSAM ONNX wired (model download separate)
+```text
+Base detect (auto)
+    ↓
+Encode image once (MobileSAM encoder)
+    ↓
+Per box: box prompt → decoder → mask → tight bbox
+    ↓
+Fallback: GrabCut / threshold if ONNX missing or score low
+```

@@ -9,7 +9,7 @@
 | 3.3 Ruby DetectClient + DetectionMapper | ✅ |
 | 3.4 Workspace UI (Detect + Overlay) | ✅ |
 | 3.5 YOLO ONNX (`yolo_v1`) | ✅ bootstrap — train via `backend/scripts/train_yolo_facade.py` |
-| 3.6 SAM refinement | ✅ v0.35.0 (`sam_v1` — GrabCut + threshold; see `docs/PHASE_3_6.md`) |
+| 3.6 SAM refinement | ✅ v0.35.1 (`sam_v1` — MobileSAM ONNX + GrabCut fallback; see `docs/PHASE_3_6.md`) |
 | 3.7 `facade_row_v1` row detector | ✅ v0.33.0 |
 | 3.8 Auto wall scale from detection | ✅ v0.33.0 |
 

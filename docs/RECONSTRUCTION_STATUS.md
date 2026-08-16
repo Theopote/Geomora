@@ -32,7 +32,8 @@ Presentation features (LOD tours, layout PDF, MP4 export) are **secondary** and 
 
 | Feature | Description |
 |---------|-------------|
-| `sam_v1` | Auto detect → GrabCut/threshold mask → tighter `bbox_norm` |
+| `sam_v1` | Auto detect → MobileSAM ONNX (or GrabCut fallback) → tighter `bbox_norm` |
+| MobileSAM ONNX | `scripts/download_mobile_sam_onnx.py` → encoder + decoder in `models/` |
 | Workspace | Detection: **SAM refine (Auto + mask)** |
 | Overlay | Green mask tint on refined regions |
 
@@ -99,7 +100,6 @@ Synthetic acceptance assets:
 |----------|------|
 | P0 | Fine-tune `yolo_v1` on **real** rectified facades — label with `docs/YOLO_LABELING.md`, train via `docs/YOLO_TRAINING.md` |
 | P0 | Complete **real photo Stage A** sign-off — `docs/REAL_PHOTO_ACCEPTANCE.md` §7 |
-| P1 | Optional MobileSAM ONNX backend (model file + export script) |
 | P1 | Video metadata in IR `sources[]` (video_id, frame_index, timestamp) |
 | P2 | Full constraint graph solver |
 | P2 | Vision-driven floor plan / storey inference |

@@ -1,7 +1,9 @@
 {
-  "model_file": "mobile_sam_v1.onnx",
-  "preferred_backend": "grabcut_v1",
+  "encoder_file": "mobile_sam_image_encoder.onnx",
+  "decoder_file": "sam_mask_decoder_single.onnx",
+  "input_size": 1024,
+  "preferred_backend": "mobile_sam_v1",
   "grabcut_iterations": 4,
   "inner_margin": 0.06,
-  "notes": "Optional MobileSAM ONNX — set GEOMORA_SAM_MODEL or place file in models/. GrabCut+threshold runs without it."
+  "notes": "Download: scripts/download_mobile_sam_onnx.py. Override via GEOMORA_SAM_ENCODER / GEOMORA_SAM_DECODER."
 }

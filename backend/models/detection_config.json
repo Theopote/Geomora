@@ -6,5 +6,12 @@
     "door"
   ],
   "confidence_threshold": 0.3,
-  "iou_threshold": 0.45
+  "iou_threshold": 0.45,
+  "training_metrics": {
+    "metrics/precision(B)": 0.9991756103157668,
+    "metrics/recall(B)": 1.0,
+    "metrics/mAP50(B)": 0.995,
+    "metrics/mAP50-95(B)": 0.9950000000000001,
+    "fitness": 0.9950000000000001
+  }
 }

@@ -41,8 +41,16 @@ When the ONNX file is missing, `method=auto` falls back to `contour_v1`.
 
 ## SAM refinement (Phase 3.6)
 
-See **`docs/PHASE_3_6.md`**. Runs without extra models (GrabCut + threshold). Optional:
+See **`docs/PHASE_3_6.md`**. Download MobileSAM ONNX (~43 MB):
 
 ```powershell
-$env:GEOMORA_SAM_MODEL = "D:\models\mobile_sam_v1.onnx"
+cd backend
+.\.venv\Scripts\python scripts\download_mobile_sam_onnx.py
+```
+
+Override paths:
+
+```powershell
+$env:GEOMORA_SAM_ENCODER = "D:\models\mobile_sam_image_encoder.onnx"
+$env:GEOMORA_SAM_DECODER = "D:\models\sam_mask_decoder_single.onnx"
 ```

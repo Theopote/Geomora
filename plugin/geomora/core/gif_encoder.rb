@@ -5,6 +5,19 @@ require 'stringio'
 module Geomora
   module Core
     class GifEncoder
+      def self.build_palette
+        colors = []
+        steps = [0, 51, 102, 153, 204, 255]
+        steps.each do |r|
+          steps.each do |g|
+            steps.each do |b|
+              colors << [r, g, b]
+            end
+          end
+        end
+        colors.take(256)
+      end
+
       PALETTE = build_palette.freeze
 
       def self.encode(frames, path, delay_centiseconds: 20, loop_count: 0)
@@ -30,19 +43,6 @@ module Geomora
         io.write(';')
         File.binwrite(path, io.string)
         path
-      end
-
-      def self.build_palette
-        colors = []
-        steps = [0, 51, 102, 153, 204, 255]
-        steps.each do |r|
-          steps.each do |g|
-            steps.each do |b|
-              colors << [r, g, b]
-            end
-          end
-        end
-        colors.take(256)
       end
 
       def self.quantize(rgb, width, height)

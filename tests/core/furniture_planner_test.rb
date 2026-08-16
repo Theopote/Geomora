@@ -30,6 +30,33 @@ class FurniturePlannerTest < Minitest::Test
     assert_equal 'room_01_01', items[0]['room_id']
   end
 
+  def test_kitchen_fixture_set_places_multiple_items
+    rooms = [
+      {
+        'id' => 'room_01_01',
+        'storey_id' => 'storey_01',
+        'semantic' => { 'room_type' => 'kitchen' },
+        'geometry' => {
+          'polygon' => [
+            [0, 0, 0],
+            [5000, 0, 0],
+            [5000, 4000, 0],
+            [0, 4000, 0]
+          ]
+        }
+      }
+    ]
+    params = {
+      'lod_level' => 'lod_300',
+      'building_elements' => { 'furniture' => true, 'fixture_sets' => true }
+    }
+
+    items = Geomora::Core::FurniturePlanner.plan(rooms: rooms, params: params, storey_index: 0)
+    assert_operator items.length, :>=, 3
+    categories = items.map { |item| item['semantic']['category'] }
+    assert_includes categories, 'fixture'
+  end
+
   def test_skips_furniture_below_lod_300
     rooms = [
       {

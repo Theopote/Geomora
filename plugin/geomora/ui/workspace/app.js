@@ -1133,8 +1133,14 @@
         partition_doors: formData.get('include_partition_doors') === 'on',
         room_zones: formData.get('include_room_zones') === 'on',
         room_types: formData.get('include_room_types') === 'on',
-        furniture: formData.get('include_furniture') === 'on'
+        furniture: formData.get('include_furniture') === 'on',
+        fixture_sets: formData.get('include_fixture_sets') === 'on',
+        structural_constraints: formData.get('include_structural_constraints') === 'on'
       },
+      room_type_overrides: formData.get('room_type_overrides') || '',
+      partition_grid_spacing: formData.get('partition_grid_spacing')
+        ? Number(formData.get('partition_grid_spacing'))
+        : null,
       partition_count: Number(formData.get('partition_count') || 1),
       partition_door_width: Number(formData.get('partition_door_width') || 900),
       partition_door_height: Number(formData.get('partition_door_height') || 2100),

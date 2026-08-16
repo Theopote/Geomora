@@ -20,6 +20,7 @@ module Geomora
       Geomora_Eaves
       Geomora_Rooms
       Geomora_Furniture
+      Geomora_Fixtures
       Geomora_Reference
     ].freeze
 

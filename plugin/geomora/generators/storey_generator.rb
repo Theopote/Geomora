@@ -191,7 +191,7 @@ module Geomora
         end
 
         storey_furniture(document, storey).each do |item|
-          next unless Core::LodPolicy.include_element?(:furniture, @lod_level)
+          next unless item_visible?(item)
 
           @furniture_gen.generate(item, storey.elevation, storey_group.entities)
         end
@@ -204,6 +204,13 @@ module Geomora
       def storey_furniture(document, storey)
         items = document.furniture || []
         items.select { |item| item.storey_id == storey.id }
+      end
+
+      def item_visible?(item)
+        type = item.type.to_s
+        return Core::LodPolicy.include_element?(:fixture, @lod_level) if type == 'fixture'
+
+        Core::LodPolicy.include_element?(:furniture, @lod_level)
       end
 
       def storey_rooms(document, storey)

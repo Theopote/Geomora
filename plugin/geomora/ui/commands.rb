@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'json'
+
 module Geomora
   module AppUI
     module Commands
@@ -41,6 +43,22 @@ module Geomora
           lod_menu.add_item('LOD 300 — Details') { apply_lod(:lod_300) }
           lod_menu.add_separator
           lod_menu.add_item('Create LOD Scene Pages') { create_lod_scenes }
+          lod_menu.add_item('Next LOD Scene') { next_lod_scene }
+          lod_menu.add_item('Export LOD Tour Manifest') { export_lod_tour }
+        end
+
+        def export_lod_tour
+          manifest = Core::Project.lod_tour_manifest
+          ::UI.messagebox("LOD tour manifest:\n\n#{JSON.pretty_generate(manifest)}")
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD tour export failed:\n\n#{e.message}")
+        end
+
+        def next_lod_scene
+          name = Core::Project.next_lod_scene
+          ::UI.messagebox("LOD scene: #{name}")
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD scene failed:\n\n#{e.message}")
         end
 
         def create_lod_scenes

@@ -134,6 +134,16 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 13.4 | Create LOD Scene Pages (menu) | Three scenes: Geomora LOD 100/200/300 |
 | 13.5 | Constraint parallel in graph | Acknowledged in `constraint_solution` |
 
+## Phase 14 — Fixtures + overrides
+
+| # | Step | Expected |
+|---|---|---|
+| 14.1 | Room override `2:kitchen` → Generate | Room 2 type = kitchen; name updated |
+| 14.2 | Fixture sets on, LOD 300 | Multiple items per room; sink/toilet tags |
+| 14.3 | Structural grid snap on | Partition X snapped to grid spacing |
+| 14.4 | Next LOD Scene (menu) | Cycles Geomora LOD scenes |
+| 14.5 | Export LOD Tour Manifest | JSON with scene order + LOD level |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos

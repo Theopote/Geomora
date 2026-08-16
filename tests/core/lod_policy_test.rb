@@ -22,6 +22,7 @@ class LodPolicyTest < Minitest::Test
 
   def test_lod_300_includes_furniture
     assert_equal true, Geomora::Core::LodPolicy.include_element?('furniture', 300)
+    assert_equal true, Geomora::Core::LodPolicy.include_element?('fixture', 300)
     assert_equal false, Geomora::Core::LodPolicy.include_element?('furniture', 200)
   end
 end

@@ -121,14 +121,14 @@ tests/core/lod_scene_pages_test.rb
 
 ## 8. Deferred (Phase 14+)
 
-- Custom room-type overrides per room
-- Multi-piece furniture sets per room
-- LOD scene animation / presentation export
-- Kitchen/bathroom fixture libraries
-- Full structural constraint solving (parallel wall geometry)
+- ~~Custom room-type overrides per room~~ → Phase 14 ✅
+- ~~Multi-piece furniture sets per room~~ → Phase 14 ✅
+- ~~LOD scene animation / presentation export~~ → Phase 14 tour ✅ (animation deferred)
+- ~~Kitchen/bathroom fixture libraries~~ → Phase 14 ✅
+- ~~Full structural constraint solving (parallel wall geometry)~~ → Phase 14 partition snap ✅
 
 ---
 
 ## 9. Gate to Phase 14
 
-Typed rooms + furniture blocks enable fixture libraries and layout refinement on multi-storey interiors.
+Typed rooms + furniture blocks enable fixture libraries and layout refinement on multi-storey interiors. See [PHASE_14.md](PHASE_14.md).

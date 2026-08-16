@@ -230,4 +230,33 @@ class IRBuilderTest < Minitest::Test
     assert_equal 'living', ir['rooms'][0]['semantic']['room_type']
     assert_equal 2, ir['furniture'].length
   end
+
+  def test_room_override_and_fixture_sets
+    params = {
+      'project_name' => 'Phase 14',
+      'wall_length' => 9000,
+      'wall_height' => 3000,
+      'wall_thickness' => 240,
+      'building_depth' => 6000,
+      'lod_level' => 'lod_300',
+      'partition_count' => 1,
+      'room_type_overrides' => '2:kitchen',
+      'building_elements' => {
+        'interior_partitions' => true,
+        'room_zones' => true,
+        'room_types' => true,
+        'furniture' => true,
+        'fixture_sets' => true
+      },
+      'windows' => [],
+      'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    doc = Geomora::IR::Parser.parse(ir)
+
+    assert Geomora::IR::Validator.validate(doc)
+    assert_equal 'kitchen', ir['rooms'][1]['semantic']['room_type']
+    assert_operator ir['furniture'].length, :>=, 3
+  end
 end

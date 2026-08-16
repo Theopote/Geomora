@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.22.0 — Room Types + Furniture</div>
+    <div class="subtitle">v0.23.0 — Fixtures + Room Overrides</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -132,6 +132,12 @@
         <label class="checkbox-label"><input name="include_room_types" type="checkbox" checked> Auto room types (living / bedroom / bath)</label>
         <label class="checkbox-label"><input name="include_furniture" type="checkbox"> Place furniture (LOD 300)</label>
         <label>Partition door offsets (mm, comma-separated)<input name="partition_door_offsets" type="text" placeholder="auto centre per wall"></label>
+
+        <div class="section-title">Fixtures + Overrides (Phase 14)</div>
+        <label class="checkbox-label"><input name="include_fixture_sets" type="checkbox" checked> Kitchen / bath fixture sets</label>
+        <label>Room type overrides<input name="room_type_overrides" type="text" placeholder="1:kitchen,2:bathroom"></label>
+        <label class="checkbox-label"><input name="include_structural_constraints" type="checkbox"> Snap partitions to structural grid</label>
+        <label>Partition grid spacing (mm)<input name="partition_grid_spacing" type="number" step="1" placeholder="300"></label>
 
         <div class="section-title">Geometry Doctor (Phase 8)</div>
         <label class="checkbox-label"><input name="doctor_tiny_edges" type="checkbox" checked> Remove tiny edges</label>

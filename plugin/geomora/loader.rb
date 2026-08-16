@@ -60,6 +60,10 @@ module Geomora
     core/room_planner
     core/room_classifier
     core/furniture_planner
+    core/fixture_library
+    core/room_overrides
+    core/structural_constraint_solver
+    core/lod_presentation
     core/constraint_solver
     core/lod_scenes
     core/lod_scene_pages

@@ -155,6 +155,7 @@ module Geomora
           storey_index: storey_index,
           height: height
         )
+        partition_walls = Core::StructuralConstraintSolver.apply!(partition_walls, params: @params)
         walls.concat(partition_walls)
         openings.concat(partition_openings)
 
@@ -233,7 +234,12 @@ module Geomora
           storey_index: storey_index,
           perimeter_walls: perimeter_walls_enabled?
         )
-        Core::RoomClassifier.classify(
+        rooms = Core::RoomClassifier.classify(
+          rooms,
+          params: @params,
+          storey_index: storey_index
+        )
+        Core::RoomOverrides.apply(
           rooms,
           params: @params,
           storey_index: storey_index

@@ -36,11 +36,23 @@ module Geomora
 
         extrude_polygon(group.entities, polygon, height, direction: 1)
         write_furniture_metadata(group, item)
-        @tags.apply(group, 'Geomora_Furniture')
+        @tags.apply(group, tag_for(item))
         group
       end
 
       private
+
+      def tag_for(item)
+        category = item_category(item)
+        category == 'fixture' ? 'Geomora_Fixtures' : 'Geomora_Furniture'
+      end
+
+      def item_category(item)
+        semantic = item.semantic
+        return 'furniture' unless semantic.is_a?(Hash)
+
+        (semantic[:category] || semantic['category'] || item.type).to_s
+      end
 
       def write_furniture_metadata(group, item)
         attrs = {

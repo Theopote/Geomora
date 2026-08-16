@@ -21,7 +21,8 @@ module Geomora
         'Geomora_Railings' => 300,
         'Geomora_Eaves' => 300,
         'Geomora_Rooms' => 200,
-        'Geomora_Furniture' => 300
+        'Geomora_Furniture' => 300,
+        'Geomora_Fixtures' => 300
       }.freeze
 
       class << self

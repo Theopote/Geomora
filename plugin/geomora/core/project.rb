@@ -76,6 +76,16 @@ module Geomora
         pages
       end
 
+      def self.next_lod_scene
+        model = Sketchup.active_model
+        LodPresentation.next_scene(model)
+      end
+
+      def self.lod_tour_manifest
+        model = Sketchup.active_model
+        LodPresentation.tour_manifest(model)
+      end
+
       def self.build_manual_facade(params)
         IRBuilder.build_manual_facade(params)
       end

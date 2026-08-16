@@ -15,6 +15,7 @@ require_relative 'cornice_generator'
 require_relative 'trim_generator'
 require_relative 'railing_generator'
 require_relative 'eaves_generator'
+require_relative 'room_generator'
 require_relative 'wall_join_processor'
 require_relative '../core/lod_policy'
 require_relative '../metadata/attributes'
@@ -118,6 +119,12 @@ module Geomora
           schema_version: context[:schema_version],
           lod_level: @lod_level
         )
+        @room_gen = RoomGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version]
+        )
       end
 
       def generate(storey, building_group, document)
@@ -170,10 +177,21 @@ module Geomora
           WallJoinProcessor.join_walls(joinable_wall_groups, storey_group)
         end
 
+        storey_rooms(document, storey).each do |room|
+          next unless Core::LodPolicy.include_element?(:room, @lod_level)
+
+          @room_gen.generate(room, storey.elevation, storey_group.entities)
+        end
+
         storey_group
       end
 
       private
+
+      def storey_rooms(document, storey)
+        rooms = document.rooms || []
+        rooms.select { |room| room.storey_id == storey.id }
+      end
 
       def wall_joinable?(wall)
         semantic = wall.semantic

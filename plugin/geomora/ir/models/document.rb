@@ -51,6 +51,7 @@ module Geomora
       Trim = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
       Railing = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
       Eaves = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
+      Room = Struct.new(:id, :storey_id, :name, :geometry, :semantic, :confidence, keyword_init: true)
 
       Opening = Struct.new(
         :id, :type, :parent_id, :geometry, :component, :confidence, :source,
@@ -92,7 +93,7 @@ module Geomora
 
       Document = Struct.new(
         :schema_version, :project, :buildings, :components,
-        :constraints, :sources, :openings,
+        :constraints, :sources, :openings, :rooms,
         keyword_init: true
       )
     end

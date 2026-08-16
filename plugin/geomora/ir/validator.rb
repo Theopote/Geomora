@@ -27,6 +27,7 @@ module Geomora
         collect_entity_ids
         validate_buildings
         validate_openings
+        validate_rooms
         validate_constraints
         validate_components
 
@@ -48,6 +49,7 @@ module Geomora
           register_id(e.id, e.type)
         end
         @doc.openings.each { |o| register_id(o.id, o.type) }
+        (@doc.rooms || []).each { |r| register_id(r.id, 'room') }
         @doc.components.each { |c| register_id(c.id, 'component') }
         @doc.constraints.each { |c| register_id(c.id, 'constraint') }
         @doc.sources.each { |s| register_id(s.id, 'source') }
@@ -247,6 +249,18 @@ module Geomora
         b_bottom = b.sill_height.to_f
         b_top = b_bottom + b.height.to_f
         a_bottom < b_top && b_bottom < a_top
+      end
+
+      def validate_rooms
+        (@doc.rooms || []).each do |room|
+          unless @ids[room.storey_id]
+            @errors << "Invalid storey_id for #{room.id}: #{room.storey_id}"
+          end
+
+          polygon = room.geometry[:polygon]
+          @errors << "Invalid polygon for #{room.id}" if polygon.nil? || polygon.length < 3
+          @errors << "Missing room name: #{room.id}" if room.name.nil? || room.name.to_s.empty?
+        end
       end
 
       def validate_constraints

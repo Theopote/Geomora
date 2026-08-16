@@ -51,4 +51,32 @@ class InteriorLayoutTest < Minitest::Test
     assert_equal 120, y_start
     assert_equal 2880, y_end
   end
+
+  def test_partition_doors_create_openings
+    params = {
+      'building_elements' => { 'partition_doors' => true },
+      'partition_door_width' => 900
+    }
+    walls = Geomora::Core::InteriorLayout.partition_walls(
+      params: params,
+      wall_length: 9000,
+      wall_thickness: 240,
+      building_depth: 6000,
+      storey_id: 'storey_01',
+      storey_index: 0,
+      wall_height: 3000,
+      perimeter_walls: false
+    )
+    result = Geomora::Core::InteriorLayout.partition_openings(
+      walls: walls,
+      params: params,
+      wall_thickness: 240,
+      wall_height: 3000,
+      storey_index: 0
+    )
+
+    assert_equal 1, result[:openings].length
+    assert_equal 'door', result[:openings][0]['type']
+    assert_equal ['partition_door_01_01'], result[:walls][0]['opening_ids']
+  end
 end

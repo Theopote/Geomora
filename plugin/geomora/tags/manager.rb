@@ -18,6 +18,7 @@ module Geomora
       Geomora_Trim
       Geomora_Railings
       Geomora_Eaves
+      Geomora_Rooms
       Geomora_Reference
     ].freeze
 

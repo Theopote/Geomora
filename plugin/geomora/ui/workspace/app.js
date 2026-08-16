@@ -1118,9 +1118,13 @@
         perimeter_walls: formData.get('include_perimeter_walls') === 'on',
         structural_grid: formData.get('include_structural_grid') === 'on',
         interior_partitions: formData.get('include_interior_partitions') === 'on',
-        full_trim: formData.get('include_full_trim') === 'on'
+        full_trim: formData.get('include_full_trim') === 'on',
+        partition_doors: formData.get('include_partition_doors') === 'on',
+        room_zones: formData.get('include_room_zones') === 'on'
       },
       partition_count: Number(formData.get('partition_count') || 1),
+      partition_door_width: Number(formData.get('partition_door_width') || 900),
+      partition_door_height: Number(formData.get('partition_door_height') || 2100),
       storey_count: Number(formData.get('storey_count') || 1),
       storey_height: formData.get('storey_height') ? Number(formData.get('storey_height')) : null,
       repeat_openings: formData.get('repeat_openings') === 'on',
@@ -1490,6 +1494,32 @@
     setStatus('success', 'Dimensions rationalized — review Inspector, then Validate or Generate.');
   }
 
+  function applyConstraintSolution(payload) {
+    const windows = (payload.windows || []).map(function (win) {
+      return {
+        offset: Number(win.offset),
+        width: Number(win.width),
+        height: Number(win.height),
+        sill_height: Number(win.sill_height),
+        bbox_norm: win.bbox_norm || windowBboxFromMm(win)
+      };
+    });
+
+    renderWindows(windows);
+
+    const door = payload.door || {};
+    const doorWidth = Number(door.width) || 0;
+    els.form.elements.namedItem('door_offset').value = door.offset || 0;
+    els.form.elements.namedItem('door_width').value = doorWidth;
+    els.form.elements.namedItem('door_height').value = doorWidth > 0 ? (door.height || 2100) : 0;
+    state.doorBbox = doorWidth > 0 ? (door.bbox_norm || doorBboxFromMm(door)) : null;
+
+    state.constraintSolution = payload.constraint_solution || null;
+    scheduleOverlayRender();
+    renderTree();
+    setStatus('success', 'Constraint solution applied — review Inspector, then Validate or Generate.');
+  }
+
   function setIrPreview(ir) {
     if (!ir || !ir.openings) return;
     renderTree();
@@ -1504,6 +1534,7 @@
     applyDetection: applyDetection,
     applyFusion: applyFusion,
     applyRationalization: applyRationalization,
+    applyConstraintSolution: applyConstraintSolution,
     applyPattern: applyPattern,
     setDetectionMeta: setDetectionMeta,
     onDetectionEmpty: onDetectionEmpty,
@@ -1565,6 +1596,14 @@
       return;
     }
     sketchupCall('rationalize', JSON.stringify(collectParams()));
+  });
+
+  document.getElementById('btn-solve-constraints').addEventListener('click', function () {
+    if (!state.windows.length) {
+      setStatus('error', 'Add at least one window before solving constraints.');
+      return;
+    }
+    sketchupCall('solve_constraints', JSON.stringify(collectParams()));
   });
 
   document.getElementById('btn-apply-pattern').addEventListener('click', function () {

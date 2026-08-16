@@ -114,6 +114,16 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 11.4 | LOD 200 → Generate | Openings visible; trim / eaves tags hidden |
 | 11.5 | Perimeter + partitions | Partitions span interior Y range inside footprint |
 
+## Phase 12 — Rooms + constraint solver
+
+| # | Step | Expected |
+|---|---|---|
+| 12.1 | Partitions + partition doors → Generate | Door cut on each partition; `partition_door_*` in IR |
+| 12.2 | Room zones on → Generate | `rooms[]` in IR; `Geomora_Rooms` tag in model |
+| 12.3 | Menu LOD 100 View | Windows/rooms/trim hidden |
+| 12.4 | Solve Constraints after Rationalize | Window widths equalized per constraint graph |
+| 12.5 | LOD 100 Generate | No partition doors in openings |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos

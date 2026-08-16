@@ -88,13 +88,13 @@ tests/core/lod_visibility_test.rb
 
 ## 6. Deferred (Phase 12+)
 
-- Partition walls with openings (doors between rooms)
-- LOD scene presets / animation
-- Interior furniture / room semantics
-- Constraint solver (Phase 4.5)
+- ~~Partition walls with openings (doors between rooms)~~ → Phase 12 ✅
+- ~~LOD scene presets / animation~~ → Phase 12 presets ✅ (animation deferred)
+- ~~Interior furniture / room semantics~~ → Phase 12 room zones ✅ (furniture deferred)
+- ~~Constraint solver (Phase 4.5)~~ → Phase 12 basic solver ✅
 
 ---
 
 ## 7. Gate to Phase 12
 
-Interior shells + LOD visibility enable room-level layout and semantic refinement on stacked buildings.
+Interior shells + LOD visibility enable room-level layout and semantic refinement on stacked buildings. See [PHASE_12.md](PHASE_12.md).

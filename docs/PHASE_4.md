@@ -8,7 +8,7 @@
 | 4.2 `Rationalizer` (snap, equal size/spacing, symmetry) | ✅ |
 | 4.3 Workspace **Rationalize** button | ✅ |
 | 4.4 IR `constraints[]` from rationalization metadata | ✅ |
-| 4.5 Constraint solver (full graph) | ⏳ deferred |
+| 4.5 Constraint solver (full graph) | ⏳ partial — Phase 12 `facade_constraint_v1` |
 
 ---
 

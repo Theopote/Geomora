@@ -15,10 +15,11 @@ module Geomora
         storey_payloads = build_storey_payloads
         storeys = storey_payloads.map { |payload| payload[:storey] }
         openings = storey_payloads.flat_map { |payload| payload[:openings] }
+        rooms = storey_payloads.flat_map { |payload| payload[:rooms] }
         windows = openings.select { |opening| opening['type'] == 'window' }
-        door = openings.find { |opening| opening['type'] == 'door' }
+        doors = openings.select { |opening| opening['type'] == 'door' }
 
-        {
+        ir = {
           'schema_version' => Geomora::SCHEMA_VERSION,
           'project' => {
             'id' => 'project_001',
@@ -36,10 +37,12 @@ module Geomora
             }
           ],
           'openings' => openings,
-          'components' => build_components(windows, door),
+          'components' => build_components(windows, doors),
           'constraints' => build_constraints(windows),
           'sources' => build_sources
         }
+        ir['rooms'] = rooms unless rooms.empty?
+        ir
       end
 
       private
@@ -83,7 +86,8 @@ module Geomora
             'height' => height,
             'elements' => walls + building_elements
           },
-          openings: openings
+          openings: openings,
+          rooms: build_storey_rooms(storey_id: storey_id, storey_index: index)
         }
       end
 
@@ -136,11 +140,13 @@ module Geomora
                   ]
                 end
 
-        walls.concat(interior_partition_walls(
-                       storey_id: storey_id,
-                       storey_index: storey_index,
-                       height: height
-                     ))
+        partition_walls, partition_openings = interior_partition_data(
+          storey_id: storey_id,
+          storey_index: storey_index,
+          height: height
+        )
+        walls.concat(partition_walls)
+        openings.concat(partition_openings)
 
         [walls, openings]
       end
@@ -181,10 +187,10 @@ module Geomora
         Core::WallEnclosure.enabled?(@params)
       end
 
-      def interior_partition_walls(storey_id:, storey_index:, height:)
-        return [] unless Core::InteriorLayout.enabled?(@params)
+      def interior_partition_data(storey_id:, storey_index:, height:)
+        return [[], []] unless Core::InteriorLayout.enabled?(@params)
 
-        Core::InteriorLayout.partition_walls(
+        walls = Core::InteriorLayout.partition_walls(
           params: @params,
           wall_length: wall_length,
           wall_thickness: wall_thickness,
@@ -192,6 +198,29 @@ module Geomora
           storey_id: storey_id,
           storey_index: storey_index,
           wall_height: height,
+          perimeter_walls: perimeter_walls_enabled?
+        )
+        result = if LodPolicy.include_openings?(lod_level)
+                   Core::InteriorLayout.partition_openings(
+                     walls: walls,
+                     params: @params,
+                     wall_thickness: wall_thickness,
+                     wall_height: height,
+                     storey_index: storey_index
+                   )
+                 else
+                   { walls: walls, openings: [] }
+                 end
+        [result[:walls], result[:openings]]
+      end
+
+      def build_storey_rooms(storey_id:, storey_index:)
+        Core::RoomPlanner.plan(
+          params: @params,
+          wall_length: wall_length,
+          building_depth: building_depth,
+          storey_id: storey_id,
+          storey_index: storey_index,
           perimeter_walls: perimeter_walls_enabled?
         )
       end
@@ -329,7 +358,7 @@ module Geomora
         }
       end
 
-      def build_components(windows, door)
+      def build_components(windows, doors)
         defs = {}
 
         windows.each do |win|
@@ -346,8 +375,12 @@ module Geomora
           }
         end
 
-        if door
+        door_list = doors.is_a?(Array) ? doors : [doors]
+        door_list.compact.each do |door|
           door_def = door.dig('component', 'definition_id')
+          next if door_def.nil? || door_def.to_s.empty?
+          next if defs.key?(door_def)
+
           defs[door_def] = {
             'id' => door_def,
             'type' => 'door',

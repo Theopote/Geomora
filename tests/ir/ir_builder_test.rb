@@ -178,4 +178,29 @@ class IRBuilderTest < Minitest::Test
     assert_equal 6, walls.length
     assert_equal 2, partitions.length
   end
+
+  def test_builds_rooms_and_partition_doors
+    params = {
+      'project_name' => 'Rooms',
+      'wall_length' => 9000,
+      'wall_height' => 3000,
+      'wall_thickness' => 240,
+      'building_depth' => 6000,
+      'partition_count' => 1,
+      'building_elements' => {
+        'interior_partitions' => true,
+        'partition_doors' => true,
+        'room_zones' => true
+      },
+      'windows' => [],
+      'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    doc = Geomora::IR::Parser.parse(ir)
+
+    assert Geomora::IR::Validator.validate(doc)
+    assert_equal 2, ir['rooms'].length
+    assert_equal 1, ir['openings'].count { |opening| opening['id'].start_with?('partition_door') }
+  end
 end

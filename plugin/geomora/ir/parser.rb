@@ -24,7 +24,8 @@ module Geomora
           components: (@data['components'] || []).map { |c| parse_component(c) },
           constraints: (@data['constraints'] || []).map { |c| parse_constraint(c) },
           sources: (@data['sources'] || []).map { |s| parse_source(s) },
-          openings: collect_openings
+          openings: collect_openings,
+          rooms: (@data['rooms'] || []).map { |r| parse_room(r) }
         )
       end
 
@@ -208,6 +209,17 @@ module Geomora
           geometry: symbolize_geometry(e['geometry']),
           semantic: e['semantic'] || {},
           confidence: e['confidence']
+        )
+      end
+
+      def parse_room(r)
+        Models::Room.new(
+          id: r['id'],
+          storey_id: r['storey_id'],
+          name: r['name'],
+          geometry: symbolize_geometry(r['geometry']),
+          semantic: r['semantic'] || {},
+          confidence: r['confidence']
         )
       end
 

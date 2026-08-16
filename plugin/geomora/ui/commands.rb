@@ -29,7 +29,23 @@ module Geomora
           menu.add_item('Validate Phase 0 Fixture') { run_validate }
           menu.add_item('Repair Geometry') { run_repair_geometry }
           menu.add_separator
+          add_lod_menu_items(menu)
+          menu.add_separator
           menu.add_item('About Geomora') { show_about }
+        end
+
+        def add_lod_menu_items(menu)
+          lod_menu = menu.add_submenu('LOD View')
+          lod_menu.add_item('LOD 100 — Massing') { apply_lod(:lod_100) }
+          lod_menu.add_item('LOD 200 — Openings') { apply_lod(:lod_200) }
+          lod_menu.add_item('LOD 300 — Details') { apply_lod(:lod_300) }
+        end
+
+        def apply_lod(preset)
+          label = Core::Project.apply_lod_preset(preset)
+          ::UI.messagebox("LOD view applied: #{label}")
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD view failed:\n\n#{e.message}")
         end
 
         def register_toolbar

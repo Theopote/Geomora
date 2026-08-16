@@ -17,6 +17,7 @@ class LodVisibilityTest < Minitest::Test
 
     assert_includes visible, 'Geomora_Windows'
     assert_includes visible, 'Geomora_InteriorWalls'
+    assert_includes visible, 'Geomora_Rooms'
     assert_includes hidden, 'Geomora_Trim'
     assert_includes hidden, 'Geomora_Eaves'
   end

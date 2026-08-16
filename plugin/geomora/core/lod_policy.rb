@@ -17,7 +17,8 @@ module Geomora
         'cornice' => 300,
         'trim' => 300,
         'railing' => 300,
-        'eaves' => 300
+        'eaves' => 300,
+        'room' => 200
       }.freeze
 
       DEFAULT_LEVEL = 200

@@ -47,7 +47,26 @@ module Geomora
       end
 
       def self.rationalize_facade(params, grid_mm: Rationalizer::DEFAULT_GRID_MM)
-        Rationalizer.rationalize(params, grid_mm: grid_mm)
+        result = Rationalizer.rationalize(params, grid_mm: grid_mm)
+        return result unless params['constraints'].is_a?(Array) && !params['constraints'].empty?
+
+        solved = ConstraintSolver.solve(params.merge(result), grid_mm: grid_mm)
+        result.merge(
+          'windows' => solved['windows'],
+          'door' => solved['door'],
+          'constraint_solution' => solved['constraint_solution']
+        )
+      end
+
+      def self.solve_constraints(params, grid_mm: Rationalizer::DEFAULT_GRID_MM)
+        ConstraintSolver.solve(params, grid_mm: grid_mm)
+      end
+
+      def self.apply_lod_preset(preset)
+        model = Sketchup.active_model
+        label = LodScenes.apply_preset(model, preset)
+        Logger.info("LOD preset applied: #{label}")
+        label
       end
 
       def self.build_manual_facade(params)

@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.19.2 — Detection Fallback</div>
+    <div class="subtitle">v0.21.0 — Interior Rooms</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -122,6 +122,12 @@
         <label>Partition count<input name="partition_count" type="number" min="1" step="1" value="1"></label>
         <label class="checkbox-label"><input name="include_full_trim" type="checkbox" checked> Full window trim (lintel + sill + jambs)</label>
 
+        <div class="section-title">Interior Rooms (Phase 12)</div>
+        <label class="checkbox-label"><input name="include_partition_doors" type="checkbox"> Partition doors</label>
+        <label>Partition door width (mm)<input name="partition_door_width" type="number" step="1" value="900"></label>
+        <label>Partition door height (mm)<input name="partition_door_height" type="number" step="1" value="2100"></label>
+        <label class="checkbox-label"><input name="include_room_zones" type="checkbox" checked> Room zone labels</label>
+
         <div class="section-title">Geometry Doctor (Phase 8)</div>
         <label class="checkbox-label"><input name="doctor_tiny_edges" type="checkbox" checked> Remove tiny edges</label>
         <label class="checkbox-label"><input name="doctor_tiny_faces" type="checkbox" checked> Remove tiny faces</label>
@@ -147,6 +153,7 @@
 
   <footer class="actions">
     <button id="btn-rationalize" class="btn">Rationalize</button>
+    <button id="btn-solve-constraints" class="btn">Solve Constraints</button>
     <button id="btn-apply-pattern" class="btn">Apply Pattern</button>
     <button id="btn-validate" class="btn">Validate</button>
     <button id="btn-generate" class="btn primary">Generate</button>

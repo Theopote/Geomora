@@ -61,6 +61,90 @@ module Geomora
         value.nil? ? default : value.to_f
       end
 
+      def self.partition_doors_enabled?(params)
+        config = params['building_elements'] || params[:building_elements]
+        return false unless config.is_a?(Hash)
+
+        value = config['partition_doors'] || config[:partition_doors]
+        value == true || value.to_s == 'true'
+      end
+
+      def self.partition_openings(walls:, params:, wall_thickness:, wall_height:, storey_index:)
+        return { walls: walls, openings: [] } unless partition_doors_enabled?(params)
+
+        openings = []
+        door_width = partition_door_width(params)
+        door_height = partition_door_height(params, wall_height)
+        suffix = format('%02d', storey_index + 1)
+
+        walls.each do |wall|
+          next unless partition_wall?(wall)
+
+          baseline = wall.dig('geometry', 'baseline')
+          next unless baseline.is_a?(Array) && baseline.length == 2
+
+          wall_run = wall_run_length(baseline)
+          next if wall_run <= door_width
+
+          offset = partition_door_offset(params, wall_run, door_width)
+          opening_id = format('partition_door_%s_%02d', suffix, wall['semantic']['partition_index'])
+          openings << {
+            'id' => opening_id,
+            'type' => 'door',
+            'parent_id' => wall['id'],
+            'geometry' => {
+              'offset' => offset,
+              'sill_height' => 0,
+              'width' => door_width,
+              'height' => door_height,
+              'depth' => wall_thickness
+            },
+            'component' => {
+              'definition_id' => partition_door_component_id(door_width, door_height)
+            },
+            'semantic' => { 'interior' => true, 'partition_door' => true },
+            'confidence' => 1.0
+          }
+          wall['opening_ids'] = [opening_id]
+        end
+
+        { walls: walls, openings: openings }
+      end
+
+      def self.partition_wall?(wall)
+        semantic = wall['semantic']
+        semantic.is_a?(Hash) && semantic['partition'] == true
+      end
+
+      def self.wall_run_length(baseline)
+        dx = baseline[1][0].to_f - baseline[0][0].to_f
+        dy = baseline[1][1].to_f - baseline[0][1].to_f
+        Math.sqrt((dx * dx) + (dy * dy))
+      end
+
+      def self.partition_door_width(params)
+        value = params['partition_door_width'] || params[:partition_door_width]
+        value.nil? ? 900.0 : value.to_f
+      end
+
+      def self.partition_door_height(params, wall_height)
+        value = params['partition_door_height'] || params[:partition_door_height]
+        height = value.nil? ? 2100.0 : value.to_f
+        [height, wall_height].min
+      end
+
+      def self.partition_door_offset(params, wall_run, door_width)
+        value = params['partition_door_offset'] || params[:partition_door_offset]
+        return (wall_run - door_width) / 2.0 if value.nil?
+
+        offset = value.to_f
+        [[offset, 0].max, wall_run - door_width].min
+      end
+
+      def self.partition_door_component_id(width, height)
+        format('door_partition_%dx%d', width.to_i, height.to_i)
+      end
+
       def self.interior_y_range(building_depth, wall_thickness, perimeter_walls)
         if perimeter_walls
           half_depth = building_depth / 2.0

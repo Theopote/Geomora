@@ -322,6 +322,34 @@ module Geomora
             post_message(dialog, 'error', e.message)
           end
 
+          dialog.add_action_callback('solve_constraints') do |_ctx, json|
+            params = JSON.parse(json)
+            if params['windows'].is_a?(Array) && params['windows'].empty?
+              raise GeomoraError, 'Add at least one window before solving constraints.'
+            end
+            constraints = params['constraints']
+            if constraints.nil? || !constraints.is_a?(Array) || constraints.empty?
+              ir = Core::Project.build_manual_facade(params)
+              constraints = ir['constraints'] || []
+              params = params.merge('constraints' => constraints)
+            end
+            if constraints.empty?
+              raise GeomoraError, 'No constraints to solve. Rationalize or Apply Pattern first.'
+            end
+
+            result = Core::Project.solve_constraints(params)
+            payload = params.merge(result)
+            dialog.execute_script("window.geomora.applyConstraintSolution(#{payload.to_json})")
+            solved = result.dig('constraint_solution', 'constraints_solved') || []
+            post_message(
+              dialog,
+              'success',
+              format('Constraints solved (%s)', solved.join(', '))
+            )
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
           dialog.add_action_callback('validate') do |_ctx, json|
             params = enrich_params(JSON.parse(json))
             ir = Core::Project.build_manual_facade(params)

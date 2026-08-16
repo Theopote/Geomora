@@ -1,6 +1,6 @@
 # Geomora Reconstruction Status (Master Doc Alignment)
 
-**Updated:** v0.33.0  
+**Updated:** v0.34.0  
 **Canonical references:** `docs/Geomora Phase 0 — Cursor Master Prompt v0.1.md`, `docs/Geomora 技术架构与开发手册 v0.1.md`
 
 Geomora's core mission:
@@ -25,6 +25,19 @@ Presentation features (LOD tours, layout PDF, MP4 export) are **secondary** and 
 | Phase 5 | Pattern / component reuse | ✅ Core complete |
 | Phase 6 | Multi-view + fusion + depth | ✅ Core complete |
 | Phase 7+ | Full building from params | ✅ Code complete (not vision-driven) |
+
+---
+
+## v0.34 reconstruction deliverables
+
+### Phase 3 — YOLO training + real-photo acceptance
+
+| Feature | Description |
+|---------|-------------|
+| YOLO training pipeline | `dataset_builder`, `train_yolo_facade.py`, exported `facade_yolo_v1.onnx` |
+| Labeling guide | `docs/YOLO_LABELING.md` |
+| Workspace **Export YOLO Labels** | Overlay boxes → `facade_yolo_custom/{train\|val}/` |
+| Real-photo acceptance | `docs/REAL_PHOTO_ACCEPTANCE.md`, `scripts/accept_real_photos.py` |
 
 ---
 
@@ -53,7 +66,7 @@ Presentation features (LOD tours, layout PDF, MP4 export) are **secondary** and 
 
 ```text
 1. backend/start_server.bat
-2. Install dist/geomora.rbz (v0.33.0+)
+2. Install dist/geomora.rbz (v0.34.0+)
 3. Open Workspace
 4. Load Primary Image OR Load Video → pick key frame
 5. Drag corners → Rectify Facade
@@ -66,6 +79,7 @@ Synthetic acceptance assets:
 
 - `examples/facade_perspective_synthetic.jpg` — rectification
 - `examples/generate_rectified_fixture.py` → `facade_rectified_synthetic.jpg` — detection
+- `examples/real_photos/` — local real building photos (see `docs/REAL_PHOTO_ACCEPTANCE.md`)
 
 ---
 
@@ -74,7 +88,7 @@ Synthetic acceptance assets:
 | Priority | Item |
 |----------|------|
 | P0 | Fine-tune `yolo_v1` on **real** rectified facades — label with `docs/YOLO_LABELING.md`, train via `docs/YOLO_TRAINING.md` |
-| P0 | User acceptance on **real building photos** |
+| P0 | Complete **real photo Stage A** sign-off — `docs/REAL_PHOTO_ACCEPTANCE.md` §7 |
 | P1 | SAM mask refinement (Phase 3.6) |
 | P1 | Video metadata in IR `sources[]` (video_id, frame_index, timestamp) |
 | P2 | Full constraint graph solver |

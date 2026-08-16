@@ -2,6 +2,8 @@
 
 Use this checklist after installing `dist/geomora.rbz` and starting `backend/start_server.bat`.
 
+**Real building photos:** see **`docs/REAL_PHOTO_ACCEPTANCE.md`** (SketchUp checklist + CLI batch metrics).
+
 ## Prerequisites
 
 - [ ] Python backend responds at `http://127.0.0.1:8765/health`
@@ -236,6 +238,16 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 23.3 | Ctrl+click + Ctrl+C/V | Multi-item copy/paste |
 | 23.4 | Ctrl+A in editor | All items selected |
 
+## Real photos (Stage A)
+
+Full workflow: **`docs/REAL_PHOTO_ACCEPTANCE.md`**
+
+| # | Step | Expected |
+|---|---|---|
+| RP.1 | ≥5 real photos: Rectify → Detect → Overlay fix → Generate | ≥4/5 succeed after light overlay edits |
+| RP.2 | Export YOLO Labels from corrected overlays | Files under `data/facade_yolo_custom/train` |
+| RP.3 | `accept_real_photos.py --dataset data/facade_yolo_custom --split val` | Exit 0; window recall ≥ 0.70 on val |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos
@@ -247,4 +259,9 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 ```powershell
 cd backend
 python run_rectify.py ..\examples\facade_perspective_synthetic.jpg --corners "[[80,60],[580,40],[600,430],[50,450]]"
+python ..\examples\generate_rectified_fixture.py
+.\.venv\Scripts\python scripts\validate_yolo_facade.py
+.\.venv\Scripts\python scripts\accept_real_photos.py --images ..\examples\real_photos\rectified --method auto
 ```
+
+Real-photo checklist: **`docs/REAL_PHOTO_ACCEPTANCE.md`**

@@ -203,4 +203,31 @@ class IRBuilderTest < Minitest::Test
     assert_equal 2, ir['rooms'].length
     assert_equal 1, ir['openings'].count { |opening| opening['id'].start_with?('partition_door') }
   end
+
+  def test_classifies_rooms_and_places_furniture
+    params = {
+      'project_name' => 'Phase 13',
+      'wall_length' => 9000,
+      'wall_height' => 3000,
+      'wall_thickness' => 240,
+      'building_depth' => 6000,
+      'lod_level' => 'lod_300',
+      'partition_count' => 1,
+      'building_elements' => {
+        'interior_partitions' => true,
+        'room_zones' => true,
+        'room_types' => true,
+        'furniture' => true
+      },
+      'windows' => [],
+      'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    doc = Geomora::IR::Parser.parse(ir)
+
+    assert Geomora::IR::Validator.validate(doc)
+    assert_equal 'living', ir['rooms'][0]['semantic']['room_type']
+    assert_equal 2, ir['furniture'].length
+  end
 end

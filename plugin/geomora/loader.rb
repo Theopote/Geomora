@@ -33,6 +33,7 @@ module Geomora
     generators/railing_generator
     generators/eaves_generator
     generators/room_generator
+    generators/furniture_generator
     generators/opening_generator
     generators/window_generator
     generators/door_generator
@@ -57,8 +58,11 @@ module Geomora
     core/wall_enclosure
     core/interior_layout
     core/room_planner
+    core/room_classifier
+    core/furniture_planner
     core/constraint_solver
     core/lod_scenes
+    core/lod_scene_pages
     core/geometry_doctor
     core/ir_builder
     core/project

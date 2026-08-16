@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.21.0 — Interior Rooms</div>
+    <div class="subtitle">v0.22.0 — Room Types + Furniture</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -127,6 +127,11 @@
         <label>Partition door width (mm)<input name="partition_door_width" type="number" step="1" value="900"></label>
         <label>Partition door height (mm)<input name="partition_door_height" type="number" step="1" value="2100"></label>
         <label class="checkbox-label"><input name="include_room_zones" type="checkbox" checked> Room zone labels</label>
+
+        <div class="section-title">Layout Refinement (Phase 13)</div>
+        <label class="checkbox-label"><input name="include_room_types" type="checkbox" checked> Auto room types (living / bedroom / bath)</label>
+        <label class="checkbox-label"><input name="include_furniture" type="checkbox"> Place furniture (LOD 300)</label>
+        <label>Partition door offsets (mm, comma-separated)<input name="partition_door_offsets" type="text" placeholder="auto centre per wall"></label>
 
         <div class="section-title">Geometry Doctor (Phase 8)</div>
         <label class="checkbox-label"><input name="doctor_tiny_edges" type="checkbox" checked> Remove tiny edges</label>

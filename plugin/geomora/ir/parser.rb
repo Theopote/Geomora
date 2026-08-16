@@ -25,7 +25,8 @@ module Geomora
           constraints: (@data['constraints'] || []).map { |c| parse_constraint(c) },
           sources: (@data['sources'] || []).map { |s| parse_source(s) },
           openings: collect_openings,
-          rooms: (@data['rooms'] || []).map { |r| parse_room(r) }
+          rooms: (@data['rooms'] || []).map { |r| parse_room(r) },
+          furniture: (@data['furniture'] || []).map { |f| parse_furniture(f) }
         )
       end
 
@@ -220,6 +221,18 @@ module Geomora
           geometry: symbolize_geometry(r['geometry']),
           semantic: r['semantic'] || {},
           confidence: r['confidence']
+        )
+      end
+
+      def parse_furniture(f)
+        Models::Furniture.new(
+          id: f['id'],
+          type: f['type'],
+          storey_id: f['storey_id'],
+          room_id: f['room_id'],
+          geometry: symbolize_geometry(f['geometry']),
+          semantic: f['semantic'] || {},
+          confidence: f['confidence']
         )
       end
 

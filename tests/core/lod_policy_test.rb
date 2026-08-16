@@ -19,4 +19,9 @@ class LodPolicyTest < Minitest::Test
     assert_equal true, Geomora::Core::LodPolicy.include_element?('trim', 300)
     assert_equal true, Geomora::Core::LodPolicy.include_element?('eaves', 300)
   end
+
+  def test_lod_300_includes_furniture
+    assert_equal true, Geomora::Core::LodPolicy.include_element?('furniture', 300)
+    assert_equal false, Geomora::Core::LodPolicy.include_element?('furniture', 200)
+  end
 end

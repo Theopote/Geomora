@@ -18,7 +18,8 @@ module Geomora
         'trim' => 300,
         'railing' => 300,
         'eaves' => 300,
-        'room' => 200
+        'room' => 200,
+        'furniture' => 300
       }.freeze
 
       DEFAULT_LEVEL = 200

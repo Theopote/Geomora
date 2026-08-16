@@ -16,6 +16,7 @@ require_relative 'trim_generator'
 require_relative 'railing_generator'
 require_relative 'eaves_generator'
 require_relative 'room_generator'
+require_relative 'furniture_generator'
 require_relative 'wall_join_processor'
 require_relative '../core/lod_policy'
 require_relative '../metadata/attributes'
@@ -125,6 +126,12 @@ module Geomora
           project_id: context[:project_id],
           schema_version: context[:schema_version]
         )
+        @furniture_gen = FurnitureGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version]
+        )
       end
 
       def generate(storey, building_group, document)
@@ -183,10 +190,21 @@ module Geomora
           @room_gen.generate(room, storey.elevation, storey_group.entities)
         end
 
+        storey_furniture(document, storey).each do |item|
+          next unless Core::LodPolicy.include_element?(:furniture, @lod_level)
+
+          @furniture_gen.generate(item, storey.elevation, storey_group.entities)
+        end
+
         storey_group
       end
 
       private
+
+      def storey_furniture(document, storey)
+        items = document.furniture || []
+        items.select { |item| item.storey_id == storey.id }
+      end
 
       def storey_rooms(document, storey)
         rooms = document.rooms || []

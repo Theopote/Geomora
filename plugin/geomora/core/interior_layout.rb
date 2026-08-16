@@ -86,7 +86,8 @@ module Geomora
           wall_run = wall_run_length(baseline)
           next if wall_run <= door_width
 
-          offset = partition_door_offset(params, wall_run, door_width)
+          partition_index = wall.dig('semantic', 'partition_index') || 1
+          offset = partition_door_offset(params, wall_run, door_width, partition_index: partition_index)
           opening_id = format('partition_door_%s_%02d', suffix, wall['semantic']['partition_index'])
           openings << {
             'id' => opening_id,
@@ -133,8 +134,13 @@ module Geomora
         [height, wall_height].min
       end
 
-      def self.partition_door_offset(params, wall_run, door_width)
-        value = params['partition_door_offset'] || params[:partition_door_offset]
+      def self.partition_door_offset(params, wall_run, door_width, partition_index: 1)
+        offsets = params['partition_door_offsets'] || params[:partition_door_offsets]
+        value = if offsets.is_a?(Array) && !offsets[partition_index - 1].nil?
+                  offsets[partition_index - 1]
+                else
+                  params['partition_door_offset'] || params[:partition_door_offset]
+                end
         return (wall_run - door_width) / 2.0 if value.nil?
 
         offset = value.to_f

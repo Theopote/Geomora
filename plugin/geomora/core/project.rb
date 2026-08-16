@@ -69,6 +69,13 @@ module Geomora
         label
       end
 
+      def self.create_lod_scene_pages
+        model = Sketchup.active_model
+        pages = LodScenePages.create_pages(model)
+        Logger.info("LOD scene pages created: #{pages.join(', ')}")
+        pages
+      end
+
       def self.build_manual_facade(params)
         IRBuilder.build_manual_facade(params)
       end

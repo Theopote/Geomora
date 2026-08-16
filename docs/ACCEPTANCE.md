@@ -124,6 +124,16 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 12.4 | Solve Constraints after Rationalize | Window widths equalized per constraint graph |
 | 12.5 | LOD 100 Generate | No partition doors in openings |
 
+## Phase 13 — Room types + furniture + LOD scenes
+
+| # | Step | Expected |
+|---|---|---|
+| 13.1 | Room zones + auto types → Generate | `rooms[].semantic.room_type` set (living, bedroom, etc.) |
+| 13.2 | Furniture on, LOD 300 → Generate | `furniture[]` in IR; `Geomora_Furniture` tag |
+| 13.3 | Partition door offsets `1200,1800` | Each partition door at specified offset |
+| 13.4 | Create LOD Scene Pages (menu) | Three scenes: Geomora LOD 100/200/300 |
+| 13.5 | Constraint parallel in graph | Acknowledged in `constraint_solution` |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos

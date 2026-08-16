@@ -39,6 +39,15 @@ module Geomora
           lod_menu.add_item('LOD 100 — Massing') { apply_lod(:lod_100) }
           lod_menu.add_item('LOD 200 — Openings') { apply_lod(:lod_200) }
           lod_menu.add_item('LOD 300 — Details') { apply_lod(:lod_300) }
+          lod_menu.add_separator
+          lod_menu.add_item('Create LOD Scene Pages') { create_lod_scenes }
+        end
+
+        def create_lod_scenes
+          pages = Core::Project.create_lod_scene_pages
+          ::UI.messagebox("LOD scene pages created:\n\n#{pages.join("\n")}")
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD scene pages failed:\n\n#{e.message}")
         end
 
         def apply_lod(preset)

@@ -28,6 +28,7 @@ module Geomora
         validate_buildings
         validate_openings
         validate_rooms
+        validate_furniture
         validate_constraints
         validate_components
 
@@ -50,6 +51,7 @@ module Geomora
         end
         @doc.openings.each { |o| register_id(o.id, o.type) }
         (@doc.rooms || []).each { |r| register_id(r.id, 'room') }
+        (@doc.furniture || []).each { |f| register_id(f.id, 'furniture') }
         @doc.components.each { |c| register_id(c.id, 'component') }
         @doc.constraints.each { |c| register_id(c.id, 'constraint') }
         @doc.sources.each { |s| register_id(s.id, 'source') }
@@ -260,6 +262,24 @@ module Geomora
           polygon = room.geometry[:polygon]
           @errors << "Invalid polygon for #{room.id}" if polygon.nil? || polygon.length < 3
           @errors << "Missing room name: #{room.id}" if room.name.nil? || room.name.to_s.empty?
+        end
+      end
+
+      def validate_furniture
+        (@doc.furniture || []).each do |item|
+          unless @ids[item.storey_id]
+            @errors << "Invalid storey_id for #{item.id}: #{item.storey_id}"
+          end
+          unless @ids[item.room_id]
+            @errors << "Invalid room_id for #{item.id}: #{item.room_id}"
+          end
+
+          position = item.geometry[:position]
+          @errors << "Invalid position for #{item.id}" if position.nil? || position.length != 3
+          %i[width depth height].each do |dim|
+            val = item.geometry[dim]
+            @errors << "Zero #{dim} on #{item.id}" if val.to_f.zero?
+          end
         end
       end
 

@@ -114,14 +114,14 @@ tests/core/lod_scenes_test.rb
 
 ## 7. Deferred (Phase 13+)
 
-- Room-type assignment (kitchen, bedroom) from layout rules
-- Partition doors at custom offsets per wall
-- LOD animation / scene pages
-- Interior furniture placement
-- Full constraint graph (parallel, perpendicular, coplanar)
+- ~~Room-type assignment (kitchen, bedroom) from layout rules~~ → Phase 13 ✅
+- ~~Partition doors at custom offsets per wall~~ → Phase 13 ✅
+- ~~LOD animation / scene pages~~ → Phase 13 scene pages ✅ (animation deferred)
+- ~~Interior furniture placement~~ → Phase 13 ✅
+- ~~Full constraint graph (parallel, perpendicular, coplanar)~~ → Phase 13 ack + horizontal/vertical ✅
 
 ---
 
 ## 8. Gate to Phase 13
 
-Room semantics + constraint solving enable layout refinement and furnishing pipelines on stacked interior shells.
+Room semantics + constraint solving enable layout refinement and furnishing pipelines on stacked interior shells. See [PHASE_13.md](PHASE_13.md).

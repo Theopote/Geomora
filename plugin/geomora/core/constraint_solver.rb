@@ -5,7 +5,10 @@ module Geomora
     class ConstraintSolver
       SUPPORTED_TYPES = %w[
         equal_width equal_height equal_spacing align symmetry fixed_dimension
+        horizontal vertical parallel perpendicular coplanar
       ].freeze
+
+      GEOMETRY_ACK_TYPES = %w[parallel perpendicular coplanar].freeze
 
       def self.solve(params, grid_mm: Rationalizer::DEFAULT_GRID_MM)
         new(params, grid_mm: grid_mm).solve
@@ -23,9 +26,15 @@ module Geomora
         constraints = explicit_constraints
         wall_length = float_param('wall_length', 10_000)
         solved = []
+        acknowledged = []
 
         constraints.each do |constraint|
           next unless SUPPORTED_TYPES.include?(constraint['type'])
+
+          if GEOMETRY_ACK_TYPES.include?(constraint['type'])
+            acknowledged << constraint['type']
+            next
+          end
 
           windows = apply_constraint(windows, constraint, door, wall_length)
           solved << constraint['type']
@@ -35,8 +44,9 @@ module Geomora
           'windows' => windows,
           'door' => door,
           'constraint_solution' => {
-            'method' => 'facade_constraint_v1',
+            'method' => 'facade_constraint_v2',
             'constraints_solved' => solved.uniq,
+            'constraints_acknowledged' => acknowledged.uniq,
             'grid_mm' => @grid_mm
           }
         }
@@ -90,6 +100,10 @@ module Geomora
           layout_equal_spacing(windows, wall_length, door)
         when 'symmetry'
           layout_symmetry(windows, wall_length, door)
+        when 'horizontal'
+          apply_align(windows)
+        when 'vertical'
+          apply_vertical_align(windows)
         when 'fixed_dimension'
           windows
         else
@@ -110,6 +124,11 @@ module Geomora
       def apply_align(windows)
         sill = snap(median(windows.map { |win| win['sill_height'].to_f }))
         windows.map { |win| win.merge('sill_height' => sill) }
+      end
+
+      def apply_vertical_align(windows)
+        offset = snap(median(windows.map { |win| win['offset'].to_f }))
+        windows.map { |win| win.merge('offset' => offset) }
       end
 
       def layout_equal_spacing(windows, wall_length, door)

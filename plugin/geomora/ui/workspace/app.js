@@ -1085,6 +1085,17 @@
     }).join('');
   }
 
+  function parsePartitionDoorOffsets(raw) {
+    if (!raw || !String(raw).trim()) {
+      return null;
+    }
+    return String(raw).split(',').map(function (value) {
+      return Number(value.trim());
+    }).filter(function (value) {
+      return !Number.isNaN(value);
+    });
+  }
+
   function collectParams() {
     persistActiveStoreyWindows();
     const formData = new FormData(els.form);
@@ -1120,11 +1131,14 @@
         interior_partitions: formData.get('include_interior_partitions') === 'on',
         full_trim: formData.get('include_full_trim') === 'on',
         partition_doors: formData.get('include_partition_doors') === 'on',
-        room_zones: formData.get('include_room_zones') === 'on'
+        room_zones: formData.get('include_room_zones') === 'on',
+        room_types: formData.get('include_room_types') === 'on',
+        furniture: formData.get('include_furniture') === 'on'
       },
       partition_count: Number(formData.get('partition_count') || 1),
       partition_door_width: Number(formData.get('partition_door_width') || 900),
       partition_door_height: Number(formData.get('partition_door_height') || 2100),
+      partition_door_offsets: parsePartitionDoorOffsets(formData.get('partition_door_offsets')),
       storey_count: Number(formData.get('storey_count') || 1),
       storey_height: formData.get('storey_height') ? Number(formData.get('storey_height')) : null,
       repeat_openings: formData.get('repeat_openings') === 'on',

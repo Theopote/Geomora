@@ -16,6 +16,7 @@ module Geomora
         storeys = storey_payloads.map { |payload| payload[:storey] }
         openings = storey_payloads.flat_map { |payload| payload[:openings] }
         rooms = storey_payloads.flat_map { |payload| payload[:rooms] }
+        furniture = storey_payloads.flat_map { |payload| payload[:furniture] }
         windows = openings.select { |opening| opening['type'] == 'window' }
         doors = openings.select { |opening| opening['type'] == 'door' }
 
@@ -42,6 +43,7 @@ module Geomora
           'sources' => build_sources
         }
         ir['rooms'] = rooms unless rooms.empty?
+        ir['furniture'] = furniture unless furniture.empty?
         ir
       end
 
@@ -78,6 +80,13 @@ module Geomora
           top_storey: index == storey_count - 1
         )
 
+        rooms = build_storey_rooms(storey_id: storey_id, storey_index: index)
+        furniture = Core::FurniturePlanner.plan(
+          rooms: rooms,
+          params: @params,
+          storey_index: index
+        )
+
         {
           storey: {
             'id' => storey_id,
@@ -87,7 +96,8 @@ module Geomora
             'elements' => walls + building_elements
           },
           openings: openings,
-          rooms: build_storey_rooms(storey_id: storey_id, storey_index: index)
+          rooms: rooms,
+          furniture: furniture
         }
       end
 
@@ -215,13 +225,18 @@ module Geomora
       end
 
       def build_storey_rooms(storey_id:, storey_index:)
-        Core::RoomPlanner.plan(
+        rooms = Core::RoomPlanner.plan(
           params: @params,
           wall_length: wall_length,
           building_depth: building_depth,
           storey_id: storey_id,
           storey_index: storey_index,
           perimeter_walls: perimeter_walls_enabled?
+        )
+        Core::RoomClassifier.classify(
+          rooms,
+          params: @params,
+          storey_index: storey_index
         )
       end
 

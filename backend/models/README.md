@@ -9,7 +9,7 @@
 
 ## Build YOLO model
 
-See **`docs/YOLO_TRAINING.md`** for dataset layout, custom photos, and validation.
+See **`docs/YOLO_TRAINING.md`** for training commands and **`docs/YOLO_LABELING.md`** for real-photo annotation.
 
 ```powershell
 cd F:\development\Geomora\backend

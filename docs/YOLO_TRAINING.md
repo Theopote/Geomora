@@ -30,6 +30,8 @@ Outputs:
 
 ## Add real building photos
 
+**Labeling guide:** `docs/YOLO_LABELING.md` (LabelImg / makesense.ai, bbox rules, quality checklist)
+
 Prepare YOLO labels for **rectified** facade images (after Workspace Rectify):
 
 ```text
@@ -74,7 +76,7 @@ Expect ≥3 windows and ≥1 door on the canonical rectified synthetic scene.
 1. Always **Rectify Facade** before Detect
 2. Label only the opening rectangles (glass/door panel), not frames
 3. Start with 10–20 rectified photos; retrain iteratively
-4. Use Overlay in Workspace to fix false boxes — export corrections as new labels for the next train round
+4. Use Overlay in Workspace to fix false boxes — see `docs/YOLO_LABELING.md` for the full labeling workflow
 
 ## CLI options
 

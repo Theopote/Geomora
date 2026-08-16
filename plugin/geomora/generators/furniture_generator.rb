@@ -27,12 +27,17 @@ module Geomora
         x = position[0].to_f
         y = position[1].to_f
         z = storey_elevation + position[2].to_f
-        polygon = [
-          [x, y, z],
-          [x + width, y, z],
-          [x + width, y + depth, z],
-          [x, y + depth, z]
-        ]
+        rotation = item.geometry[:rotation] || item.geometry['rotation']
+        polygon = if rotation
+                    FurnitureOrientation.rotated_corners(x, y, width, depth, rotation, z: z)
+                  else
+                    [
+                      [x, y, z],
+                      [x + width, y, z],
+                      [x + width, y + depth, z],
+                      [x, y + depth, z]
+                    ]
+                  end
 
         extrude_polygon(group.entities, polygon, height, direction: 1)
         write_furniture_metadata(group, item)

@@ -164,6 +164,16 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 16.4 | Perpendicular repair on, skewed partition | Baseline axis-aligned; `semantic.repaired` set |
 | 16.5 | Export LOD Tour HTML | `.html` slideshow with auto-advance |
 
+## Phase 17 — Visual layout + LOD capture
+
+| # | Step | Expected |
+|---|---|---|
+| 17.1 | Open layout editor | Canvas shows rooms; furniture draggable |
+| 17.2 | Apply editor to layouts field | `room_furniture_layouts` updated |
+| 17.3 | Layout `sofa@600,600@90` | Rotated furniture in model |
+| 17.4 | Preview catalog diff | Summary of added/changed sets |
+| 17.5 | Export LOD Capture HTML | HTML with embedded viewport images |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos

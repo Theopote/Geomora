@@ -63,12 +63,15 @@ module Geomora
     core/fixture_library
     core/room_layout
     core/furniture_collision
+    core/furniture_orientation
     core/room_layout_presets
+    core/room_layout_editor
     core/fixture_catalog
     core/perpendicular_constraint_solver
     core/room_overrides
     core/structural_constraint_solver
     core/lod_presentation
+    core/lod_capture
     core/constraint_solver
     core/lod_scenes
     core/lod_scene_pages

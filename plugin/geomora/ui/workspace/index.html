@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.24.0 — Catalog + Room Layouts</div>
+    <div class="subtitle">v0.26.0 — Layout Editor + LOD Capture</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -151,7 +151,23 @@
         <div class="inline-actions">
           <button type="button" id="btn-suggest-layout" class="btn-link">Suggest layout presets</button>
           <button type="button" id="btn-reload-catalog" class="btn-link">Reload fixture catalog</button>
+          <button type="button" id="btn-preview-catalog-diff" class="btn-link">Preview catalog diff</button>
         </div>
+
+        <div class="section-title">Layout Editor (Phase 17)</div>
+        <label class="checkbox-label"><input name="include_furniture_wall_align" type="checkbox"> Wall-aligned furniture placement</label>
+        <div class="inline-actions">
+          <button type="button" id="btn-open-layout-editor" class="btn-link">Open layout editor</button>
+          <button type="button" id="btn-sync-layout-field" class="btn-link">Apply editor to layouts field</button>
+        </div>
+        <div id="layout-editor-panel" class="layout-editor-panel" hidden>
+          <label>Room
+            <select id="layout-editor-room"></select>
+          </label>
+          <canvas id="layout-editor-canvas" width="320" height="220" aria-label="Room layout editor"></canvas>
+          <div class="layout-editor-hint">Drag furniture blocks. Positions are in millimetres.</div>
+        </div>
+        <div id="catalog-diff-preview" class="meta">Catalog diff: not checked</div>
 
         <div class="section-title">Geometry Doctor (Phase 8)</div>
         <label class="checkbox-label"><input name="doctor_tiny_edges" type="checkbox" checked> Remove tiny edges</label>
@@ -185,6 +201,7 @@
     <button id="btn-repair-geometry" class="btn secondary">Repair Geometry</button>
   </footer>
 
+  <script src="layout_editor.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

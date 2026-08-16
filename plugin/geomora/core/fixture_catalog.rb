@@ -60,6 +60,57 @@ module Geomora
         @cache = {}
       end
 
+      def self.read_catalog_file(path)
+        return empty_catalog unless path && File.exist?(path)
+
+        data = JSON.parse(File.read(path))
+        data.is_a?(Hash) ? data : empty_catalog
+      rescue JSON::ParserError => e
+        Logger.warn("Fixture catalog parse error: #{e.message}")
+        empty_catalog
+      end
+
+      def self.diff(params)
+        path = catalog_path(params)
+        cache_key = File.expand_path(path)
+        cached = (@cache || {})[cache_key] || empty_catalog
+        disk = read_catalog_file(path)
+        compare_catalogs(cached, disk).merge(
+          'path' => path,
+          'cached' => !(@cache || {})[cache_key].nil?
+        )
+      end
+
+      def self.compare_catalogs(before, after)
+        before_sets = before['sets'] || {}
+        after_sets = after['sets'] || {}
+        before_keys = before_sets.keys
+        after_keys = after_sets.keys
+        added_sets = after_keys - before_keys
+        removed_sets = before_keys - after_keys
+        shared = before_keys & after_keys
+        changed_sets = shared.select do |key|
+          normalize_items(before_sets[key]) != normalize_items(after_sets[key])
+        end
+        {
+          'version_before' => before['version'],
+          'version_after' => after['version'],
+          'added_sets' => added_sets,
+          'removed_sets' => removed_sets,
+          'changed_sets' => changed_sets,
+          'unchanged_sets' => shared - changed_sets,
+          'summary' => format_diff_summary(added_sets, removed_sets, changed_sets)
+        }
+      end
+
+      def self.format_diff_summary(added, removed, changed)
+        parts = []
+        parts << "#{added.length} added" unless added.empty?
+        parts << "#{removed.length} removed" unless removed.empty?
+        parts << "#{changed.length} changed" unless changed.empty?
+        parts.empty? ? 'No catalog changes' : parts.join(', ')
+      end
+
       def self.catalog_path(params)
         custom = params['fixture_catalog_path'] || params[:fixture_catalog_path]
         return custom if custom && !custom.to_s.strip.empty?

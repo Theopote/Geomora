@@ -116,6 +116,74 @@ module Geomora
         path
       end
 
+      def self.export_tour_capture_html(model, path, step_seconds: 2.0, width: LodCapture::DEFAULT_WIDTH, height: LodCapture::DEFAULT_HEIGHT)
+        frames = LodCapture.capture_pages(model, width: width, height: height)
+        raise GeomoraError, 'No Geomora LOD scenes found. Create LOD Scene Pages first.' if frames.empty?
+
+        interval_ms = (step_seconds.to_f * 1000).round
+        slides = frames.map.with_index do |frame, index|
+          active = index.zero? ? ' active' : ''
+          src = "data:image/png;base64,#{frame['base64']}"
+          <<~SLIDE.strip
+            <section class="slide#{active}" data-level="#{frame['lod_level']}">
+              <div class="badge">Step #{frame['order']}</div>
+              <h1>#{escape_html(frame['name'])}</h1>
+              <img src="#{src}" alt="#{escape_html(frame['name'])}" width="#{width}" height="#{height}">
+              <p class="lod">LOD #{frame['lod_level']}</p>
+            </section>
+          SLIDE
+        end.join("\n")
+
+        html = <<~HTML
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Geomora LOD Capture Tour</title>
+            <style>
+              :root { color-scheme: dark; font-family: "Segoe UI", system-ui, sans-serif; }
+              body { margin: 0; background: #111; color: #f5f5f5; }
+              .deck { min-height: 100vh; display: grid; place-items: center; padding: 2rem; }
+              .slide { display: none; text-align: center; max-width: 100%; animation: fade 0.6s ease; }
+              .slide.active { display: block; }
+              .slide img { max-width: min(960px, 100%); height: auto; border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,0.45); }
+              .badge { display: inline-block; margin-bottom: 1rem; padding: 0.35rem 0.75rem; border-radius: 999px; background: #2d6cdf; font-size: 0.85rem; }
+              h1 { margin: 0 0 0.5rem; font-size: 1.5rem; }
+              .lod { font-size: 1.25rem; color: #8ec5ff; }
+              .progress { position: fixed; left: 0; right: 0; bottom: 0; height: 4px; background: #333; }
+              .progress > span { display: block; height: 100%; width: 0; background: #2d6cdf; transition: width 0.3s ease; }
+              @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+            </style>
+          </head>
+          <body>
+            <main class="deck">#{slides}</main>
+            <div class="progress"><span id="progress"></span></div>
+            <script>
+              const slides = Array.from(document.querySelectorAll('.slide'));
+              const progress = document.getElementById('progress');
+              let index = 0;
+              function showSlide(nextIndex) {
+                slides[index].classList.remove('active');
+                index = nextIndex % slides.length;
+                slides[index].classList.add('active');
+                progress.style.width = ((index + 1) / slides.length * 100) + '%';
+              }
+              setInterval(function () { showSlide(index + 1); }, #{interval_ms});
+              progress.style.width = (100 / slides.length) + '%';
+            </script>
+          </body>
+          </html>
+        HTML
+
+        File.write(path, html)
+        path
+      end
+
+      def self.export_tour_frames(model, directory, width: LodCapture::DEFAULT_WIDTH, height: LodCapture::DEFAULT_HEIGHT)
+        LodCapture.export_frames(model, directory, width: width, height: height)
+      end
+
       def self.escape_html(text)
         text.to_s
             .gsub('&', '&amp;')

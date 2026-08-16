@@ -47,6 +47,8 @@ module Geomora
           lod_menu.add_item('Export LOD Tour Manifest') { export_lod_tour }
           lod_menu.add_item('Save LOD Tour JSON...') { save_lod_tour_file }
           lod_menu.add_item('Export LOD Tour HTML...') { export_lod_tour_html }
+          lod_menu.add_item('Export LOD Capture HTML...') { export_lod_tour_capture_html }
+          lod_menu.add_item('Export LOD Tour Frames...') { export_lod_tour_frames }
           lod_menu.add_item('Play LOD Tour') { play_lod_tour }
           lod_menu.add_separator
           lod_menu.add_item('Reload Fixture Catalog') { reload_fixture_catalog }
@@ -70,6 +72,27 @@ module Geomora
           ::UI.messagebox("LOD tour HTML exported:\n\n#{saved}")
         rescue GeomoraError => e
           ::UI.messagebox("LOD tour HTML export failed:\n\n#{e.message}")
+        end
+
+        def export_lod_tour_capture_html
+          path = ::UI.savepanel('Export LOD capture tour', '', 'geomora_lod_capture.html')
+          return unless path
+
+          saved = Core::Project.export_lod_tour_capture_html(path)
+          ::UI.messagebox("LOD capture tour exported:\n\n#{saved}")
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD capture export failed:\n\n#{e.message}")
+        end
+
+        def export_lod_tour_frames
+          path = ::UI.select_directory('Export LOD tour frames')
+          return unless path
+
+          frames = Core::Project.export_lod_tour_frames(path)
+          names = frames.map { |frame| File.basename(frame['path']) }.join("\n")
+          ::UI.messagebox("LOD frames exported:\n\n#{names}")
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD frame export failed:\n\n#{e.message}")
         end
 
         def reload_fixture_catalog

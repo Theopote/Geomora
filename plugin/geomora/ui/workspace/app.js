@@ -1139,7 +1139,8 @@
         structural_constraints: formData.get('include_structural_constraints') === 'on',
         perpendicular_constraints: formData.get('include_perpendicular_constraints') === 'on',
         perpendicular_repair: formData.get('include_perpendicular_repair') === 'on',
-        furniture_collision: formData.get('include_furniture_collision') === 'on'
+        furniture_collision: formData.get('include_furniture_collision') === 'on',
+        furniture_wall_align: formData.get('include_furniture_wall_align') === 'on'
       },
       room_type_overrides: formData.get('room_type_overrides') || '',
       room_furniture_layouts: formData.get('room_furniture_layouts') || '',
@@ -1570,11 +1571,39 @@
     applyConstraintSolution: applyConstraintSolution,
     applyPattern: applyPattern,
     applyRoomLayoutSuggestion: applyRoomLayoutSuggestion,
+    setRoomLayoutPreview: setRoomLayoutPreview,
+    setCatalogDiffPreview: setCatalogDiffPreview,
     setDetectionMeta: setDetectionMeta,
     onDetectionEmpty: onDetectionEmpty,
     setIrPreview: setIrPreview,
     setStatus: setStatus
   };
+
+  window.geomoraLayoutBootstrap = {
+    requestPreview: function () {
+      sketchupCall('preview_room_layout', JSON.stringify(collectParams()));
+    },
+    requestCatalogDiff: function () {
+      sketchupCall('preview_fixture_catalog_diff', JSON.stringify(collectParams()));
+    },
+    syncLayoutField: function (layout) {
+      const field = els.form.querySelector('[name="room_furniture_layouts"]');
+      if (field) field.value = layout || '';
+    },
+    setStatus: setStatus
+  };
+
+  function setRoomLayoutPreview(rooms) {
+    if (window.geomoraLayoutEditor) {
+      window.geomoraLayoutEditor.setPreview(rooms);
+    }
+  }
+
+  function setCatalogDiffPreview(diff) {
+    if (window.geomoraLayoutEditor) {
+      window.geomoraLayoutEditor.setCatalogDiff(diff);
+    }
+  }
 
   document.getElementById('btn-pick-image').addEventListener('click', function () {
     sketchupCall('pick_image');

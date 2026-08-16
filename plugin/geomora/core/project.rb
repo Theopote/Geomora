@@ -96,6 +96,24 @@ module Geomora
         LodPresentation.export_tour_html(model, path, step_seconds: step_seconds)
       end
 
+      def self.export_lod_tour_capture_html(path, step_seconds: 2.0)
+        model = Sketchup.active_model
+        LodPresentation.export_tour_capture_html(model, path, step_seconds: step_seconds)
+      end
+
+      def self.export_lod_tour_frames(directory)
+        model = Sketchup.active_model
+        LodPresentation.export_tour_frames(model, directory)
+      end
+
+      def self.fixture_catalog_diff(params = {})
+        FixtureCatalog.diff(params)
+      end
+
+      def self.preview_room_layout(params)
+        RoomLayoutEditor.preview(params)
+      end
+
       def self.reload_fixture_catalog(params = {})
         FixtureCatalog.reload!(params)
       end

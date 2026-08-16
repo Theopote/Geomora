@@ -6,15 +6,21 @@ module Geomora
       ITEM_PATTERN = /
         (?<kind>[a-z_]+)
         @
-        (?<x>[-\d.]+)
-        ,
-        (?<y>[-\d.]+)
-        (?:,
-        (?<width>[-\d.]+)
-        x
-        (?<depth>[-\d.]+)
-        x
-        (?<height>[-\d.]+))?
+        (?:
+          (?<wall>wall_(?:north|south|east|west))
+          |
+          (?<x>[-\d.]+)
+          ,
+          (?<y>[-\d.]+)
+          (?:,
+          (?<width>[-\d.]+)
+          x
+          (?<depth>[-\d.]+)
+          x
+          (?<height>[-\d.]+))?
+        )
+        (?:@
+        (?<rotation>\d+|wall_(?:north|south|east|west)))?
       /ix
 
       def self.enabled?(params)
@@ -93,30 +99,74 @@ module Geomora
             width: default_width(match[:kind]),
             depth: default_depth(match[:kind]),
             height: default_height(match[:kind]),
-            position: [match[:x].to_f, match[:y].to_f, 0],
             category: default_category(match[:kind])
           }
+          if match[:wall]
+            item[:orientation] = match[:wall]
+          else
+            item[:position] = [match[:x].to_f, match[:y].to_f, 0]
+          end
           if match[:width]
             item[:width] = match[:width].to_f
             item[:depth] = match[:depth].to_f
             item[:height] = match[:height].to_f
           end
+          if match[:rotation]
+            if match[:rotation].start_with?('wall_')
+              item[:orientation] = match[:rotation]
+            else
+              item[:rotation] = match[:rotation].to_i
+            end
+          end
           item
         end
+      end
+
+      def self.serialize_item(item)
+        kind = (item[:kind] || item['kind']).to_s
+        width = (item[:width] || item['width']).to_f
+        depth = (item[:depth] || item['depth']).to_f
+        height = (item[:height] || item['height']).to_f
+        rotation = item[:rotation] || item['rotation']
+        orientation = item[:orientation] || item['orientation']
+        position = item[:position] || item['position']
+        if orientation && !position.is_a?(Array)
+          base = "#{kind}@#{orientation}"
+        elsif position.is_a?(Array)
+          base = format('%s@%.0f,%.0f', kind, position[0].to_f, position[1].to_f)
+          unless default_dimensions?(kind, width, depth, height)
+            base += format(',%.0fx%.0fx%.0f', width, depth, height)
+          end
+        else
+          base = "#{kind}@0,0"
+        end
+        return base if orientation
+        return base unless rotation
+
+        "#{base}@#{rotation.to_i % 360}"
+      end
+
+      def self.default_dimensions?(kind, width, depth, height)
+        width == default_width(kind) &&
+          depth == default_depth(kind) &&
+          height == default_height(kind)
       end
 
       def self.normalize_item_hash(item)
         return nil unless item.is_a?(Hash)
 
         position = item['position'] || [item['x'], item['y'], item['z'] || 0]
-        {
+        normalized = {
           kind: item['kind'].to_s,
           width: (item['width'] || default_width(item['kind'])).to_f,
           depth: (item['depth'] || default_depth(item['kind'])).to_f,
           height: (item['height'] || default_height(item['kind'])).to_f,
-          position: [position[0].to_f, position[1].to_f, position[2].to_f],
           category: item['category'] || default_category(item['kind'])
         }
+        normalized[:position] = [position[0].to_f, position[1].to_f, position[2].to_f] if position
+        normalized[:rotation] = item['rotation'].to_i if item['rotation']
+        normalized[:orientation] = item['orientation'] if item['orientation']
+        normalized
       end
 
       def self.default_width(kind)

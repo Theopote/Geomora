@@ -407,6 +407,24 @@ module Geomora
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)
           end
+
+          dialog.add_action_callback('preview_room_layout') do |_ctx, json|
+            params = enrich_params(JSON.parse(json))
+            rooms = Core::RoomLayoutEditor.preview(params)
+            dialog.execute_script("window.geomora.setRoomLayoutPreview(#{rooms.to_json})")
+            post_message(dialog, 'success', format('Layout editor loaded (%d rooms).', rooms.length))
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
+          dialog.add_action_callback('preview_fixture_catalog_diff') do |_ctx, json|
+            params = enrich_params(JSON.parse(json))
+            diff = Core::FixtureCatalog.diff(params)
+            dialog.execute_script("window.geomora.setCatalogDiffPreview(#{diff.to_json})")
+            post_message(dialog, 'success', diff['summary'] || 'Catalog diff ready.')
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
         end
 
         def enrich_params(params)

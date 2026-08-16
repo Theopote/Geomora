@@ -90,12 +90,14 @@ tests/core/room_layout_presets_test.rb
 
 ---
 
-## 8. Deferred (Phase 17+)
+## 8. Deferred (Phase 17 — delivered in v0.26.0)
 
-- True animated LOD export (video/GIF from SketchUp viewports)
-- Visual drag-and-drop room layout editor in Workspace
-- Furniture rotation and wall-aligned placement
-- Catalog diff preview before reload
+See `docs/PHASE_17.md` for layout editor, rotation/wall align, catalog diff, and LOD capture export.
+
+Remaining for Phase 18+:
+
+- True GIF/video encoder from captured frames
+- Full drag-and-drop catalog palette in editor
 
 ---
 

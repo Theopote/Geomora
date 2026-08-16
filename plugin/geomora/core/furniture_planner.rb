@@ -53,7 +53,7 @@ module Geomora
           position = placement_position(bounds, spec, params)
           next unless position
 
-          spec.merge(position: position)
+          apply_orientation(spec.merge(position: position), bounds, params)
         end
         drafts = resolve_collisions(drafts, bounds, params)
         drafts.each_with_index.map do |spec, spec_index|
@@ -64,7 +64,8 @@ module Geomora
       def self.place_items(room, specs, bounds:, params:, suffix:, index:, room_type:)
         drafts = specs.each_with_index.map do |spec, spec_index|
           position = spec[:position] || placement_position(bounds, spec, params)
-          spec.merge(position: position)
+          oriented = apply_orientation(spec.merge(position: position), bounds, params)
+          oriented
         end
         drafts = resolve_collisions(drafts, bounds, params)
         drafts.each_with_index.map do |spec, spec_index|
@@ -79,10 +80,20 @@ module Geomora
         FurnitureCollision.resolve(drafts, bounds)
       end
 
+      def self.apply_orientation(spec, bounds, params)
+        oriented = FurnitureOrientation.apply(spec, bounds, params)
+        return oriented unless FurnitureOrientation.enabled?(params)
+        return oriented if oriented[:position]
+
+        position = placement_position(bounds, oriented, params)
+        oriented.merge(position: position)
+      end
+
       def self.build_item(room, spec, suffix:, index:, spec_index:, room_type:)
         kind = spec[:kind]
         category = spec[:category] || 'furniture'
         position = spec[:position] || [0, 0, 0]
+        rotation = spec[:rotation] || spec[:orientation] && FurnitureOrientation.wall_rotation(spec[:orientation])
         {
           'id' => format('furniture_%s_%02d_%s_%02d', suffix, index, kind, spec_index + 1),
           'type' => category == 'fixture' ? 'fixture' : 'furniture',
@@ -92,13 +103,15 @@ module Geomora
             'position' => position,
             'width' => spec[:width],
             'depth' => spec[:depth],
-            'height' => spec[:height]
-          },
+            'height' => spec[:height],
+            'rotation' => rotation
+          }.compact,
           'semantic' => {
             'kind' => kind,
             'room_type' => room_type,
             'category' => category,
-            'custom_layout' => spec[:position] ? true : nil
+            'custom_layout' => spec[:position] ? true : nil,
+            'orientation' => spec[:orientation]
           }.compact,
           'confidence' => 1.0
         }

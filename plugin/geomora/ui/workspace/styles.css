@@ -419,8 +419,32 @@ body {
 
 .inline-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin: 4px 0 10px;
+}
+
+.layout-editor-panel {
+  margin: 8px 0 12px;
+  padding: 8px;
+  border: 1px solid #3c4043;
+  border-radius: 6px;
+  background: #202124;
+}
+
+.layout-editor-panel canvas {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  border-radius: 4px;
+  background: #111;
+  cursor: crosshair;
+}
+
+.layout-editor-hint {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #9aa0a6;
 }
 
 .view-toggle {

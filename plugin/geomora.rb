@@ -13,7 +13,7 @@ module Geomora
       File.join(EXTENSION_PATH, 'extension.rb')
     )
     extension.description = 'Architectural geometry reconstruction for SketchUp'
-    extension.version     = '0.19.0'
+    extension.version     = '0.19.2'
     extension.creator     = 'Geomora'
     Sketchup.register_extension(extension, true)
     file_loaded(__FILE__)

@@ -104,6 +104,16 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 10.4 | Element tree | Shows selected LOD level |
 | 10.5 | Storey count 2, repeat off | Per-floor tabs; different window counts per floor |
 
+## Phase 11 — Interior layout + LOD visibility
+
+| # | Step | Expected |
+|---|---|---|
+| 11.1 | Interior partitions on, count = 1 → Generate | One centre partition wall per storey; `Geomora_InteriorWalls` tag |
+| 11.2 | LOD 300 + windows → Generate | Four trim pieces per window (lintel, sill, 2 jambs) |
+| 11.3 | LOD 100 → Generate | `Geomora_Windows` / `Geomora_Trim` tags hidden in model |
+| 11.4 | LOD 200 → Generate | Openings visible; trim / eaves tags hidden |
+| 11.5 | Perimeter + partitions | Partitions span interior Y range inside footprint |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos

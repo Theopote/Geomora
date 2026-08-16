@@ -155,4 +155,27 @@ class IRBuilderTest < Minitest::Test
     assert_includes offsets, 500.0
     assert_includes offsets, 2500.0
   end
+
+  def test_builds_interior_partitions_when_enabled
+    params = {
+      'project_name' => 'Interior',
+      'wall_length' => 9000,
+      'wall_height' => 3000,
+      'wall_thickness' => 240,
+      'building_depth' => 6000,
+      'partition_count' => 2,
+      'building_elements' => { 'interior_partitions' => true, 'perimeter_walls' => true },
+      'windows' => [],
+      'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    doc = Geomora::IR::Parser.parse(ir)
+
+    assert Geomora::IR::Validator.validate(doc)
+    walls = ir['buildings'][0]['storeys'][0]['elements'].select { |e| e['type'] == 'wall' }
+    partitions = walls.select { |wall| wall['semantic']['interior'] }
+    assert_equal 6, walls.length
+    assert_equal 2, partitions.length
+  end
 end

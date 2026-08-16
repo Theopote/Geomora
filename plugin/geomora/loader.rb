@@ -51,8 +51,10 @@ module Geomora
     core/pattern_analyzer
     core/building_composer
     core/lod_policy
+    core/lod_visibility
     core/structural_grid
     core/wall_enclosure
+    core/interior_layout
     core/geometry_doctor
     core/ir_builder
     core/project

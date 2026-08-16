@@ -4,6 +4,7 @@ module Geomora
   module Tags
     TAGS = %w[
       Geomora_Walls
+      Geomora_InteriorWalls
       Geomora_Windows
       Geomora_Doors
       Geomora_Floors

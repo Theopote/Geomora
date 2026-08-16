@@ -321,31 +321,101 @@ module Geomora
         windows = windows_for_storey
         return [] unless windows.is_a?(Array)
 
+        windows.each_with_index.flat_map do |win, index|
+          next [] unless win.is_a?(Hash) && win['width'].to_f.positive?
+
+          if full_trim_set?
+            full_trim_for_window(win, index)
+          else
+            [lintel_trim(win, index)]
+          end
+        end
+      end
+
+      def full_trim_set?
+        return false unless lod_allows?(:trim)
+
+        enabled?(:full_trim) || lod_level >= 300
+      end
+
+      def lintel_trim(win, index)
+        offset = win['offset'].to_f
+        width = win['width'].to_f
+        sill = (win['sill_height'] || 900).to_f
+        height = win['height'].to_f
         projection = float_param('trim_projection', 80)
         band_height = float_param('trim_height', 100)
 
-        windows.each_with_index.filter_map do |win, index|
-          next unless win.is_a?(Hash) && win['width'].to_f.positive?
+        trim_element(
+          id: format('trim_lintel_%02d_%02d', @storey_index + 1, index + 1),
+          position: [offset, 0, sill + height],
+          width: width,
+          height: band_height,
+          depth: projection,
+          detail: 'lintel'
+        )
+      end
 
-          offset = win['offset'].to_f
-          width = win['width'].to_f
-          sill = (win['sill_height'] || 900).to_f
-          height = win['height'].to_f
+      def full_trim_for_window(win, index)
+        offset = win['offset'].to_f
+        width = win['width'].to_f
+        sill = (win['sill_height'] || 900).to_f
+        height = win['height'].to_f
+        projection = float_param('trim_projection', 80)
+        band_height = float_param('trim_height', 100)
+        jamb_width = float_param('trim_jamb_width', 80)
+        prefix = format('%02d_%02d', @storey_index + 1, index + 1)
 
-          {
-            'id' => format('trim_%02d_%02d', @storey_index + 1, index + 1),
-            'type' => 'trim',
-            'storey_id' => @storey_id,
-            'geometry' => {
-              'position' => [offset, 0, sill + height],
-              'width' => width,
-              'height' => band_height,
-              'depth' => projection
-            },
-            'semantic' => { 'exterior' => true, 'detail' => 'lintel' },
-            'confidence' => 1.0
-          }
-        end
+        [
+          trim_element(
+            id: format('trim_lintel_%s', prefix),
+            position: [offset, 0, sill + height],
+            width: width,
+            height: band_height,
+            depth: projection,
+            detail: 'lintel'
+          ),
+          trim_element(
+            id: format('trim_sill_%s', prefix),
+            position: [offset, 0, sill - band_height],
+            width: width,
+            height: band_height,
+            depth: projection,
+            detail: 'sill'
+          ),
+          trim_element(
+            id: format('trim_jamb_l_%s', prefix),
+            position: [offset - jamb_width, 0, sill],
+            width: jamb_width,
+            height: height,
+            depth: projection,
+            detail: 'jamb_left'
+          ),
+          trim_element(
+            id: format('trim_jamb_r_%s', prefix),
+            position: [offset + width, 0, sill],
+            width: jamb_width,
+            height: height,
+            depth: projection,
+            detail: 'jamb_right'
+          )
+        ]
+      end
+
+      def trim_element(id:, position:, width:, height:, depth:, detail:)
+        {
+          'id' => id,
+          'type' => 'trim',
+          'storey_id' => @storey_id,
+          'geometry' => {
+            'position' => position,
+            'width' => width,
+            'height' => height,
+            'depth' => depth
+          },
+          'semantic' => { 'exterior' => true, 'detail' => detail },
+          'confidence' => 1.0
+        }
       end
 
       def railing_element

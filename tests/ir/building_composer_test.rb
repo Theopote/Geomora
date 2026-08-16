@@ -101,4 +101,24 @@ class BuildingComposerTest < Minitest::Test
     assert_equal %w[floor], ground.map { |element| element['type'] }
     assert_includes top.map { |element| element['type'] }, 'roof'
   end
+
+  def test_lod_300_full_trim_set
+    params = {
+      'lod_level' => 'lod_300',
+      'building_elements' => { 'full_trim' => true },
+      'windows' => [{ 'offset' => 500, 'width' => 1500, 'height' => 1500, 'sill_height' => 900 }]
+    }
+
+    elements = Geomora::Core::BuildingComposer.compose(
+      params,
+      wall_length: 8000,
+      wall_height: 3000,
+      wall_thickness: 240,
+      storey_id: 'storey_01'
+    )
+
+    trims = elements.select { |element| element['type'] == 'trim' }
+    details = trims.map { |trim| trim['semantic']['detail'] }.sort
+    assert_equal %w[jamb_left jamb_right lintel sill], details
+  end
 end

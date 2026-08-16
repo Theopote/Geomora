@@ -59,12 +59,12 @@ When **Structural column grid** is enabled (requires **Columns**):
 
 ## 5. Deferred (Phase 11+)
 
-- LOD-driven layer visibility in SketchUp
-- Interior partition walls
-- Full frame / sill / jamb trim sets
+- ~~LOD-driven layer visibility in SketchUp~~ → Phase 11 ✅
+- ~~Interior partition walls~~ → Phase 11 ✅
+- ~~Full frame / sill / jamb trim sets~~ → Phase 11 ✅
 
 ---
 
 ## 6. Gate to Phase 11
 
-LOD + structural grid enable semantic refinement pipelines and interior layout on stacked shells.
+LOD + structural grid enable semantic refinement pipelines and interior layout on stacked shells. See [PHASE_11.md](PHASE_11.md).

@@ -38,7 +38,9 @@ def detect_facade(
     if normalized_method == "yolo_v1":
         return detect_yolo_elements(image, return_overlay=return_overlay)
 
-    if model_available():
-        return detect_yolo_elements(image, return_overlay=return_overlay)
-
-    return detect_contour_elements(image, return_overlay=return_overlay)
+    if normalized_method == "auto":
+        if model_available():
+            yolo_result = detect_yolo_elements(image, return_overlay=return_overlay)
+            if yolo_result.elements:
+                return yolo_result
+        return detect_contour_elements(image, return_overlay=return_overlay)

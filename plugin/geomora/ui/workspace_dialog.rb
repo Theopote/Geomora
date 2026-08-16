@@ -212,27 +212,25 @@ module Geomora
 
             Logger.info("Detecting facade elements: #{image_path} (method=#{detection_method})")
             result = Perception::DetectClient.detect(image_path, method: detection_method)
-            mapped = Core::DetectionMapper.to_facade_params(
-              result,
-              wall_length: params['wall_length'],
-              wall_height: params['wall_height'],
-              wall_thickness: params['wall_thickness']
-            )
-            @detection = result.to_source_metadata
-            overlay_url = nil
-            if result.overlay_base64 && !result.overlay_base64.empty?
-              overlay_path = save_overlay_from_result(result)
-              overlay_url = path_to_file_url(overlay_path) if overlay_path
+            mapped = map_detection_params(result, params)
+
+            if openings_empty?(mapped) && contour_fallback?(detection_method)
+              Logger.info('YOLO/auto found no usable openings — retrying with contour_v1')
+              result = Perception::DetectClient.detect(image_path, method: 'contour_v1')
+              mapped = map_detection_params(result, params)
             end
 
-            if result.elements.empty?
+            @detection = result.to_source_metadata
+            overlay_url = detection_overlay_url(result)
+
+            if openings_empty?(mapped)
               dialog.execute_script(
-                "window.geomora.setDetectionMeta(#{result.to_dict.to_json}, #{overlay_url.to_json})"
+                "window.geomora.onDetectionEmpty(#{result.to_dict.to_json}, #{overlay_url.to_json})"
               )
               post_message(
                 dialog,
-                'error',
-                'No openings detected. Rectify first, then set wall size manually or edit openings by hand.'
+                'warning',
+                'No openings detected. Use Overlay → Draw window, or set Detection to Contour and retry.'
               )
             else
               payload = mapped.merge('detection' => result.to_dict)
@@ -473,6 +471,30 @@ module Geomora
         def path_to_file_url(path)
           normalized = path.gsub('\\', '/')
           "file:///#{normalized}"
+        end
+
+        def map_detection_params(result, params)
+          Core::DetectionMapper.to_facade_params(
+            result,
+            wall_length: params['wall_length'],
+            wall_height: params['wall_height'],
+            wall_thickness: params['wall_thickness']
+          )
+        end
+
+        def openings_empty?(mapped)
+          mapped['windows'].empty? && mapped.dig('door', 'width').to_f <= 0
+        end
+
+        def contour_fallback?(method)
+          %w[auto yolo_v1].include?(method.to_s.strip.downcase)
+        end
+
+        def detection_overlay_url(result)
+          return nil unless result.overlay_base64 && !result.overlay_base64.empty?
+
+          overlay_path = save_overlay_from_result(result)
+          path_to_file_url(overlay_path) if overlay_path
         end
 
         def format_repair_report(report)

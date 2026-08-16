@@ -454,17 +454,39 @@
   }
 
   function doorBboxFromMm(door) {
-    const wallLength = Number(els.form.elements.namedItem('wall_length').value) || 10000;
-    const wallHeight = Number(els.form.elements.namedItem('wall_height').value) || 3300;
     const width = Number(door.width) || 0;
     if (!width) return null;
     const offset = Number(door.offset) || 0;
     const height = Number(door.height) || 2100;
-    const x1 = offset / wallLength;
-    const x2 = (offset + width) / wallLength;
+    const x1 = offset / (Number(els.form.elements.namedItem('wall_length').value) || 10000);
+    const x2 = (offset + width) / (Number(els.form.elements.namedItem('wall_length').value) || 10000);
     const y2 = 1;
-    const y1 = 1 - height / wallHeight;
+    const y1 = 1 - height / (Number(els.form.elements.namedItem('wall_height').value) || 3300);
     return [x1, y1, x2, y2];
+  }
+
+  function ensureDoorBbox() {
+    const doorWidth = Number(els.form.elements.namedItem('door_width').value) || 0;
+    if (doorWidth <= 0) {
+      state.doorBbox = null;
+      return null;
+    }
+    if (state.doorBbox && state.doorBbox.length === 4) {
+      return state.doorBbox;
+    }
+    state.doorBbox = doorBboxFromMm({
+      offset: Number(els.form.elements.namedItem('door_offset').value) || 0,
+      width: doorWidth,
+      height: Number(els.form.elements.namedItem('door_height').value) || 2100
+    });
+    return state.doorBbox;
+  }
+
+  function updateOverlayLayers() {
+    const cornerMode = cornersEditable();
+    const overlayMode = overlayEditable();
+    els.cornerSvg.classList.toggle('inactive', !cornerMode);
+    els.overlaySvg.classList.toggle('inactive', !overlayMode);
   }
 
   function overlayEditable() {
@@ -593,6 +615,7 @@
   function applyBboxToWindow(index, bboxNorm) {
     const mapped = bboxNormToWindow(bboxNorm);
     state.windows[index] = Object.assign({}, state.windows[index], mapped);
+    persistActiveStoreyWindows();
     syncWindowRowFromState(index);
     renderDetectionOverlay();
     renderTree();
@@ -715,8 +738,9 @@
     });
 
     const doorWidth = Number(els.form.elements.namedItem('door_width').value) || 0;
-    if (state.doorBbox && state.doorBbox.length === 4 && doorWidth > 0) {
-      const box = bboxPixelsFromNorm(state.doorBbox);
+    const doorBbox = ensureDoorBbox();
+    if (doorBbox && doorBbox.length === 4 && doorWidth > 0) {
+      const box = bboxPixelsFromNorm(doorBbox);
       const selected = state.selectedDoor;
       markup +=
         '<rect class="det-box door' + (selected ? ' selected' : '') + '" data-kind="door" data-index="-1" x="' +
@@ -913,6 +937,7 @@
   function updateViewerToolbar() {
     const cornerMode = cornersEditable();
     const overlayMode = overlayEditable();
+    updateOverlayLayers();
     els.viewerToolbar.hidden = !cornerMode && !overlayMode;
     els.btnDrawWindow.hidden = !overlayMode;
     els.btnDeleteSelected.hidden = !overlayMode;
@@ -979,6 +1004,7 @@
     const index = parseInt(input.dataset.win, 10);
     const field = input.dataset.field;
     state.windows[index][field] = parseFloat(input.value);
+    persistActiveStoreyWindows();
     renderTree();
   }
 
@@ -1090,8 +1116,11 @@
         parapet: formData.get('include_parapet') === 'on',
         cornice: formData.get('include_cornice') === 'on',
         perimeter_walls: formData.get('include_perimeter_walls') === 'on',
-        structural_grid: formData.get('include_structural_grid') === 'on'
+        structural_grid: formData.get('include_structural_grid') === 'on',
+        interior_partitions: formData.get('include_interior_partitions') === 'on',
+        full_trim: formData.get('include_full_trim') === 'on'
       },
+      partition_count: Number(formData.get('partition_count') || 1),
       storey_count: Number(formData.get('storey_count') || 1),
       storey_height: formData.get('storey_height') ? Number(formData.get('storey_height')) : null,
       repeat_openings: formData.get('repeat_openings') === 'on',
@@ -1163,6 +1192,7 @@
       els.image.src = url;
     }
     updateViewerToolbar();
+    updateOverlayLayers();
     if (els.image.complete) {
       if (state.activeView === 'original') {
         renderCornerOverlay();
@@ -1309,10 +1339,22 @@
         ' | ' + state.detection.windows + ' windows, ' + state.detection.doors + ' doors' +
         ' | confidence ' + state.detection.confidence;
     }
-    if (overlayUrl) {
+    if (state.rectifiedImageUrl) {
+      setActiveView('overlay');
+    } else if (overlayUrl) {
       setActiveView('overlay');
     }
+    scheduleOverlayRender();
     renderTree();
+  }
+
+  function onDetectionEmpty(detection, overlayUrl) {
+    setDetectionMeta(detection, overlayUrl);
+    setDrawMode(false);
+    setStatus(
+      'warning',
+      'No openings detected — click Draw window on the image, or try Detection: Contour.'
+    );
   }
 
   function applyFusion(payload, overlayUrl) {
@@ -1341,20 +1383,22 @@
     if (isRepeatOpenings()) {
       copyGroundWindowsToUpperStoreys();
     }
+    state.activeStoreyIndex = 0;
+    state.windows = cloneWindows(state.storeyWindows[0] || windows);
     clearSelection();
-    if (state.activeStoreyIndex === 0) {
-      state.windows = cloneWindows(windows);
-      renderWindows(state.windows);
-    } else {
-      renderStoreySelector();
-    }
+    renderWindows(state.windows);
+    renderStoreySelector();
 
     const door = payload.door || {};
     const doorWidth = Number(door.width) || 0;
     els.form.elements.namedItem('door_offset').value = door.offset || 0;
     els.form.elements.namedItem('door_width').value = doorWidth;
     els.form.elements.namedItem('door_height').value = doorWidth > 0 ? (door.height || 2100) : 0;
-    state.doorBbox = door.bbox_norm && doorWidth > 0 ? door.bbox_norm : null;
+    if (door.bbox_norm && doorWidth > 0) {
+      state.doorBbox = door.bbox_norm;
+    } else {
+      state.doorBbox = doorWidth > 0 ? doorBboxFromMm(door) : null;
+    }
 
     state.detection = payload.detection || null;
     state.overlayImageUrl = overlayUrl || null;
@@ -1462,6 +1506,7 @@
     applyRationalization: applyRationalization,
     applyPattern: applyPattern,
     setDetectionMeta: setDetectionMeta,
+    onDetectionEmpty: onDetectionEmpty,
     setIrPreview: setIrPreview,
     setStatus: setStatus
   };

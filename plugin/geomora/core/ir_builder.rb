@@ -105,39 +105,44 @@ module Geomora
           end
         end
 
-        if perimeter_walls_enabled?
-          walls = Core::WallEnclosure.perimeter_walls(
-            wall_length: wall_length,
-            wall_thickness: wall_thickness,
-            building_depth: building_depth,
-            storey_id: storey_id,
-            storey_index: storey_index,
-            wall_height: height,
-            facade_wall_id: facade_wall_id,
-            facade_semantic: facade_semantic_with_openings(opening_ids)
-          )
-          walls[0]['opening_ids'] = opening_ids
-          return [walls, openings]
-        end
+        walls = if perimeter_walls_enabled?
+                  perimeter = Core::WallEnclosure.perimeter_walls(
+                    wall_length: wall_length,
+                    wall_thickness: wall_thickness,
+                    building_depth: building_depth,
+                    storey_id: storey_id,
+                    storey_index: storey_index,
+                    wall_height: height,
+                    facade_wall_id: facade_wall_id,
+                    facade_semantic: facade_semantic_with_openings(opening_ids)
+                  )
+                  perimeter[0]['opening_ids'] = opening_ids
+                  perimeter
+                else
+                  [
+                    {
+                      'id' => facade_wall_id,
+                      'type' => 'wall',
+                      'storey_id' => storey_id,
+                      'geometry' => {
+                        'baseline' => [[0, 0, 0], [wall_length, 0, 0]],
+                        'height' => height,
+                        'thickness' => wall_thickness
+                      },
+                      'semantic' => { 'exterior' => true },
+                      'opening_ids' => opening_ids,
+                      'confidence' => 1.0
+                    }
+                  ]
+                end
 
-        [
-          [
-            {
-              'id' => facade_wall_id,
-              'type' => 'wall',
-              'storey_id' => storey_id,
-              'geometry' => {
-                'baseline' => [[0, 0, 0], [wall_length, 0, 0]],
-                'height' => height,
-                'thickness' => wall_thickness
-              },
-              'semantic' => { 'exterior' => true },
-              'opening_ids' => opening_ids,
-              'confidence' => 1.0
-            }
-          ],
-          openings
-        ]
+        walls.concat(interior_partition_walls(
+                       storey_id: storey_id,
+                       storey_index: storey_index,
+                       height: height
+                     ))
+
+        [walls, openings]
       end
 
       def facade_semantic_with_openings(opening_ids)
@@ -174,6 +179,21 @@ module Geomora
 
       def perimeter_walls_enabled?
         Core::WallEnclosure.enabled?(@params)
+      end
+
+      def interior_partition_walls(storey_id:, storey_index:, height:)
+        return [] unless Core::InteriorLayout.enabled?(@params)
+
+        Core::InteriorLayout.partition_walls(
+          params: @params,
+          wall_length: wall_length,
+          wall_thickness: wall_thickness,
+          building_depth: building_depth,
+          storey_id: storey_id,
+          storey_index: storey_index,
+          wall_height: height,
+          perimeter_walls: perimeter_walls_enabled?
+        )
       end
 
       def lod_level

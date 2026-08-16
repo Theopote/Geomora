@@ -54,11 +54,20 @@ module Geomora
 
         Metadata::Attributes.write(group, entity_metadata(wall))
 
-        @tags.apply(group, 'Geomora_Walls')
+        @tags.apply(group, wall_tag(wall))
         group
       end
 
       private
+
+      def wall_tag(wall)
+        semantic = wall.semantic
+        if semantic.is_a?(Hash) && (semantic['interior'] == true || semantic[:interior] == true)
+          return 'Geomora_InteriorWalls'
+        end
+
+        'Geomora_Walls'
+      end
 
       def entity_metadata(wall)
         {

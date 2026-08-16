@@ -2,6 +2,7 @@
 
 require_relative 'building_generator'
 require_relative '../core/lod_policy'
+require_relative '../core/lod_visibility'
 require_relative '../metadata/attributes'
 
 module Geomora
@@ -24,6 +25,7 @@ module Geomora
           building_gen.generate(building, project_group, document)
         end
 
+        Core::LodVisibility.apply(@model, context[:lod_level])
         Logger.info('Generation complete')
         project_group
       end

@@ -5,6 +5,8 @@ module Geomora
     class DetectionMapper
       MIN_GAP_MM = 50.0
       MIN_OPENING_WIDTH_MM = 300.0
+      MIN_NORM_SPAN = 0.04
+      MIN_CONFIDENCE = 0.35
       REVIEW_WINDOW_LIMIT = 8
 
       def self.to_facade_params(detection, wall_length:, wall_height:, wall_thickness: 240)
@@ -24,6 +26,8 @@ module Geomora
 
         @detection.elements.each do |element|
           mapped = map_element(element)
+          next unless mapped
+
           case element['type']
           when 'window'
             windows << mapped
@@ -46,10 +50,14 @@ module Geomora
       private
 
       def map_element(element)
+        confidence = element['confidence'].to_f
+        return nil if confidence < MIN_CONFIDENCE
+
         bbox = element['bbox_norm']
         raise GeomoraError, 'Detection element missing bbox_norm' unless bbox.is_a?(Array) && bbox.length == 4
 
         x_min, y_min, x_max, y_max = bbox.map(&:to_f)
+        return nil if (x_max - x_min) < MIN_NORM_SPAN || (y_max - y_min) < MIN_NORM_SPAN
         inset = 0.01
         x_min = [[x_min + inset, 0.0].max, 1.0].min
         y_min = [[y_min + inset, 0.0].max, 1.0].min

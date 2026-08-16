@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.19.0 — Per-floor Windows</div>
+    <div class="subtitle">v0.19.2 — Detection Fallback</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -116,6 +116,11 @@
           <option value="lod_200" selected>LOD 200 — Openings + structure</option>
           <option value="lod_300">LOD 300 — Details (trim, eaves, railing)</option>
         </select>
+
+        <div class="section-title">Interior Layout (Phase 11)</div>
+        <label class="checkbox-label"><input name="include_interior_partitions" type="checkbox"> Interior partition walls</label>
+        <label>Partition count<input name="partition_count" type="number" min="1" step="1" value="1"></label>
+        <label class="checkbox-label"><input name="include_full_trim" type="checkbox" checked> Full window trim (lintel + sill + jambs)</label>
 
         <div class="section-title">Geometry Doctor (Phase 8)</div>
         <label class="checkbox-label"><input name="doctor_tiny_edges" type="checkbox" checked> Remove tiny edges</label>

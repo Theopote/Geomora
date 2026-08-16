@@ -1815,6 +1815,13 @@
   });
 
   document.getElementById('btn-detect').addEventListener('click', function () {
+    if (!state.rectifiedImageUrl) {
+      setStatus(
+        'error',
+        'Rectify Facade first (Original → drag corners → Rectify), then Detect Elements.'
+      );
+      return;
+    }
     sketchupCall('detect', JSON.stringify(collectParams()));
   });
 

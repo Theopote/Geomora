@@ -251,6 +251,11 @@ module Geomora
 
           dialog.add_action_callback('detect') do |_ctx, json|
             params = JSON.parse(json)
+            unless @rectified_image_path && File.exist?(@rectified_image_path)
+              raise GeomoraError,
+                    'Rectify Facade first (drag four corners on Original view), then Detect Elements.'
+            end
+
             image_path = detection_image_path(params)
             if image_path.nil? || image_path.empty?
               raise GeomoraError, 'Load an image (and rectified view recommended) before detecting.'

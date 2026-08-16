@@ -1826,6 +1826,10 @@
     sketchupCall('export_layout_report_pdf_booklet', JSON.stringify(collectParams()));
   });
 
+  document.getElementById('btn-export-layout-booklet-html').addEventListener('click', function () {
+    sketchupCall('export_layout_report_html_booklet', JSON.stringify(collectParams()));
+  });
+
   els.btnDeleteSelected.addEventListener('click', function () {
     removeSelected();
   });

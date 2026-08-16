@@ -122,7 +122,7 @@ module Geomora
         mb_rows = height / 16
         mb_rows.times do |mb_y|
           mb_cols.times do |mb_x|
-            write_ipcm_macroblock(writer, yuv, width, mb_x, mb_y)
+            write_intra16x16_macroblock(writer, yuv, width, mb_x, mb_y)
           end
         end
         writer.write_bits(1, 1) # rbsp_stop_one_bit
@@ -130,6 +130,45 @@ module Geomora
         writer.bytes
       end
 
+      def self.write_intra16x16_macroblock(writer, yuv, width, mb_x, mb_y)
+        writer.write_ue(0) # I_16x16_0_0_0
+        luma_dcs = extract_luma_dcs(yuv, width, mb_x, mb_y)
+        cb_dcs = extract_chroma_dcs(yuv, width, mb_x, mb_y, 'u')
+        cr_dcs = extract_chroma_dcs(yuv, width, mb_x, mb_y, 'v')
+        H264Cavlc.encode_intra16x16_residual(writer, luma_dcs, cb_dcs, cr_dcs)
+      end
+
+      def self.extract_luma_dcs(yuv, width, mb_x, mb_y)
+        16.times.map do |block|
+          block_x = (mb_x * 16) + ((block % 4) * 4)
+          block_y = (mb_y * 16) + ((block / 4) * 4)
+          sum = 0
+          16.times do |index|
+            x = block_x + (index % 4)
+            y = block_y + (index / 4)
+            sum += yuv['y'][(y * width) + x]
+          end
+          sum / 16
+        end
+      end
+
+      def self.extract_chroma_dcs(yuv, width, mb_x, mb_y, plane)
+        plane_data = yuv[plane]
+        chroma_width = width / 2
+        4.times.map do |block|
+          block_x = (mb_x * 8) + ((block % 2) * 4)
+          block_y = (mb_y * 8) + ((block / 2) * 4)
+          sum = 0
+          16.times do |index|
+            x = block_x + (index % 4)
+            y = block_y + (index / 4)
+            sum += plane_data[(y * chroma_width) + x]
+          end
+          sum / 16
+        end
+      end
+
+      # Legacy I_PCM path kept for debugging/comparison.
       def self.write_ipcm_macroblock(writer, yuv, width, mb_x, mb_y)
         writer.write_ue(25) # I_PCM
         writer.write_bits(0, 1) # pcm_alignment_zero_bit

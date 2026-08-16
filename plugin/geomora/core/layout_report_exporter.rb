@@ -54,6 +54,86 @@ module Geomora
         PdfReportExporter.export_booklet(params, path)
       end
 
+      def self.export_html_booklet(params, path)
+        storeys = RoomLayoutEditor.preview_all_storeys(params)
+        raise GeomoraError, 'No rooms to export' if storeys.empty?
+
+        room_pages = storeys.flat_map do |storey|
+          (storey['rooms'] || []).map do |room|
+            { 'storey' => storey, 'room' => room }
+          end
+        end
+        spreads = []
+        room_index = 0
+        room_pages.each_slice(2) do |pair|
+          cards = pair.map do |entry|
+            room_index += 1
+            render_booklet_card(entry['storey'], entry['room'], "room-#{room_index}")
+          end
+          spreads << %(<section class="spread">#{cards.join}</section>)
+        end
+        toc = room_pages.each_with_index.map do |entry, index|
+          "<li><a href=\"#room-#{index + 1}\">#{escape(entry['storey']['label'])} — #{escape(entry['room']['name'])}</a></li>"
+        end.join
+
+        html = <<~HTML
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <title>Geomora Layout Booklet</title>
+            <style>
+              body { font-family: "Segoe UI", sans-serif; margin: 24px; color: #111; }
+              .cover, .toc, .spread { page-break-after: always; margin-bottom: 48px; }
+              .cover h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+              .meta { color: #555; }
+              .spread { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+              .room-card svg { border: 1px solid #ccc; background: #f8f9fa; width: 100%; height: auto; }
+              .room-card h2 { font-size: 1rem; margin: 0 0 8px; }
+              table { border-collapse: collapse; margin-top: 8px; width: 100%; font-size: 12px; }
+              th, td { border: 1px solid #ddd; padding: 4px 6px; text-align: left; }
+              th { background: #eef2f7; }
+              @media print { body { margin: 12mm; } .cover, .toc, .spread { page-break-after: always; } }
+            </style>
+          </head>
+          <body>
+            <section class="cover">
+              <h1>Geomora Layout Booklet</h1>
+              <div class="meta">#{Time.now.utc.strftime('%Y-%m-%d %H:%M UTC')} · #{room_pages.length} rooms</div>
+            </section>
+            <section class="toc">
+              <h2>Contents</h2>
+              <ol>#{toc}</ol>
+            </section>
+            #{spreads.join("\n")}
+          </body>
+          </html>
+        HTML
+
+        File.write(path, html)
+        path
+      end
+
+      def self.render_booklet_card(storey, room, anchor_id)
+        bounds = symbolize_bounds(room['bounds'])
+        svg = render_svg(bounds, room['items'] || [])
+        rows = (room['items'] || []).map do |item|
+          pos = item['position'] || [0, 0, 0]
+          "<tr><td>#{escape(item['kind'])}</td><td>#{pos[0].round}, #{pos[1].round}</td>" \
+            "<td>#{item['width'].round}×#{item['depth'].round}×#{item['height'].round}</td></tr>"
+        end.join
+        <<~HTML
+          <article class="room-card" id="#{anchor_id}">
+            <h2>#{escape(storey['label'])} — #{escape(room['name'])}</h2>
+            #{svg}
+            <table>
+              <thead><tr><th>Item</th><th>Position</th><th>W×D×H</th></tr></thead>
+              <tbody>#{rows}</tbody>
+            </table>
+          </article>
+        HTML
+      end
+
       def self.render_room_page(storey, room)
         bounds = symbolize_bounds(room['bounds'])
         svg = render_svg(bounds, room['items'] || [])

@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.31.0 — H.264 MP4 + Layout Booklet</div>
+    <div class="subtitle">v0.32.0 — Compact H.264 + Multi-select</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -164,7 +164,7 @@
           <button type="button" id="btn-preview-catalog-diff" class="btn-link">Preview catalog diff</button>
         </div>
 
-        <div class="section-title">Layout Editor (Phase 17–22)</div>
+        <div class="section-title">Layout Editor (Phase 17–23)</div>
         <label class="checkbox-label"><input name="include_furniture_wall_align" type="checkbox"> Wall-aligned furniture placement</label>
         <label class="checkbox-label"><input id="layout-snap-grid" type="checkbox" checked> Snap to grid (100 mm)</label>
         <label class="checkbox-label"><input id="layout-wall-magnet" type="checkbox" checked> Wall magnet</label>
@@ -177,8 +177,9 @@
           <button type="button" id="btn-export-layout-report" class="btn-link">Export layout report (HTML)</button>
           <button type="button" id="btn-export-layout-pdf" class="btn-link">Export layout PDF</button>
           <button type="button" id="btn-export-layout-booklet" class="btn-link">Export layout booklet PDF</button>
+          <button type="button" id="btn-export-layout-booklet-html" class="btn-link">Export layout booklet HTML</button>
         </div>
-        <div class="layout-editor-hint">Shortcuts: Ctrl+Z/Y undo/redo · Ctrl+C/V copy/paste · R rotate · Del remove</div>
+        <div class="layout-editor-hint">Shortcuts: Ctrl+A select all · Ctrl+click multi-select · Ctrl+C/V copy/paste · Ctrl+Z/Y undo/redo</div>
         <div id="layout-editor-panel" class="layout-editor-panel" hidden>
           <div class="layout-editor-row">
             <label>Storey

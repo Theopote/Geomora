@@ -155,6 +155,10 @@ module Geomora
         LayoutReportExporter.export_pdf_booklet(params, path)
       end
 
+      def self.export_layout_report_html_booklet(path, params)
+        LayoutReportExporter.export_html_booklet(params, path)
+      end
+
       def self.pause_viewport_stream
         ViewportStream.pause
       end

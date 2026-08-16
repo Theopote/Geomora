@@ -75,14 +75,17 @@ tests/core/pdf_booklet_exporter_test.rb
 
 ---
 
-## 7. Deferred (Phase 23+)
+## 7. Deferred (Phase 23 — delivered in v0.32.0)
 
-- Smaller native H.264 files (DCT intra instead of I_PCM)
-- Booklet HTML export matching PDF layout
-- Multi-item clipboard
+See `docs/PHASE_23.md` for compact H.264, booklet HTML, and multi-item clipboard.
+
+Remaining for Phase 24+:
+
+- Full CAVLC for non-flat macroblocks
+- Layout editor marquee selection
 
 ---
 
 ## 8. Gate to Phase 23
 
-H.264 video and printable booklet complete the client presentation package for offline review.
+Compact video and multi-format booklet exports complete the offline client review package.

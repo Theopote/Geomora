@@ -224,6 +224,15 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 22.3 | Ctrl+C / Ctrl+V in editor | Copy and paste furniture item |
 | 22.4 | Live stream blur then focus | Stream resumes automatically |
 
+## Phase 23 — Compact H.264 + booklet HTML + multi-select
+
+| # | Step | Expected |
+|---|---|---|
+| 23.1 | Export LOD Tour MP4 (H.264) without ffmpeg | Smaller file than Phase 22 I_PCM |
+| 23.2 | Export layout booklet HTML | Cover + TOC + two-room spreads |
+| 23.3 | Ctrl+click + Ctrl+C/V | Multi-item copy/paste |
+| 23.4 | Ctrl+A in editor | All items selected |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos

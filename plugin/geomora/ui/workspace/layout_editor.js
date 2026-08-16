@@ -13,7 +13,7 @@
     paletteFilter: '',
     drag: null,
     paletteDrag: null,
-    selectedItemIndex: null,
+    selectedItemIndices: [],
     snapGrid: true,
     wallMagnet: true,
     clipboard: null
@@ -132,7 +132,7 @@
       storeySelect.addEventListener('change', function () {
         state.activeStoreyIndex = Number(storeySelect.value) || 0;
         state.activeRoomIndex = 0;
-        state.selectedItemIndex = null;
+        state.selectedItemIndices = [];
         rebuildRoomSelect();
         updateItemSizePanel();
         render();
@@ -142,7 +142,7 @@
 
     roomSelect.addEventListener('change', function () {
       state.activeRoomIndex = Number(roomSelect.value) || 0;
-      state.selectedItemIndex = null;
+      state.selectedItemIndices = [];
       updateItemSizePanel();
       render();
       render3d();
@@ -151,12 +151,16 @@
     canvas.addEventListener('mousedown', function (event) {
       const hit = hitTest(event);
       if (!hit) {
-        state.selectedItemIndex = null;
+        state.selectedItemIndices = [];
         updateItemSizePanel();
         render();
         return;
       }
-      state.selectedItemIndex = hit.index;
+      if (event.ctrlKey || event.metaKey) {
+        toggleSelection(hit.index);
+      } else {
+        setSelection([hit.index]);
+      }
       state.drag = {
         itemIndex: hit.index,
         offsetX: hit.localX - hit.item.position[0],
@@ -187,7 +191,7 @@
         rotation: 0
       };
       room.items.push(item);
-      state.selectedItemIndex = room.items.length - 1;
+      setSelection([room.items.length - 1]);
       state.paletteDrag = null;
       updateItemSizePanel();
       commitHistory();
@@ -266,7 +270,7 @@
       state.storeys = payload;
       state.activeStoreyIndex = 0;
       state.activeRoomIndex = 0;
-      state.selectedItemIndex = null;
+      state.selectedItemIndices = [];
       rebuildStoreySelect();
       rebuildRoomSelect();
       panel.hidden = false;
@@ -323,7 +327,7 @@
             rotation: 0
           };
           room.items.push(item);
-          state.selectedItemIndex = room.items.length - 1;
+          setSelection([room.items.length - 1]);
           updateItemSizePanel();
           commitHistory();
         });
@@ -402,10 +406,43 @@
       return storey.rooms[state.activeRoomIndex] || null;
     }
 
+    function setSelection(indices) {
+      state.selectedItemIndices = indices.slice();
+    }
+
+    function toggleSelection(index) {
+      const pos = state.selectedItemIndices.indexOf(index);
+      if (pos === -1) {
+        state.selectedItemIndices.push(index);
+      } else {
+        state.selectedItemIndices.splice(pos, 1);
+      }
+    }
+
+    function isSelected(index) {
+      return state.selectedItemIndices.indexOf(index) !== -1;
+    }
+
+    function selectAllItems() {
+      const room = currentRoom();
+      if (!room) return;
+      setSelection(room.items.map(function (_item, index) { return index; }));
+      updateItemSizePanel();
+      render();
+    }
+
     function getSelectedItem() {
       const room = currentRoom();
-      if (!room || state.selectedItemIndex === null) return null;
-      return room.items[state.selectedItemIndex] || null;
+      if (!room || !state.selectedItemIndices.length) return null;
+      return room.items[state.selectedItemIndices[0]] || null;
+    }
+
+    function getSelectedItems() {
+      const room = currentRoom();
+      if (!room || !state.selectedItemIndices.length) return [];
+      return state.selectedItemIndices
+        .map(function (index) { return room.items[index]; })
+        .filter(Boolean);
     }
 
     function updateItemSizePanel() {
@@ -519,7 +556,7 @@
           scale,
           offsetX,
           offsetY,
-          index === state.selectedItemIndex || index === (state.drag && state.drag.itemIndex)
+          isSelected(index) || index === (state.drag && state.drag.itemIndex)
         );
       });
     }
@@ -666,29 +703,35 @@
 
     function removeSelected() {
       const room = currentRoom();
-      if (!room || state.selectedItemIndex === null) return;
-      room.items.splice(state.selectedItemIndex, 1);
-      state.selectedItemIndex = null;
+      if (!room || !state.selectedItemIndices.length) return;
+      state.selectedItemIndices.sort(function (a, b) { return b - a; }).forEach(function (index) {
+        room.items.splice(index, 1);
+      });
+      state.selectedItemIndices = [];
       updateItemSizePanel();
       commitHistory();
     }
 
     function copySelected() {
-      const item = getSelectedItem();
-      if (!item) return;
-      state.clipboard = JSON.parse(JSON.stringify(item));
+      const items = getSelectedItems();
+      if (!items.length) return;
+      state.clipboard = JSON.parse(JSON.stringify(items));
     }
 
     function pasteClipboard() {
-      if (!state.clipboard) return;
+      if (!state.clipboard || !state.clipboard.length) return;
       const room = currentRoom();
       if (!room) return;
-      const item = JSON.parse(JSON.stringify(state.clipboard));
-      const pos = item.position || [0, 0, 0];
-      const offset = applySnap(pos[0] + 200, pos[1] + 200, room, item);
-      item.position = [offset[0], offset[1], 0];
-      room.items.push(item);
-      state.selectedItemIndex = room.items.length - 1;
+      const newIndices = [];
+      state.clipboard.forEach(function (source, index) {
+        const item = JSON.parse(JSON.stringify(source));
+        const pos = item.position || [0, 0, 0];
+        const offset = applySnap(pos[0] + 200 + (index * 40), pos[1] + 200 + (index * 40), room, item);
+        item.position = [offset[0], offset[1], 0];
+        room.items.push(item);
+        newIndices.push(room.items.length - 1);
+      });
+      setSelection(newIndices);
       updateItemSizePanel();
       commitHistory();
     }
@@ -723,6 +766,9 @@
       } else if (event.ctrlKey && event.key.toLowerCase() === 'y') {
         event.preventDefault();
         redo();
+      } else if (event.ctrlKey && event.key.toLowerCase() === 'a') {
+        event.preventDefault();
+        selectAllItems();
       } else if (event.ctrlKey && event.key.toLowerCase() === 'c') {
         event.preventDefault();
         copySelected();

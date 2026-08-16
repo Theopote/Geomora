@@ -51,6 +51,7 @@ module Geomora
     perception/fusion_result
     core/detection_mapper
     core/scale_estimator
+    core/yolo_label_exporter
     core/rationalizer
     core/pattern_analyzer
     core/building_composer

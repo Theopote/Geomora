@@ -53,6 +53,8 @@
     btnViewRectified: document.getElementById('btn-view-rectified'),
     btnViewOverlay: document.getElementById('btn-view-overlay'),
     detectMethod: document.getElementById('detect-method'),
+    yoloSplit: document.getElementById('yolo-split'),
+    btnExportYoloLabels: document.getElementById('btn-export-yolo-labels'),
     registerMethod: document.getElementById('register-method'),
     depthMethod: document.getElementById('depth-method'),
     storeyWindowBar: document.getElementById('storey-window-bar')
@@ -1096,6 +1098,27 @@
     });
   }
 
+  function collectYoloExportPayload() {
+    persistActiveStoreyWindows();
+    ensureWindowBboxes();
+    const groundWindows = state.storeyWindows[0] || state.windows || [];
+    const windows = groundWindows.map(function (win) {
+      const bbox = resolveWindowBbox(win);
+      return bbox ? { bbox_norm: bbox.slice() } : null;
+    }).filter(Boolean);
+
+    const doorWidth = Number(els.form.elements.namedItem('door_width').value) || 0;
+    const doorBbox = doorWidth > 0 ? ensureDoorBbox() : null;
+
+    return {
+      project_name: els.form.elements.namedItem('project_name').value,
+      source_path: state.sourcePath,
+      yolo_split: els.yoloSplit ? els.yoloSplit.value : 'train',
+      windows: windows,
+      door_bbox_norm: doorBbox
+    };
+  }
+
   function collectParams() {
     persistActiveStoreyWindows();
     const formData = new FormData(els.form);
@@ -1794,6 +1817,16 @@
   document.getElementById('btn-detect').addEventListener('click', function () {
     sketchupCall('detect', JSON.stringify(collectParams()));
   });
+
+  if (els.btnExportYoloLabels) {
+    els.btnExportYoloLabels.addEventListener('click', function () {
+      if (!state.rectifiedImageUrl) {
+        setStatus('error', 'Rectify the facade before exporting YOLO labels.');
+        return;
+      }
+      sketchupCall('export_yolo_labels', JSON.stringify(collectYoloExportPayload()));
+    });
+  }
 
   document.getElementById('btn-load-template').addEventListener('click', function () {
     sketchupCall('load_template');

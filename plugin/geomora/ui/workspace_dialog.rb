@@ -531,6 +531,45 @@ module Geomora
             post_message(dialog, 'success', format('Viewport stream resumed (%ss).', interval))
           end
 
+          dialog.add_action_callback('export_yolo_labels') do |_ctx, json|
+            params = JSON.parse(json)
+            rectified_path = @rectified_image_path
+            if rectified_path.nil? || rectified_path.empty? || !File.exist?(rectified_path)
+              raise GeomoraError, 'Rectify the facade before exporting YOLO labels.'
+            end
+
+            default_dir = Core::YoloLabelExporter.default_dataset_root
+            dataset_root = ::UI.select_directory(
+              title: 'Select YOLO dataset root (facade_yolo_custom)',
+              directory: default_dir
+            )
+            next unless dataset_root
+
+            result = Core::YoloLabelExporter.export!(
+              rectified_path: rectified_path,
+              dataset_root: dataset_root,
+              split: params['yolo_split'] || 'train',
+              windows: params['windows'] || [],
+              door_bbox: params['door_bbox_norm'],
+              source_path: params['source_path'],
+              project_name: params['project_name']
+            )
+
+            post_message(
+              dialog,
+              'success',
+              format(
+                "Exported %d boxes to %s\nImage: %s\nLabel: %s",
+                result.box_count,
+                File.join(result.dataset_root, result.split),
+                result.image_path,
+                result.label_path
+              )
+            )
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
           dialog.add_action_callback('export_layout_report') do |_ctx, json|
             params = enrich_params(JSON.parse(json))
             path = ::UI.savepanel('Export layout report', '', 'geomora_layout_report.html')

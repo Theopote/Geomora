@@ -107,6 +107,19 @@ body {
   font-size: 13px;
 }
 
+.yolo-export-row {
+  display: grid;
+  grid-template-columns: 1fr 88px;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.yolo-export-row .detect-method {
+  width: 100%;
+  margin: 0;
+}
+
 .video-frame-picker {
   margin-top: 8px;
   margin-bottom: 8px;

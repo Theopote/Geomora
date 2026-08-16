@@ -25,6 +25,13 @@
       <button id="btn-reset-corners" class="btn secondary">Reset Corners</button>
       <button id="btn-rectify" class="btn">Rectify Facade</button>
       <button id="btn-detect" class="btn">Detect Elements</button>
+      <div class="yolo-export-row">
+        <button id="btn-export-yolo-labels" class="btn secondary" type="button">Export YOLO Labels</button>
+        <select id="yolo-split" class="detect-method" aria-label="YOLO dataset split">
+          <option value="train" selected>train</option>
+          <option value="val">val</option>
+        </select>
+      </div>
       <label class="detect-method-label" for="detect-method">Detection</label>
       <select id="detect-method" class="detect-method">
         <option value="auto" selected>Auto (YOLO → Facade row → Contour)</option>

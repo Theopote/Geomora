@@ -193,9 +193,38 @@ door
 
 ---
 
-## 6. 用 Geomora Workspace 辅助（非导出工具）
+## 6. Workspace 一键导出（推荐）
 
-Workspace **Overlay** 用于**人工校正检测框**，当前**不会**自动导出 YOLO txt。推荐用法：
+Geomora Workspace 可直接把 **Overlay 上的框** 导出为 YOLO 数据集，无需在外部工具里重复标框。
+
+**步骤：**
+
+1. **Load Image** → 调四角 → **Rectify Facade**
+2. **Detect Elements**（或 **Draw window** 手动画框）→ 在 **Overlay** 视图校正框
+3. 选择 **train** 或 **val**
+4. 点击 **Export YOLO Labels**
+5. 在文件夹对话框中选择数据集根目录（默认建议 `backend/data/facade_yolo_custom`）
+6. 确认状态栏成功消息中的 `images/` 与 `labels/` 路径
+
+**导出内容：**
+
+- 复制当前 rectified 图片 → `{dataset}/{split}/images/<stem>.jpg`
+- 由 Overlay 框生成 YOLO txt → `{dataset}/{split}/labels/<stem>.txt`
+- class 0 = window，class 1 = door（与上文一致）
+- 仅导出**首层**开洞（训练立面检测用）；门仅在 **Door width > 0** 时导出
+
+**典型迭代：**
+
+```text
+Detect → Overlay 删误检/补漏检 → Export (train) × N 张
+→ 挑 2–3 张 Export (val) → train_yolo_facade.py → 再 Detect 验证
+```
+
+---
+
+## 7. 用 Geomora Workspace 辅助（外部工具对照）
+
+若使用 LabelImg 等外部工具，仍可用 Workspace Overlay 作**视觉参考**（当前不会自动同步到 LabelImg 项目）：
 
 1. **Rectify** 后 **Detect Elements**（Auto / YOLO / Facade row）
 2. 切换到 **Rectified** 或 **Overlay** 视图
@@ -204,13 +233,13 @@ Workspace **Overlay** 用于**人工校正检测框**，当前**不会**自动�
    - 点击框选中 → 拖角点缩放 / 拖动平移
    - **Delete selected**：删除误检
    - 门：在 Inspector 填写 **Door width > 0** 后才会显示门框
-4. 对照 Overlay 上的框，在 LabelImg 里标到**同一位置**（或按上文公式从 `bbox_norm` 手算 YOLO 行）
+4. 对照 Overlay 上的框，在 LabelImg 里标到**同一位置**（或按第 3 节公式从 `bbox_norm` 手算 YOLO 行）
 
-这样可以把自动检测当作“初稿”，人工标注仍以外部工具为准。
+这样可以把自动检测当作“初稿”；**优先用第 6 节一键导出**，外部工具适合批量精修或团队审核。
 
 ---
 
-## 7. 标注质量检查清单
+## 8. 标注质量检查清单
 
 标完一批后，逐项核对：
 
@@ -235,7 +264,7 @@ cd F:\development\Geomora\backend
 
 ---
 
-## 8. 训练与迭代
+## 9. 训练与迭代
 
 1. 将标注好的目录放在 `backend/data/facade_yolo_custom/`
 2. 训练（会自动合并 custom 数据）：
@@ -265,7 +294,10 @@ cd F:\development\Geomora\backend
 
 ---
 
-## 9. 常见问题
+## 10. 常见问题
+
+**Q：Workspace 能直接导出 YOLO 吗？**  
+A：可以。**Export YOLO Labels** 会把当前 Overlay 框 + rectified 图写入 `facade_yolo_custom/{train|val}/`。见第 6 节。
 
 **Q：能否直接标原始照片？**  
 A：不建议。检测管线假设输入接近正立面；请先 Workspace **Rectify**。
@@ -284,7 +316,7 @@ A：把漏检/误检案例加入 val，标好后重训；优先增加**与失败
 
 ---
 
-## 10. 最小示例（可复制）
+## 11. 最小示例（可复制）
 
 `building_001.txt`（800×600 正立面，左下门 + 上方四窗）：
 

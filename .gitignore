@@ -22,7 +22,13 @@ desktop.ini
 backend/.venv/
 backend/runs/
 backend/data/
+backend/cache/
+backend/yolov8n.pt
+backend/models/*.pt
 backend/models/*.onnx
 backend/models/*.onnx_data
 .pytest_tmp/
 plugin/geomora/cache/
+examples/real_photos/perspective/
+examples/real_photos/rectified/
+!examples/real_photos/rectified/facade_rectified_synthetic.jpg

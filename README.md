@@ -8,6 +8,8 @@ Phase 0 implements the **Architectural IR** and **SketchUp Native Geometry Kerne
 
 **Phase 2** (core complete): perspective rectification + manual 4-corner UI — see [PHASE_2.md](docs/PHASE_2.md). Requires local Python backend (`backend/start_server.bat`).
 
+**Current focus:** Real Photo Stage A benchmark — see [ROADMAP.md](docs/ROADMAP.md) and [REAL_PHOTO_ACCEPTANCE.md](docs/REAL_PHOTO_ACCEPTANCE.md).
+
 **Phase 6** (core + 6.5 + 6.5+ + 6.5+++): multi-view registration, opening fusion, neural/COLMAP depth — see [PHASE_6.md](docs/PHASE_6.md).
 
 **Phase 7** (+ 7+): floor, roof, column, beam, stair, balcony, parapet, cornice — see [PHASE_7.md](docs/PHASE_7.md).
@@ -99,11 +101,11 @@ ruby tests/run_tests.rb
 
 ## Documentation
 
+- [ROADMAP.md](docs/ROADMAP.md) — **milestones and priorities (canonical)**
+- [REAL_PHOTO_ACCEPTANCE.md](docs/REAL_PHOTO_ACCEPTANCE.md) — Stage A benchmark workflow
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - [IR.md](docs/IR.md)
-- [PHASE_0.md](docs/PHASE_0.md)
-- [PHASE_1.md](docs/PHASE_1.md) — complete
-- [PHASE_2.md](docs/PHASE_2.md) — planning
+- [PHASE_0.md](docs/PHASE_0.md) through [PHASE_7.md](docs/PHASE_7.md) — layer design (no progress claims)
 
 ## License
 

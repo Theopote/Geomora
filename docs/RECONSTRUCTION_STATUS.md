@@ -1,6 +1,7 @@
 # Geomora Reconstruction Status (Master Doc Alignment)
 
-**Updated:** v0.35.0  
+**Updated:** v0.36.0  
+**Milestone progress:** `docs/ROADMAP.md` (canonical)  
 **Canonical references:** `docs/Geomora Phase 0 — Cursor Master Prompt v0.1.md`, `docs/Geomora 技术架构与开发手册 v0.1.md`
 
 Geomora's core mission:
@@ -96,12 +97,16 @@ Synthetic acceptance assets:
 
 ## Still open (next priorities)
 
+See **`docs/ROADMAP.md`** for the canonical queue. Summary:
+
 | Priority | Item |
 |----------|------|
-| P0 | Fine-tune `yolo_v1` on **real** rectified facades — label with `docs/YOLO_LABELING.md`, train via `docs/YOLO_TRAINING.md` |
-| P0 | Complete **real photo Stage A** sign-off — `docs/REAL_PHOTO_ACCEPTANCE.md` §7 |
-| P1 | Video metadata in IR `sources[]` (video_id, frame_index, timestamp) |
-| P2 | Full constraint graph solver |
+| **P0** | **A1** Real Photo Benchmark — 20 photos, baseline recorded |
+| **P0** | **A2** Failure-driven improvement (YOLO / Rectify / Scale / Rationalize only) |
+| **P0** | **A3** Reconstruction Gate — hold-out ≥4/5, val recall ≥0.80 |
+| P0 (post-A3) | Constraint Graph Solver |
+| P1 | Video metadata in IR `sources[]` |
+| P1 | Evidence-driven SAM / depth inclusion |
 | P2 | Vision-driven floor plan / storey inference |
 
 ---

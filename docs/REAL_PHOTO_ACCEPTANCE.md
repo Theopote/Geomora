@@ -6,10 +6,12 @@
 
 | 文档 | 用途 |
 |------|------|
+| `docs/ROADMAP.md` | **唯一里程碑进度源**（A1/A2/A3） |
 | `docs/ACCEPTANCE.md` | 合成数据 + 功能清单 |
 | `docs/YOLO_LABELING.md` | 标注与 Workspace 导出 |
 | `docs/YOLO_TRAINING.md` | 重训 YOLO |
-| `docs/RECONSTRUCTION_STATUS.md` | 总体进度 |
+| `docs/MODEL_ARTIFACT_POLICY.md` | 模型/数据集不进 git |
+| `docs/RECONSTRUCTION_STATUS.md` | 技术交付日志 |
 
 ---
 
@@ -47,27 +49,39 @@ python ..\examples\generate_rectified_fixture.py
 
 ---
 
-## 2. 准备真实样本
+## 2. 准备真实样本（A1 基准：20 张）
 
-建议首批 **5–10 张**，覆盖不同场景：
+Stage A 使用 **20 张**真实建筑照片（不是 5 张），按类别与 split 组织：
 
-| 类型 | 说明 |
+| 类别 | 数量 |
 |------|------|
-| 标准行列窗 + 单门 | 最常见住宅立面 |
-| 无门立面 | 验证 door 不误检 |
-| 暗光 / 反光 | 检测鲁棒性 |
-| 遮挡（树、车） | 允许 Overlay 手修 |
-| 视频关键帧 | Load Video → 选帧 → 同上流程 |
+| 普通住宅立面 | 5 |
+| 办公建筑 | 3 |
+| 老建筑 | 3 |
+| 商业立面 | 3 |
+| 被树遮挡 | 2 |
+| 强透视 | 2 |
+| 暗光/反光 | 2 |
+
+| Split | 数量 | 规则 |
+|-------|------|------|
+| train | 10 | 可 Export YOLO Labels 并重训 |
+| val | 5 | 仅用于 `accept_real_photos.py --split val` |
+| **hold-out** | **5** | **绝不参与训练** — 最终 Gate 用 |
+
+清单文件：`examples/real_photos/benchmark/manifest.json`
 
 目录建议：
 
 ```text
 examples/real_photos/
-  perspective/     # 原始照片（SketchUp 里 Load Image 用）
-  rectified/       # 可选：已 Rectify 的图，供 CLI 批量检测
+  benchmark/manifest.json   # 进 git（仅元数据）
+  perspective/              # 原始照片（gitignore）
+  rectified/              # 本地 rectified（gitignore，除合成 fixture）
+backend/cache/            # 本地验收缓存（gitignore）
 ```
 
-`perspective/` 不进 git 亦可；`rectified/` 可放脱敏样本供团队 CLI 验收。
+原始照片与 rectified 不进 git；见 `docs/MODEL_ARTIFACT_POLICY.md`。
 
 ---
 
@@ -96,20 +110,43 @@ Load Image（或 Load Video → 选帧）
 | R4 | Overlay 修正后 **Export YOLO Labels (train)** | ☐ |
 | R5 | Generate 后立面比例可接受（不要求毫米级精度） | ☐ |
 
-### 批次通过标准（Stage A）
+### 批次通过标准（Stage A · A3 Gate）
 
 | 指标 | 最低要求 |
 |------|----------|
-| 样本数 | ≥ **5** 张不同建筑/角度 |
-| 成功率 | ≥ **4/5** 在 Overlay 轻微修正后可 Generate |
-| 阻塞缺陷 | 无「Rectify 完全失败」且无法手调四角的情况 |
+| 样本数 | **20** 张（manifest 定义） |
+| hold-out 成功率 | ≥ **4/5** 在 Overlay 轻微修正（~1 分钟）后可 Generate |
+| val window recall | ≥ **0.80**（A3 目标；A1 基线 0.70） |
+| train 标注 | ≥ **10** 张 Export 并重训 YOLO 一次 |
+| 阻塞缺陷 | 无「Rectify 完全失败」且无法手调四角 |
+
+### Reconstruction Quality Score（RQS）
+
+**最终指标是 Photo → 可用 SketchUp 模型**，不是 YOLO IoU。每张图满分 100：
+
+| 维度 | 分值 |
+|------|------|
+| Perspective Rectification | 15 |
+| Opening Detection | 20 |
+| Opening Placement | 15 |
+| Scale | 10 |
+| Pattern Rationalization | 10 |
+| Geometry Validity | 15 |
+| SketchUp Editability | 10 |
+| Human Correction Cost | 5 |
+
+A1 基线：在 SketchUp 人工验收时填写 RQS，写入 `cache/benchmark_a1_e2e.json` 的 `e2e.rqs` 字段。
+
+失败分类（A2 只修这些）：
+
+`missed_window` · `false_window` · `missed_door` · `false_door` · `bad_rectify` · `wrong_scale` · `wrong_pattern` · `invalid_geometry` · `generate_failed`
 
 记录表（可复制）：
 
 ```text
-| 文件名 | Rectify | 窗(检/真) | 门 | Overlay 修正 | Generate | 备注 |
-|--------|---------|-----------|-----|--------------|----------|------|
-|        | OK/FAIL |           | Y/N | 无/轻/重     | OK/FAIL  |      |
+| ID | Split | Rectify | 窗(检/真) | 门 | Overlay | Generate | RQS | 失败类 | 备注 |
+|----|-------|---------|-----------|-----|---------|----------|-----|--------|------|
+|    |       | OK/FAIL |           | Y/N | 无/轻/重 | OK/FAIL  | /100 |        |      |
 ```
 
 ---
@@ -181,17 +218,20 @@ SketchUp 复测同一批照片
 
 ---
 
-## 7. Stage A 签字标准
+## 7. Stage A 签字标准（A3 Reconstruction Gate）
 
-满足以下全部条件，可认为 **Phase 3 真实照片 Stage A 验收通过**：
+满足以下全部条件，可认为 **真实照片 Stage A 验收通过**（见 `docs/ROADMAP.md`）：
 
 1. 合成基线（§1）通过  
-2. ≥5 张真实照片完成 §3 checklist，≥4/5 Generate 成功  
-3. 至少 **10 张** train 标注已 Export 并重训 YOLO 一次  
-4. `accept_real_photos.py --split val` 在 val 集上 window recall ≥ 0.70  
-5. 验收记录表与 `cache/real_photo_acceptance.json` 已存档  
+2. A1：20 张 manifest 照片完成检测基线 + SketchUp E2E 记录  
+3. A2：仅按失败分类改进检测/Rectify/Scale/Rationalize  
+4. hold-out **≥4/5** 轻度 Overlay 后可 Generate；单张修正 ~1 分钟  
+5. train ≥10 张标注 Export 并重训 YOLO 一次  
+6. `accept_real_photos.py --split val` window recall ≥ **0.80**  
+7. `cache/benchmark_a1_e2e.json` 与 `cache/real_photo_acceptance.json` 已存档  
 
-Stage B（后续）：多视角 Fuse、SAM 精修、毫米级尺度 — 不在本清单范围。
+**A3 之后**才进入 Constraint Graph Solver（`docs/ROADMAP.md` B0）。  
+Stage B：多视角 Fuse、证据驱动的 SAM — 不在本清单范围。
 
 ---
 
@@ -201,13 +241,23 @@ Stage B（后续）：多视角 Fuse、SAM 精修、毫米级尺度 — 不在�
 # 健康检查
 curl http://127.0.0.1:8765/health
 
+# A1 检测基线（20 张 manifest）
+.\.venv\Scripts\python scripts\run_real_photo_benchmark.py
+.\.venv\Scripts\python scripts\run_real_photo_benchmark.py --split holdout
+
+# 全量检测 smoke（本地 cache 全部图）
+.\.venv\Scripts\python scripts\accept_real_photos.py --images cache\real_photo_desktop_rectified --method auto --report cache\benchmark_a1_detection.json
+
+# 可视化验收包（P0 优先）
+.\.venv\Scripts\python scripts\export_real_photo_review.py --images cache\real_photo_desktop_rectified --report cache\benchmark_a1_detection.json --rectify-log cache\real_photo_rectify_log.json --out cache\real_photo_review
+
 # 合成 YOLO 验证
 .\.venv\Scripts\python scripts\validate_yolo_facade.py
 
-# val 集指标
+# val 集指标（有标注后）
 .\.venv\Scripts\python scripts\accept_real_photos.py --dataset data\facade_yolo_custom --split val --method auto
 
-# 重训
+# 重训（仅用 train split，禁止 hold-out）
 .\.venv\Scripts\python scripts\train_yolo_facade.py --epochs 80
 
 # 打包插件

@@ -1,27 +1,36 @@
-# Real building photos (local acceptance)
+# Real building photos (Stage A benchmark)
 
-Place your **local** test photos here. These paths are for manual / CLI acceptance — do not commit private photos unless your team policy allows it.
+**Milestone:** A1 — see `docs/ROADMAP.md` and `docs/REAL_PHOTO_ACCEPTANCE.md`.
+
+## Layout
 
 ```text
-perspective/    # Original photos → load in SketchUp Workspace
-rectified/      # Optional pre-rectified images → CLI batch detect
+benchmark/manifest.json   # 20 photos, splits, categories (in git)
+perspective/              # Original photos (gitignored)
+rectified/                # Local rectified copies (gitignored)
 ```
 
-## SketchUp workflow
+## A1 workflow
 
-See **`docs/REAL_PHOTO_ACCEPTANCE.md`** §3.
-
-## CLI smoke test (rectified folder)
+1. Place originals in `perspective/` (or use existing `backend/cache/real_photo_desktop_src/`)
+2. Rectify in SketchUp Workspace → save to `backend/cache/real_photo_desktop_rectified/`
+3. Run detection baseline:
 
 ```powershell
 cd F:\development\Geomora\backend
-.\.venv\Scripts\python scripts\accept_real_photos.py --images ..\examples\real_photos\rectified --method auto
+.\.venv\Scripts\python scripts\run_real_photo_benchmark.py
+.\.venv\Scripts\python scripts\accept_real_photos.py --images cache\real_photo_desktop_rectified --method auto --report cache\benchmark_a1_detection.json
 ```
 
-## CLI with labels
+4. Open `cache/real_photo_review/index.html` for P0-first visual review
+5. SketchUp E2E pass on all 20 manifest images — fill RQS in `cache/benchmark_a1_e2e.json`
 
-Export labels from Workspace into `backend/data/facade_yolo_custom/`, then:
+## Splits
 
-```powershell
-.\.venv\Scripts\python scripts\accept_real_photos.py --dataset data\facade_yolo_custom --split val --report cache\real_photo_acceptance.json
-```
+| Split | Count | Rule |
+|-------|-------|------|
+| train | 10 | Export YOLO labels, retrain OK |
+| val | 5 | Metrics only |
+| hold-out | 5 | **Never train** — final gate |
+
+Hold-out IDs: `photo_16` … `photo_20` in `benchmark/manifest.json`.

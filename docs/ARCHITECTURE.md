@@ -59,18 +59,28 @@ This boundary ensures AI can be swapped, upgraded, or run offline without touchi
 
 ## Phase Roadmap
 
-| Phase | Status | Focus |
-|---|---|---|
-| 0 | Complete | IR + SketchUp geometry kernel |
-| 1 | Complete | HtmlDialog workspace + manual facade definition |
-| 2 | Complete (core) | Perspective rectification (OpenCV, local Python); manual 4-corner UI v0.5.0 |
-| 3 | Real-photo path v0.33 | Semantic detection + `facade_row_v1` + auto scale; YOLO training for production photos |
-| 4 | Complete (core) | Geometry rationalization — snap, equal spacing, symmetry |
-| 5 | Complete (core) | Pattern intelligence — bay detection, shared components |
-| 6 | Complete (core) | Multi-view registration + fusion (6.5) |
-| 7+ | Future | Full building elements |
+Design details: `docs/PHASE_0.md` … `docs/PHASE_7.md`, `docs/ACCEPTANCE.md`.
 
-See `docs/PHASE_0.md` … `PHASE_6.md`, `ACCEPTANCE.md`.
+**Milestone progress:** see `docs/ROADMAP.md` (canonical — this table is design-only).
+
+| Phase | Focus |
+|---|---|
+| 0 | IR + SketchUp geometry kernel |
+| 1 | HtmlDialog workspace + manual facade definition |
+| 2 | Perspective rectification (OpenCV, local Python); manual 4-corner UI |
+| 3 | Semantic detection + `facade_row_v1` + auto scale; YOLO training |
+| 4 | Geometry rationalization — snap, equal spacing, symmetry |
+| 5 | Pattern intelligence — bay detection, shared components |
+| 6 | Multi-view registration + fusion |
+| 7+ | Parametric building elements (floor, roof, stair, …) |
+
+## Perception boundary
+
+```text
+Perception → Observation Graph → Understanding → Constraint Graph → IR → SketchUp
+```
+
+See `docs/OBSERVATION_LAYER.md`. The SketchUp Generator still has no knowledge of detector provenance (ADR-001).
 
 ## Key Design Decisions (ADRs)
 

@@ -1,0 +1,173 @@
+{
+  "version": "a1-v1",
+  "description": "Real Photo Stage A benchmark — 20 photos, train/val/hold-out. Hold-out NEVER used for YOLO training.",
+  "created": "2026-08-16",
+  "image_root": "backend/cache/real_photo_desktop_rectified",
+  "perspective_root": "backend/cache/real_photo_desktop_src",
+  "category_targets": {
+    "residential": 5,
+    "office": 3,
+    "old_building": 3,
+    "commercial": 3,
+    "tree_occluded": 2,
+    "strong_perspective": 2,
+    "low_light_reflection": 2
+  },
+  "split_targets": {
+    "train": 10,
+    "val": 5,
+    "holdout": 5
+  },
+  "images": [
+    {
+      "id": "photo_01",
+      "file": "0c16490709f73dab8b89c614d789a383.jpg",
+      "split": "train",
+      "category": "residential",
+      "notes": "5 windows, auto_full_frame rectify"
+    },
+    {
+      "id": "photo_02",
+      "file": "0dd26eed0cc68659a73ee6380a0990a5.jpg",
+      "split": "train",
+      "category": "residential",
+      "notes": "2 windows + door"
+    },
+    {
+      "id": "photo_03",
+      "file": "2616b29ae632ac1af2fb7fa656750917.jpg",
+      "split": "train",
+      "category": "residential",
+      "notes": "4 windows"
+    },
+    {
+      "id": "photo_04",
+      "file": "2aa8c66ea11c9926e99c6e7f75481fbb.jpg",
+      "split": "train",
+      "category": "residential",
+      "notes": "2 windows + door"
+    },
+    {
+      "id": "photo_05",
+      "file": "7be1b0a8a8c83bf5853aec7b74057c05.jpg",
+      "split": "train",
+      "category": "residential",
+      "notes": "3 windows + door"
+    },
+    {
+      "id": "photo_06",
+      "file": "3bb64ded1dd83f5696c49e3912b21b7b.jpg",
+      "split": "train",
+      "category": "office",
+      "notes": "2 windows, tall aspect"
+    },
+    {
+      "id": "photo_07",
+      "file": "4fef50fa904f66d8b4627efe9f1a9c61.jpg",
+      "split": "train",
+      "category": "office",
+      "notes": "2 windows"
+    },
+    {
+      "id": "photo_08",
+      "file": "a75977b661c3ea427f87b4015974e8ba.jpg",
+      "split": "train",
+      "category": "old_building",
+      "notes": "3 windows, facade_row"
+    },
+    {
+      "id": "photo_09",
+      "file": "4288e0fc2ee6aa9a24cc3e1a25bd6a28.jpg",
+      "split": "train",
+      "category": "old_building",
+      "notes": "1 window + door"
+    },
+    {
+      "id": "photo_10",
+      "file": "d8e38eadf07c14a6fa706883f444ea0c.jpg",
+      "split": "train",
+      "category": "commercial",
+      "notes": "2 windows, high conf"
+    },
+    {
+      "id": "photo_11",
+      "file": "025123d59801215ad27eafd1693f7cf8.jpg",
+      "split": "val",
+      "category": "commercial",
+      "notes": "3 windows, low conf 0.47"
+    },
+    {
+      "id": "photo_12",
+      "file": "86409266e1df0b959411fc5e44b9e0de.jpg",
+      "split": "val",
+      "category": "low_light_reflection",
+      "notes": "2 windows, low conf 0.47"
+    },
+    {
+      "id": "photo_13",
+      "file": "5bd6374a9fe522bb94b94fec90c358c5.jpg",
+      "split": "val",
+      "category": "commercial",
+      "notes": "8 windows — check false positives"
+    },
+    {
+      "id": "photo_14",
+      "file": "8b93459eebd9944f31e14b22fb22ce54.jpg",
+      "split": "val",
+      "category": "office",
+      "notes": "8 windows — check false positives"
+    },
+    {
+      "id": "photo_15",
+      "file": "cd5e7dc87e824501cf4b316d10e599a3.jpg",
+      "split": "val",
+      "category": "strong_perspective",
+      "notes": "2 windows + door, auto_full_frame"
+    },
+    {
+      "id": "photo_16",
+      "file": "d5550fb8626cddd9b76789b823a59e8f.jpg",
+      "split": "holdout",
+      "category": "strong_perspective",
+      "notes": "P0_FAIL: 0 windows, 1 door — DO NOT TRAIN"
+    },
+    {
+      "id": "photo_17",
+      "file": "f6b7c5c2b9bd63cdb2e848c9b59627ff.jpg",
+      "split": "holdout",
+      "category": "low_light_reflection",
+      "notes": "P0_FAIL: 0 windows, 1 door — DO NOT TRAIN"
+    },
+    {
+      "id": "photo_18",
+      "file": "9edb3d78f87794960d82c82dafae789b.jpg",
+      "split": "holdout",
+      "category": "tree_occluded",
+      "notes": "P0_LOW_CONF 0.38 — DO NOT TRAIN"
+    },
+    {
+      "id": "photo_19",
+      "file": "5ea1e19bd267bfc79851e67b56d1fcd6.jpg",
+      "split": "holdout",
+      "category": "old_building",
+      "notes": "10 windows — over-detection risk — DO NOT TRAIN"
+    },
+    {
+      "id": "photo_20",
+      "file": "256a0a906dd5eab45ce95c51cfa12b7a.jpg",
+      "split": "holdout",
+      "category": "tree_occluded",
+      "notes": "7 windows + door, auto_full_frame — DO NOT TRAIN"
+    }
+  ],
+  "excluded_from_benchmark": [
+    "5121f3ca8edcf1fefc5efb424e67f1ce.jpg",
+    "5645ecc5f9b95f31b311764f7edd67b4.jpg",
+    "a7f37f4720aabdbcb3408193b48355e9.jpg",
+    "acc0baa45e373961f2c43ca8a6414d67.jpg",
+    "c605df4d5d8581d9f7d4a7ec118ecea8.jpg",
+    "d3cf989c6cd73a3a4aee05534eac398f.jpg",
+    "da5b79a2b2db4e061c37b403468c3106.jpg",
+    "ef473f5e864c9d375a93515f8535e157.jpg"
+  ]
+}

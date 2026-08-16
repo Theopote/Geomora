@@ -3,7 +3,9 @@
 module Geomora
   module Core
     class LodScenePages
-      PAGE_FLAGS = if defined?(Sketchup::Page)
+      PAGE_FLAGS = if defined?(::PAGE_USE_LAYER_VISIBILITY)
+                     ::PAGE_USE_LAYER_VISIBILITY
+                   elsif defined?(Sketchup::Page) && Sketchup::Page.const_defined?(:PAGE_USE_LAYER_VISIBILITY)
                      Sketchup::Page::PAGE_USE_LAYER_VISIBILITY
                    else
                      64

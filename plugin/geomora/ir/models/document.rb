@@ -45,6 +45,9 @@ module Geomora
       Column = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
       Beam = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
       Stair = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
+      Balcony = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
+      Parapet = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
+      Cornice = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
 
       Opening = Struct.new(
         :id, :type, :parent_id, :geometry, :component, :confidence, :source,

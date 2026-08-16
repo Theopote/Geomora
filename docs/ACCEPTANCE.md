@@ -5,7 +5,7 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 ## Prerequisites
 
 - [ ] Python backend responds at `http://127.0.0.1:8765/health`
-- [ ] SketchUp extension **Geomora** enabled (v0.14.0+)
+- [ ] SketchUp extension **Geomora** enabled (v0.15.0+)
 - [ ] Fixture available: `examples/facade_perspective_synthetic.jpg`
 
 ## Phase 2 — Rectification
@@ -66,6 +66,14 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 7.2 | Enable Columns + Beam + Stair → Generate | Tagged groups under storey |
 | 7.3 | Element tree | Shows enabled building elements before Generate |
 | 7.4 | Validate | Passes with floor/roof in IR |
+
+## Phase 7+ — Exterior details
+
+| # | Step | Expected |
+|---|---|---|
+| 7.5 | Enable Balcony → Generate | `Geomora_Balconies` tag; slab at first window sill |
+| 7.6 | Enable Parapet + Cornice → Generate | `Geomora_Parapets` / `Geomora_Cornices` tags |
+| 7.7 | Element tree | Shows balcony, parapet, cornice when enabled |
 
 ## Known limitations (acceptable for Stage A)
 

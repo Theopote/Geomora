@@ -909,7 +909,10 @@
         roof: formData.get('include_roof') === 'on',
         columns: formData.get('include_columns') === 'on',
         beam: formData.get('include_beam') === 'on',
-        stair: formData.get('include_stair') === 'on'
+        stair: formData.get('include_stair') === 'on',
+        balcony: formData.get('include_balcony') === 'on',
+        parapet: formData.get('include_parapet') === 'on',
+        cornice: formData.get('include_cornice') === 'on'
       },
       windows: windows,
       door: {

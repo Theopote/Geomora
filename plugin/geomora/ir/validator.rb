@@ -100,6 +100,12 @@ module Geomora
               validate_beam(element, storey)
             when 'stair'
               validate_stair(element, storey)
+            when 'balcony'
+              validate_balcony(element, storey)
+            when 'parapet'
+              validate_parapet(element, storey)
+            when 'cornice'
+              validate_cornice(element, storey)
             else
               @errors << "Unsupported element type: #{element.type}"
             end
@@ -271,6 +277,34 @@ module Geomora
       def validate_stair(element, storey)
         validate_storey_reference(element, storey)
         %i[width run rise steps].each do |dim|
+          val = element.geometry[dim]
+          @errors << "Zero #{dim} on #{element.id}" if val.to_f.zero?
+        end
+      end
+
+      def validate_balcony(element, storey)
+        validate_storey_reference(element, storey)
+        %i[width depth thickness].each do |dim|
+          val = element.geometry[dim]
+          @errors << "Zero #{dim} on #{element.id}" if val.to_f.zero?
+        end
+      end
+
+      def validate_parapet(element, storey)
+        validate_storey_reference(element, storey)
+        baseline = element.geometry[:baseline]
+        @errors << "Invalid baseline for #{element.id}" if baseline.nil? || baseline.length != 2
+        %i[height thickness].each do |dim|
+          val = element.geometry[dim]
+          @errors << "Zero #{dim} on #{element.id}" if val.to_f.zero?
+        end
+      end
+
+      def validate_cornice(element, storey)
+        validate_storey_reference(element, storey)
+        baseline = element.geometry[:baseline]
+        @errors << "Invalid baseline for #{element.id}" if baseline.nil? || baseline.length != 2
+        %i[width height projection].each do |dim|
           val = element.geometry[dim]
           @errors << "Zero #{dim} on #{element.id}" if val.to_f.zero?
         end

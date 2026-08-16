@@ -26,6 +26,9 @@ module Geomora
     generators/column_generator
     generators/beam_generator
     generators/stair_generator
+    generators/balcony_generator
+    generators/parapet_generator
+    generators/cornice_generator
     generators/opening_generator
     generators/window_generator
     generators/door_generator

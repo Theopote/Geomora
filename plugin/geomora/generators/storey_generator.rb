@@ -9,6 +9,9 @@ require_relative 'roof_generator'
 require_relative 'column_generator'
 require_relative 'beam_generator'
 require_relative 'stair_generator'
+require_relative 'balcony_generator'
+require_relative 'parapet_generator'
+require_relative 'cornice_generator'
 require_relative '../metadata/attributes'
 
 module Geomora
@@ -68,6 +71,24 @@ module Geomora
           project_id: context[:project_id],
           schema_version: context[:schema_version]
         )
+        @balcony_gen = BalconyGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version]
+        )
+        @parapet_gen = ParapetGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version]
+        )
+        @cornice_gen = CorniceGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version]
+        )
       end
 
       def generate(storey, building_group, document)
@@ -97,6 +118,12 @@ module Geomora
             @beam_gen.generate(element, storey.elevation, storey_group.entities)
           when 'stair'
             @stair_gen.generate(element, storey.elevation, storey_group.entities)
+          when 'balcony'
+            @balcony_gen.generate(element, storey.elevation, storey_group.entities)
+          when 'parapet'
+            @parapet_gen.generate(element, storey.elevation, storey_group.entities)
+          when 'cornice'
+            @cornice_gen.generate(element, storey.elevation, storey_group.entities)
           end
         end
 

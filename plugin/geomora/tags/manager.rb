@@ -11,6 +11,9 @@ module Geomora
       Geomora_Columns
       Geomora_Beams
       Geomora_Stairs
+      Geomora_Balconies
+      Geomora_Parapets
+      Geomora_Cornices
       Geomora_Reference
     ].freeze
 

@@ -3,7 +3,7 @@
 module Geomora
   module Core
     class BuildingComposer
-      SUPPORTED_ELEMENTS = %w[floor roof column beam stair].freeze
+      SUPPORTED_ELEMENTS = %w[floor roof column beam stair balcony parapet cornice].freeze
 
       def self.compose(params, wall_length:, wall_height:, wall_thickness:, storey_id:)
         new(params, wall_length: wall_length, wall_height: wall_height,
@@ -25,6 +25,9 @@ module Geomora
         elements.concat(column_elements) if enabled?(:columns)
         elements << beam_element if enabled?(:beam)
         elements << stair_element if enabled?(:stair)
+        elements << balcony_element if enabled?(:balcony)
+        elements << parapet_element if enabled?(:parapet)
+        elements << cornice_element if enabled?(:cornice)
         elements
       end
 
@@ -169,6 +172,77 @@ module Geomora
       def int_param(key, default)
         value = @params[key]
         value.nil? ? default : value.to_i
+      end
+
+      def first_window
+        windows = @params['windows']
+        return nil unless windows.is_a?(Array)
+
+        windows.find { |win| win.is_a?(Hash) && win['width'].to_f.positive? }
+      end
+
+      def balcony_element
+        win = first_window
+        offset = win ? win['offset'].to_f : 2000
+        width = win ? win['width'].to_f : 2000
+        sill = win ? (win['sill_height'] || 900).to_f : 900
+        depth = float_param('balcony_depth', 1500)
+        thickness = float_param('balcony_thickness', 150)
+
+        {
+          'id' => 'balcony_001',
+          'type' => 'balcony',
+          'storey_id' => @storey_id,
+          'geometry' => {
+            'position' => [offset, 0, sill],
+            'width' => width,
+            'depth' => depth,
+            'thickness' => thickness,
+            'direction' => -1
+          },
+          'semantic' => { 'exterior' => true },
+          'confidence' => 1.0
+        }
+      end
+
+      def parapet_element
+        half_depth = building_depth / 2.0
+        top_z = @wall_height + roof_thickness
+        height = float_param('parapet_height', 900)
+        thickness = float_param('parapet_thickness', 200)
+
+        {
+          'id' => 'parapet_001',
+          'type' => 'parapet',
+          'storey_id' => @storey_id,
+          'geometry' => {
+            'baseline' => [[0, -half_depth, top_z], [@wall_length, -half_depth, top_z]],
+            'height' => height,
+            'thickness' => thickness
+          },
+          'semantic' => { 'exterior' => true },
+          'confidence' => 1.0
+        }
+      end
+
+      def cornice_element
+        cornice_height = float_param('cornice_height', 250)
+        projection = float_param('cornice_projection', 300)
+        z = @wall_height - cornice_height
+
+        {
+          'id' => 'cornice_001',
+          'type' => 'cornice',
+          'storey_id' => @storey_id,
+          'geometry' => {
+            'baseline' => [[0, 0, z], [@wall_length, 0, z]],
+            'width' => @wall_thickness,
+            'height' => cornice_height,
+            'projection' => projection
+          },
+          'semantic' => { 'exterior' => true },
+          'confidence' => 1.0
+        }
       end
     end
   end

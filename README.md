@@ -10,7 +10,7 @@ Phase 0 implements the **Architectural IR** and **SketchUp Native Geometry Kerne
 
 **Phase 6** (core + 6.5 + 6.5+ + 6.5+++): multi-view registration, opening fusion, neural/COLMAP depth — see [PHASE_6.md](docs/PHASE_6.md).
 
-**Phase 7**: floor, roof, column, beam, stair generators — see [PHASE_7.md](docs/PHASE_7.md).
+**Phase 7** (+ 7+): floor, roof, column, beam, stair, balcony, parapet, cornice — see [PHASE_7.md](docs/PHASE_7.md).
 
 Test images: see [examples/README.md](examples/README.md).
 

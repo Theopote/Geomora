@@ -6,7 +6,7 @@ module Geomora
   module IR
     class Parser
       OPENING_TYPES = %w[window door opening].freeze
-      ELEMENT_TYPES = %w[wall floor roof column beam stair].freeze
+      ELEMENT_TYPES = %w[wall floor roof column beam stair balcony parapet cornice].freeze
 
       def self.parse(data)
         new(data).parse
@@ -66,6 +66,9 @@ module Geomora
         when 'column' then parse_column(e)
         when 'beam' then parse_beam(e)
         when 'stair' then parse_stair(e)
+        when 'balcony' then parse_balcony(e)
+        when 'parapet' then parse_parapet(e)
+        when 'cornice' then parse_cornice(e)
         else
           raise UnsupportedSchemaError, "Unsupported element type: #{e['type']}"
         end
@@ -138,6 +141,39 @@ module Geomora
         )
       end
 
+      def parse_balcony(e)
+        Models::Balcony.new(
+          id: e['id'],
+          type: e['type'],
+          storey_id: e['storey_id'],
+          geometry: symbolize_geometry(e['geometry']),
+          semantic: e['semantic'] || {},
+          confidence: e['confidence']
+        )
+      end
+
+      def parse_parapet(e)
+        Models::Parapet.new(
+          id: e['id'],
+          type: e['type'],
+          storey_id: e['storey_id'],
+          geometry: symbolize_geometry(e['geometry']),
+          semantic: e['semantic'] || {},
+          confidence: e['confidence']
+        )
+      end
+
+      def parse_cornice(e)
+        Models::Cornice.new(
+          id: e['id'],
+          type: e['type'],
+          storey_id: e['storey_id'],
+          geometry: symbolize_geometry(e['geometry']),
+          semantic: e['semantic'] || {},
+          confidence: e['confidence']
+        )
+      end
+
       def collect_openings
         openings = @data['openings'] || []
         openings.map { |o| parse_opening(o) }
@@ -195,7 +231,9 @@ module Geomora
           origin: geo['origin'],
           run: geo['run'],
           rise: geo['rise'],
-          steps: geo['steps']
+          steps: geo['steps'],
+          direction: geo['direction'],
+          projection: geo['projection']
         }.compact
       end
     end

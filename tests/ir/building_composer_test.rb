@@ -48,4 +48,31 @@ class BuildingComposerTest < Minitest::Test
     assert_includes types, 'stair'
     assert_equal 10, elements.find { |e| e['type'] == 'stair' }['geometry']['steps']
   end
+
+  def test_compose_exterior_elements
+    params = {
+      'building_elements' => {
+        'balcony' => true,
+        'parapet' => true,
+        'cornice' => true
+      },
+      'windows' => [{ 'offset' => 1200, 'width' => 1800, 'height' => 1500, 'sill_height' => 900 }]
+    }
+
+    elements = Geomora::Core::BuildingComposer.compose(
+      params,
+      wall_length: 10_000,
+      wall_height: 3300,
+      wall_thickness: 240,
+      storey_id: 'storey_01'
+    )
+
+    types = elements.map { |element| element['type'] }
+    assert_includes types, 'balcony'
+    assert_includes types, 'parapet'
+    assert_includes types, 'cornice'
+    balcony = elements.find { |e| e['type'] == 'balcony' }
+    assert_equal 1200, balcony['geometry']['position'][0]
+    assert_equal 1800, balcony['geometry']['width']
+  end
 end

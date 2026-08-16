@@ -1,0 +1,11 @@
+{
+  "total": 28,
+  "by_tier": {
+    "P0_FAIL": 2,
+    "P0_LOW_CONF": 3,
+    "P1_HIGH_WINDOWS": 3,
+    "P1_FULL_FRAME_RECTIFY": 11,
+    "P2_SINGLE_WINDOW": 1,
+    "P2_OK": 8
+  }
+}

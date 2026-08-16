@@ -11,9 +11,9 @@ MAX_IMAGE_DIM = 2048
 
 
 def load_image(path: str) -> np.ndarray:
-    image = cv2.imread(path, cv2.IMREAD_COLOR)
-    if image is None:
-        raise ValueError(f"Could not read image: {path}")
+    from geomora_detect.image_io import imread_bgr
+
+    image = imread_bgr(path)
     return resize_if_needed(image)
 
 

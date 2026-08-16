@@ -1,0 +1,487 @@
+{
+  "method_requested": "sam_v1",
+  "results": [
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\025123d59801215ad27eafd1693f7cf8.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.4707,
+      "window_count": 3,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.594,
+        "opening_span_norm": 0.8416
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\0c16490709f73dab8b89c614d789a383.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.7556,
+      "window_count": 5,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2500,
+        "method": "window_sill",
+        "confidence": 0.75,
+        "opening_span_norm": 0.9971
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\0dd26eed0cc68659a73ee6380a0990a5.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.7767,
+      "window_count": 2,
+      "door_count": 1,
+      "scale_hint": {
+        "wall_length_mm": 5000,
+        "wall_height_mm": 6000,
+        "method": "door_height",
+        "confidence": 0.679,
+        "opening_span_norm": 0.9956
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\256a0a906dd5eab45ce95c51cfa12b7a.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.6187,
+      "window_count": 7,
+      "door_count": 1,
+      "scale_hint": {
+        "wall_length_mm": 4100,
+        "wall_height_mm": 6000,
+        "method": "door_height",
+        "confidence": 0.791,
+        "opening_span_norm": 0.845
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\2616b29ae632ac1af2fb7fa656750917.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.6689,
+      "window_count": 4,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.688,
+        "opening_span_norm": 0.6714
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\2aa8c66ea11c9926e99c6e7f75481fbb.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.7031,
+      "window_count": 2,
+      "door_count": 1,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2450,
+        "method": "door_height",
+        "confidence": 0.66,
+        "opening_span_norm": 0.9689
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\3bb64ded1dd83f5696c49e3912b21b7b.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.7121,
+      "window_count": 2,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.75,
+        "opening_span_norm": 0.8181
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\4288e0fc2ee6aa9a24cc3e1a25bd6a28.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.588,
+      "window_count": 1,
+      "door_count": 1,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 6000,
+        "method": "door_height",
+        "confidence": 0.468,
+        "opening_span_norm": 0.629
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\4fef50fa904f66d8b4627efe9f1a9c61.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.7152,
+      "window_count": 2,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.75,
+        "opening_span_norm": 0.2768
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\5121f3ca8edcf1fefc5efb424e67f1ce.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.7314,
+      "window_count": 2,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 3100,
+        "method": "window_sill",
+        "confidence": 0.75,
+        "opening_span_norm": 0.2827
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\5645ecc5f9b95f31b311764f7edd67b4.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.6712,
+      "window_count": 2,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2600,
+        "method": "window_sill",
+        "confidence": 0.697,
+        "opening_span_norm": 0.5479
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\5bd6374a9fe522bb94b94fec90c358c5.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.7562,
+      "window_count": 8,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.75,
+        "opening_span_norm": 0.7538
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\5ea1e19bd267bfc79851e67b56d1fcd6.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.7456,
+      "window_count": 10,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4900,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.75,
+        "opening_span_norm": 1.0
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\7be1b0a8a8c83bf5853aec7b74057c05.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.6263,
+      "window_count": 3,
+      "door_count": 1,
+      "scale_hint": {
+        "wall_length_mm": 5500,
+        "wall_height_mm": 6000,
+        "method": "door_height",
+        "confidence": 0.774,
+        "opening_span_norm": 0.9372
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\86409266e1df0b959411fc5e44b9e0de.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.4692,
+      "window_count": 2,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 6000,
+        "method": "window_sill",
+        "confidence": 0.504,
+        "opening_span_norm": 0.5569
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\8b93459eebd9944f31e14b22fb22ce54.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.7478,
+      "window_count": 8,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2450,
+        "method": "window_sill",
+        "confidence": 0.75,
+        "opening_span_norm": 0.9315
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\9edb3d78f87794960d82c82dafae789b.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.3825,
+      "window_count": 2,
+      "door_count": 1,
+      "scale_hint": {
+        "wall_length_mm": 4200,
+        "wall_height_mm": 5000,
+        "method": "door_height",
+        "confidence": 0.451,
+        "opening_span_norm": 0.859
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\a75977b661c3ea427f87b4015974e8ba.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.6727,
+      "window_count": 3,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.736,
+        "opening_span_norm": 0.4141
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\a7f37f4720aabdbcb3408193b48355e9.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.818,
+      "window_count": 1,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.75,
+        "opening_span_norm": 0.3559
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\acc0baa45e373961f2c43ca8a6414d67.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.836,
+      "window_count": 1,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.75,
+        "opening_span_norm": 0.834
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\c605df4d5d8581d9f7d4a7ec118ecea8.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.9516,
+      "window_count": 1,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.75,
+        "opening_span_norm": 0.4106
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\cd5e7dc87e824501cf4b316d10e599a3.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.5668,
+      "window_count": 2,
+      "door_count": 1,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.613,
+        "opening_span_norm": 0.9995
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\d3cf989c6cd73a3a4aee05534eac398f.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.6756,
+      "window_count": 3,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.685,
+        "opening_span_norm": 0.2825
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\d5550fb8626cddd9b76789b823a59e8f.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.348,
+      "window_count": 0,
+      "door_count": 1,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 6000,
+        "method": "door_height",
+        "confidence": 0.348,
+        "opening_span_norm": 0.25
+      },
+      "passed": false,
+      "notes": [
+        "expected at least 1 windows, found 0"
+      ]
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\d8e38eadf07c14a6fa706883f444ea0c.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.9293,
+      "window_count": 2,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.75,
+        "opening_span_norm": 0.2745
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\da5b79a2b2db4e061c37b403468c3106.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.8674,
+      "window_count": 1,
+      "door_count": 0,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 2400,
+        "method": "window_sill",
+        "confidence": 0.75,
+        "opening_span_norm": 0.5311
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\ef473f5e864c9d375a93515f8535e157.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.5725,
+      "window_count": 2,
+      "door_count": 1,
+      "scale_hint": {
+        "wall_length_mm": 6100,
+        "wall_height_mm": 6000,
+        "method": "door_height",
+        "confidence": 0.7,
+        "opening_span_norm": 0.9989
+      },
+      "passed": true,
+      "notes": []
+    },
+    {
+      "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\f6b7c5c2b9bd63cdb2e848c9b59627ff.jpg",
+      "label_path": null,
+      "method": "sam_v1",
+      "confidence": 0.519,
+      "window_count": 0,
+      "door_count": 1,
+      "scale_hint": {
+        "wall_length_mm": 4000,
+        "wall_height_mm": 6000,
+        "method": "door_height",
+        "confidence": 0.519,
+        "opening_span_norm": 0.25
+      },
+      "passed": false,
+      "notes": [
+        "expected at least 1 windows, found 0"
+      ]
+    }
+  ],
+  "passed": 26,
+  "total": 28
+}

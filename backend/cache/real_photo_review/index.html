@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <title>Geomora 真实照片验收 · 28 张</title>
+  <style>
+    body { font-family: "Segoe UI", sans-serif; margin: 24px; background: #f4f6f8; color: #1a1a1a; }
+    h1 { margin-bottom: 8px; }
+    .meta { color: #555; margin-bottom: 24px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
+    .card { background: #fff; border-radius: 10px; padding: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .card img { width: 100%; border-radius: 6px; background: #ddd; }
+    .card header { display: flex; gap: 8px; margin-bottom: 8px; }
+    .tier { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #e8eef7; }
+    .status { font-size: 12px; font-weight: 600; }
+    .tier-P0_FAIL .tier, .tier-P0_LOW_CONF .tier { background: #fde8e8; color: #b42318; }
+    .tier-P1_HIGH_WINDOWS .tier, .tier-P1_FULL_FRAME_RECTIFY .tier { background: #fff4e5; color: #b54708; }
+    dl { margin: 8px 0 0; font-size: 13px; }
+    dt { font-weight: 600; margin-top: 6px; }
+    dd { margin: 2px 0 0; color: #444; }
+  </style>
+</head>
+<body>
+  <h1>真实立面照片验收预览</h1>
+  <p class="meta">方法: auto · 共 28 张 · 按优先级排序（P0 最先验收）</p>
+  <div class="grid">
+    
+            <article class="card tier-P0_FAIL">
+              <header>
+                <span class="tier">P0 · 失败</span>
+                <span class="status">FAIL</span>
+              </header>
+              <h2>d5550fb8626cddd9b76789b823a59e8f.jpg</h2>
+              <img src="overlays/d5550fb8626cddd9b76789b823a59e8f.jpg" alt="d5550fb8626cddd9b76789b823a59e8f.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>0 窗 / 1 门 · yolo_v1 · conf 0.348</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>手拖四角 Rectify + Overlay 手画窗/删误检门</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P0_FAIL">
+              <header>
+                <span class="tier">P0 · 失败</span>
+                <span class="status">FAIL</span>
+              </header>
+              <h2>f6b7c5c2b9bd63cdb2e848c9b59627ff.jpg</h2>
+              <img src="overlays/f6b7c5c2b9bd63cdb2e848c9b59627ff.jpg" alt="f6b7c5c2b9bd63cdb2e848c9b59627ff.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>0 窗 / 1 门 · yolo_v1 · conf 0.519</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>手拖四角 Rectify + Overlay 手画窗/删误检门</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P0_LOW_CONF">
+              <header>
+                <span class="tier">P0 · 低置信</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>9edb3d78f87794960d82c82dafae789b.jpg</h2>
+              <img src="overlays/9edb3d78f87794960d82c82dafae789b.jpg" alt="9edb3d78f87794960d82c82dafae789b.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>2 窗 / 1 门 · yolo_v1 · conf 0.3825</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>Overlay 核对每框 + Export train</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P0_LOW_CONF">
+              <header>
+                <span class="tier">P0 · 低置信</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>86409266e1df0b959411fc5e44b9e0de.jpg</h2>
+              <img src="overlays/86409266e1df0b959411fc5e44b9e0de.jpg" alt="86409266e1df0b959411fc5e44b9e0de.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>2 窗 / 0 门 · yolo_v1 · conf 0.4692</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>Overlay 核对每框 + Export train</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P0_LOW_CONF">
+              <header>
+                <span class="tier">P0 · 低置信</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>025123d59801215ad27eafd1693f7cf8.jpg</h2>
+              <img src="overlays/025123d59801215ad27eafd1693f7cf8.jpg" alt="025123d59801215ad27eafd1693f7cf8.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>3 窗 / 0 门 · yolo_v1 · conf 0.4707</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>Overlay 核对每框 + Export train</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_HIGH_WINDOWS">
+              <header>
+                <span class="tier">P1 · 窗数偏多</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>5ea1e19bd267bfc79851e67b56d1fcd6.jpg</h2>
+              <img src="overlays/5ea1e19bd267bfc79851e67b56d1fcd6.jpg" alt="5ea1e19bd267bfc79851e67b56d1fcd6.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>10 窗 / 0 门 · yolo_v1 · conf 0.7456</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>核对是否误检过多 + Delete 多余框</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_HIGH_WINDOWS">
+              <header>
+                <span class="tier">P1 · 窗数偏多</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>8b93459eebd9944f31e14b22fb22ce54.jpg</h2>
+              <img src="overlays/8b93459eebd9944f31e14b22fb22ce54.jpg" alt="8b93459eebd9944f31e14b22fb22ce54.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>8 窗 / 0 门 · facade_row_v1 · conf 0.7478</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>核对是否误检过多 + Delete 多余框</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_HIGH_WINDOWS">
+              <header>
+                <span class="tier">P1 · 窗数偏多</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>5bd6374a9fe522bb94b94fec90c358c5.jpg</h2>
+              <img src="overlays/5bd6374a9fe522bb94b94fec90c358c5.jpg" alt="5bd6374a9fe522bb94b94fec90c358c5.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>8 窗 / 0 门 · facade_row_v1 · conf 0.7562</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>核对是否误检过多 + Delete 多余框</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_FULL_FRAME_RECTIFY">
+              <header>
+                <span class="tier">P1 · 整图 Rectify</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>cd5e7dc87e824501cf4b316d10e599a3.jpg</h2>
+              <img src="overlays/cd5e7dc87e824501cf4b316d10e599a3.jpg" alt="cd5e7dc87e824501cf4b316d10e599a3.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>2 窗 / 1 门 · yolo_v1 · conf 0.5668</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>重拖四角 Rectify 后再 Detect</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_FULL_FRAME_RECTIFY">
+              <header>
+                <span class="tier">P1 · 整图 Rectify</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>ef473f5e864c9d375a93515f8535e157.jpg</h2>
+              <img src="overlays/ef473f5e864c9d375a93515f8535e157.jpg" alt="ef473f5e864c9d375a93515f8535e157.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>2 窗 / 1 门 · yolo_v1 · conf 0.5725</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>重拖四角 Rectify 后再 Detect</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_FULL_FRAME_RECTIFY">
+              <header>
+                <span class="tier">P1 · 整图 Rectify</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>4288e0fc2ee6aa9a24cc3e1a25bd6a28.jpg</h2>
+              <img src="overlays/4288e0fc2ee6aa9a24cc3e1a25bd6a28.jpg" alt="4288e0fc2ee6aa9a24cc3e1a25bd6a28.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>1 窗 / 1 门 · yolo_v1 · conf 0.588</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>重拖四角 Rectify 后再 Detect</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_FULL_FRAME_RECTIFY">
+              <header>
+                <span class="tier">P1 · 整图 Rectify</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>256a0a906dd5eab45ce95c51cfa12b7a.jpg</h2>
+              <img src="overlays/256a0a906dd5eab45ce95c51cfa12b7a.jpg" alt="256a0a906dd5eab45ce95c51cfa12b7a.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>7 窗 / 1 门 · yolo_v1 · conf 0.6187</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>重拖四角 Rectify 后再 Detect</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_FULL_FRAME_RECTIFY">
+              <header>
+                <span class="tier">P1 · 整图 Rectify</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>2616b29ae632ac1af2fb7fa656750917.jpg</h2>
+              <img src="overlays/2616b29ae632ac1af2fb7fa656750917.jpg" alt="2616b29ae632ac1af2fb7fa656750917.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>4 窗 / 0 门 · facade_row_v1 · conf 0.6689</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>重拖四角 Rectify 后再 Detect</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_FULL_FRAME_RECTIFY">
+              <header>
+                <span class="tier">P1 · 整图 Rectify</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>3bb64ded1dd83f5696c49e3912b21b7b.jpg</h2>
+              <img src="overlays/3bb64ded1dd83f5696c49e3912b21b7b.jpg" alt="3bb64ded1dd83f5696c49e3912b21b7b.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>2 窗 / 0 门 · facade_row_v1 · conf 0.7121</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>重拖四角 Rectify 后再 Detect</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_FULL_FRAME_RECTIFY">
+              <header>
+                <span class="tier">P1 · 整图 Rectify</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>4fef50fa904f66d8b4627efe9f1a9c61.jpg</h2>
+              <img src="overlays/4fef50fa904f66d8b4627efe9f1a9c61.jpg" alt="4fef50fa904f66d8b4627efe9f1a9c61.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>2 窗 / 0 门 · facade_row_v1 · conf 0.7152</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>重拖四角 Rectify 后再 Detect</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_FULL_FRAME_RECTIFY">
+              <header>
+                <span class="tier">P1 · 整图 Rectify</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>0c16490709f73dab8b89c614d789a383.jpg</h2>
+              <img src="overlays/0c16490709f73dab8b89c614d789a383.jpg" alt="0c16490709f73dab8b89c614d789a383.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>5 窗 / 0 门 · facade_row_v1 · conf 0.7556</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>重拖四角 Rectify 后再 Detect</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_FULL_FRAME_RECTIFY">
+              <header>
+                <span class="tier">P1 · 整图 Rectify</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>a7f37f4720aabdbcb3408193b48355e9.jpg</h2>
+              <img src="overlays/a7f37f4720aabdbcb3408193b48355e9.jpg" alt="a7f37f4720aabdbcb3408193b48355e9.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>1 窗 / 0 门 · yolo_v1 · conf 0.818</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>重拖四角 Rectify 后再 Detect</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_FULL_FRAME_RECTIFY">
+              <header>
+                <span class="tier">P1 · 整图 Rectify</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>da5b79a2b2db4e061c37b403468c3106.jpg</h2>
+              <img src="overlays/da5b79a2b2db4e061c37b403468c3106.jpg" alt="da5b79a2b2db4e061c37b403468c3106.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>1 窗 / 0 门 · yolo_v1 · conf 0.8674</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>重拖四角 Rectify 后再 Detect</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P1_FULL_FRAME_RECTIFY">
+              <header>
+                <span class="tier">P1 · 整图 Rectify</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>c605df4d5d8581d9f7d4a7ec118ecea8.jpg</h2>
+              <img src="overlays/c605df4d5d8581d9f7d4a7ec118ecea8.jpg" alt="c605df4d5d8581d9f7d4a7ec118ecea8.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>1 窗 / 0 门 · yolo_v1 · conf 0.9516</dd>
+                <dt>Rectify</dt><dd>auto_full_frame (0.95)</dd>
+                <dt>SketchUp</dt><dd>重拖四角 Rectify 后再 Detect</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P2_SINGLE_WINDOW">
+              <header>
+                <span class="tier">P2 · 仅 1 窗</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>acc0baa45e373961f2c43ca8a6414d67.jpg</h2>
+              <img src="overlays/acc0baa45e373961f2c43ca8a6414d67.jpg" alt="acc0baa45e373961f2c43ca8a6414d67.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>1 窗 / 0 门 · yolo_v1 · conf 0.836</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>确认是否漏检其他窗</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P2_OK">
+              <header>
+                <span class="tier">P2 · 正常</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>7be1b0a8a8c83bf5853aec7b74057c05.jpg</h2>
+              <img src="overlays/7be1b0a8a8c83bf5853aec7b74057c05.jpg" alt="7be1b0a8a8c83bf5853aec7b74057c05.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>3 窗 / 1 门 · yolo_v1 · conf 0.6263</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>快速目视 → Generate</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P2_OK">
+              <header>
+                <span class="tier">P2 · 正常</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>5645ecc5f9b95f31b311764f7edd67b4.jpg</h2>
+              <img src="overlays/5645ecc5f9b95f31b311764f7edd67b4.jpg" alt="5645ecc5f9b95f31b311764f7edd67b4.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>2 窗 / 0 门 · facade_row_v1 · conf 0.6712</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>快速目视 → Generate</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P2_OK">
+              <header>
+                <span class="tier">P2 · 正常</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>a75977b661c3ea427f87b4015974e8ba.jpg</h2>
+              <img src="overlays/a75977b661c3ea427f87b4015974e8ba.jpg" alt="a75977b661c3ea427f87b4015974e8ba.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>3 窗 / 0 门 · facade_row_v1 · conf 0.6727</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>快速目视 → Generate</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P2_OK">
+              <header>
+                <span class="tier">P2 · 正常</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>d3cf989c6cd73a3a4aee05534eac398f.jpg</h2>
+              <img src="overlays/d3cf989c6cd73a3a4aee05534eac398f.jpg" alt="d3cf989c6cd73a3a4aee05534eac398f.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>3 窗 / 0 门 · facade_row_v1 · conf 0.6756</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>快速目视 → Generate</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P2_OK">
+              <header>
+                <span class="tier">P2 · 正常</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>2aa8c66ea11c9926e99c6e7f75481fbb.jpg</h2>
+              <img src="overlays/2aa8c66ea11c9926e99c6e7f75481fbb.jpg" alt="2aa8c66ea11c9926e99c6e7f75481fbb.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>2 窗 / 1 门 · facade_row_v1 · conf 0.7031</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>快速目视 → Generate</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P2_OK">
+              <header>
+                <span class="tier">P2 · 正常</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>5121f3ca8edcf1fefc5efb424e67f1ce.jpg</h2>
+              <img src="overlays/5121f3ca8edcf1fefc5efb424e67f1ce.jpg" alt="5121f3ca8edcf1fefc5efb424e67f1ce.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>2 窗 / 0 门 · facade_row_v1 · conf 0.7314</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>快速目视 → Generate</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P2_OK">
+              <header>
+                <span class="tier">P2 · 正常</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>0dd26eed0cc68659a73ee6380a0990a5.jpg</h2>
+              <img src="overlays/0dd26eed0cc68659a73ee6380a0990a5.jpg" alt="0dd26eed0cc68659a73ee6380a0990a5.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>2 窗 / 1 门 · yolo_v1 · conf 0.7767</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>快速目视 → Generate</dd>
+              </dl>
+            </article>
+            
+            <article class="card tier-P2_OK">
+              <header>
+                <span class="tier">P2 · 正常</span>
+                <span class="status">PASS</span>
+              </header>
+              <h2>d8e38eadf07c14a6fa706883f444ea0c.jpg</h2>
+              <img src="overlays/d8e38eadf07c14a6fa706883f444ea0c.jpg" alt="d8e38eadf07c14a6fa706883f444ea0c.jpg"/>
+              <dl>
+                <dt>检测</dt><dd>2 窗 / 0 门 · yolo_v1 · conf 0.9293</dd>
+                <dt>Rectify</dt><dd>auto_line_intersections (0.95)</dd>
+                <dt>SketchUp</dt><dd>快速目视 → Generate</dd>
+              </dl>
+            </article>
+            
+  </div>
+</body>
+</html>

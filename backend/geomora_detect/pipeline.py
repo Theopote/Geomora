@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import cv2
+from .image_io import imread_bgr
 
 from .contour_detector import detect_contour_elements
 from .facade_row_detector import detect_facade_row_elements
@@ -50,7 +50,7 @@ def detect_facade(
     if not path.exists():
         raise ValueError(f"Image not found: {image_path}")
 
-    image = cv2.imread(str(path))
+    image = imread_bgr(path)
     if image is None:
         raise ValueError(f"Unable to read image: {image_path}")
 

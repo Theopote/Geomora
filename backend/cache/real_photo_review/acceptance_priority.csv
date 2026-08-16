@@ -1,0 +1,29 @@
+﻿tier,file,passed,confidence,windows,doors,detect_method,rectify_method,sketchup_action,overlay
+P0_FAIL,d5550fb8626cddd9b76789b823a59e8f.jpg,False,0.348,0,1,yolo_v1,auto_line_intersections,手拖四角 Rectify + Overlay 手画窗/删误检门,overlays/d5550fb8626cddd9b76789b823a59e8f.jpg
+P0_FAIL,f6b7c5c2b9bd63cdb2e848c9b59627ff.jpg,False,0.519,0,1,yolo_v1,auto_full_frame,手拖四角 Rectify + Overlay 手画窗/删误检门,overlays/f6b7c5c2b9bd63cdb2e848c9b59627ff.jpg
+P0_LOW_CONF,9edb3d78f87794960d82c82dafae789b.jpg,True,0.3825,2,1,yolo_v1,auto_line_intersections,Overlay 核对每框 + Export train,overlays/9edb3d78f87794960d82c82dafae789b.jpg
+P0_LOW_CONF,86409266e1df0b959411fc5e44b9e0de.jpg,True,0.4692,2,0,yolo_v1,auto_full_frame,Overlay 核对每框 + Export train,overlays/86409266e1df0b959411fc5e44b9e0de.jpg
+P0_LOW_CONF,025123d59801215ad27eafd1693f7cf8.jpg,True,0.4707,3,0,yolo_v1,auto_line_intersections,Overlay 核对每框 + Export train,overlays/025123d59801215ad27eafd1693f7cf8.jpg
+P1_HIGH_WINDOWS,5ea1e19bd267bfc79851e67b56d1fcd6.jpg,True,0.7456,10,0,yolo_v1,auto_line_intersections,核对是否误检过多 + Delete 多余框,overlays/5ea1e19bd267bfc79851e67b56d1fcd6.jpg
+P1_HIGH_WINDOWS,8b93459eebd9944f31e14b22fb22ce54.jpg,True,0.7478,8,0,facade_row_v1,auto_full_frame,核对是否误检过多 + Delete 多余框,overlays/8b93459eebd9944f31e14b22fb22ce54.jpg
+P1_HIGH_WINDOWS,5bd6374a9fe522bb94b94fec90c358c5.jpg,True,0.7562,8,0,facade_row_v1,auto_line_intersections,核对是否误检过多 + Delete 多余框,overlays/5bd6374a9fe522bb94b94fec90c358c5.jpg
+P1_FULL_FRAME_RECTIFY,cd5e7dc87e824501cf4b316d10e599a3.jpg,True,0.5668,2,1,yolo_v1,auto_full_frame,重拖四角 Rectify 后再 Detect,overlays/cd5e7dc87e824501cf4b316d10e599a3.jpg
+P1_FULL_FRAME_RECTIFY,ef473f5e864c9d375a93515f8535e157.jpg,True,0.5725,2,1,yolo_v1,auto_full_frame,重拖四角 Rectify 后再 Detect,overlays/ef473f5e864c9d375a93515f8535e157.jpg
+P1_FULL_FRAME_RECTIFY,4288e0fc2ee6aa9a24cc3e1a25bd6a28.jpg,True,0.588,1,1,yolo_v1,auto_full_frame,重拖四角 Rectify 后再 Detect,overlays/4288e0fc2ee6aa9a24cc3e1a25bd6a28.jpg
+P1_FULL_FRAME_RECTIFY,256a0a906dd5eab45ce95c51cfa12b7a.jpg,True,0.6187,7,1,yolo_v1,auto_full_frame,重拖四角 Rectify 后再 Detect,overlays/256a0a906dd5eab45ce95c51cfa12b7a.jpg
+P1_FULL_FRAME_RECTIFY,2616b29ae632ac1af2fb7fa656750917.jpg,True,0.6689,4,0,facade_row_v1,auto_full_frame,重拖四角 Rectify 后再 Detect,overlays/2616b29ae632ac1af2fb7fa656750917.jpg
+P1_FULL_FRAME_RECTIFY,3bb64ded1dd83f5696c49e3912b21b7b.jpg,True,0.7121,2,0,facade_row_v1,auto_full_frame,重拖四角 Rectify 后再 Detect,overlays/3bb64ded1dd83f5696c49e3912b21b7b.jpg
+P1_FULL_FRAME_RECTIFY,4fef50fa904f66d8b4627efe9f1a9c61.jpg,True,0.7152,2,0,facade_row_v1,auto_full_frame,重拖四角 Rectify 后再 Detect,overlays/4fef50fa904f66d8b4627efe9f1a9c61.jpg
+P1_FULL_FRAME_RECTIFY,0c16490709f73dab8b89c614d789a383.jpg,True,0.7556,5,0,facade_row_v1,auto_full_frame,重拖四角 Rectify 后再 Detect,overlays/0c16490709f73dab8b89c614d789a383.jpg
+P1_FULL_FRAME_RECTIFY,a7f37f4720aabdbcb3408193b48355e9.jpg,True,0.818,1,0,yolo_v1,auto_full_frame,重拖四角 Rectify 后再 Detect,overlays/a7f37f4720aabdbcb3408193b48355e9.jpg
+P1_FULL_FRAME_RECTIFY,da5b79a2b2db4e061c37b403468c3106.jpg,True,0.8674,1,0,yolo_v1,auto_full_frame,重拖四角 Rectify 后再 Detect,overlays/da5b79a2b2db4e061c37b403468c3106.jpg
+P1_FULL_FRAME_RECTIFY,c605df4d5d8581d9f7d4a7ec118ecea8.jpg,True,0.9516,1,0,yolo_v1,auto_full_frame,重拖四角 Rectify 后再 Detect,overlays/c605df4d5d8581d9f7d4a7ec118ecea8.jpg
+P2_SINGLE_WINDOW,acc0baa45e373961f2c43ca8a6414d67.jpg,True,0.836,1,0,yolo_v1,auto_line_intersections,确认是否漏检其他窗,overlays/acc0baa45e373961f2c43ca8a6414d67.jpg
+P2_OK,7be1b0a8a8c83bf5853aec7b74057c05.jpg,True,0.6263,3,1,yolo_v1,auto_line_intersections,快速目视 → Generate,overlays/7be1b0a8a8c83bf5853aec7b74057c05.jpg
+P2_OK,5645ecc5f9b95f31b311764f7edd67b4.jpg,True,0.6712,2,0,facade_row_v1,auto_line_intersections,快速目视 → Generate,overlays/5645ecc5f9b95f31b311764f7edd67b4.jpg
+P2_OK,a75977b661c3ea427f87b4015974e8ba.jpg,True,0.6727,3,0,facade_row_v1,auto_line_intersections,快速目视 → Generate,overlays/a75977b661c3ea427f87b4015974e8ba.jpg
+P2_OK,d3cf989c6cd73a3a4aee05534eac398f.jpg,True,0.6756,3,0,facade_row_v1,auto_line_intersections,快速目视 → Generate,overlays/d3cf989c6cd73a3a4aee05534eac398f.jpg
+P2_OK,2aa8c66ea11c9926e99c6e7f75481fbb.jpg,True,0.7031,2,1,facade_row_v1,auto_line_intersections,快速目视 → Generate,overlays/2aa8c66ea11c9926e99c6e7f75481fbb.jpg
+P2_OK,5121f3ca8edcf1fefc5efb424e67f1ce.jpg,True,0.7314,2,0,facade_row_v1,auto_line_intersections,快速目视 → Generate,overlays/5121f3ca8edcf1fefc5efb424e67f1ce.jpg
+P2_OK,0dd26eed0cc68659a73ee6380a0990a5.jpg,True,0.7767,2,1,yolo_v1,auto_line_intersections,快速目视 → Generate,overlays/0dd26eed0cc68659a73ee6380a0990a5.jpg
+P2_OK,d8e38eadf07c14a6fa706883f444ea0c.jpg,True,0.9293,2,0,yolo_v1,auto_line_intersections,快速目视 → Generate,overlays/d8e38eadf07c14a6fa706883f444ea0c.jpg

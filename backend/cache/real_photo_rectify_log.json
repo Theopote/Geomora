@@ -1,0 +1,282 @@
+[
+  {
+    "file": "025123d59801215ad27eafd1693f7cf8.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      1132,
+      722
+    ]
+  },
+  {
+    "file": "0c16490709f73dab8b89c614d789a383.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      1152,
+      1728
+    ]
+  },
+  {
+    "file": "0dd26eed0cc68659a73ee6380a0990a5.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      735,
+      1004
+    ]
+  },
+  {
+    "file": "256a0a906dd5eab45ce95c51cfa12b7a.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      576,
+      806
+    ]
+  },
+  {
+    "file": "2616b29ae632ac1af2fb7fa656750917.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      706,
+      889
+    ]
+  },
+  {
+    "file": "2aa8c66ea11c9926e99c6e7f75481fbb.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      932,
+      1454
+    ]
+  },
+  {
+    "file": "3bb64ded1dd83f5696c49e3912b21b7b.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      860,
+      1105
+    ]
+  },
+  {
+    "file": "4288e0fc2ee6aa9a24cc3e1a25bd6a28.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      706,
+      941
+    ]
+  },
+  {
+    "file": "4fef50fa904f66d8b4627efe9f1a9c61.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      1123,
+      1373
+    ]
+  },
+  {
+    "file": "5121f3ca8edcf1fefc5efb424e67f1ce.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      909,
+      1166
+    ]
+  },
+  {
+    "file": "5645ecc5f9b95f31b311764f7edd67b4.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      1204,
+      1497
+    ]
+  },
+  {
+    "file": "5bd6374a9fe522bb94b94fec90c358c5.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      689,
+      1060
+    ]
+  },
+  {
+    "file": "5ea1e19bd267bfc79851e67b56d1fcd6.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      1148,
+      633
+    ]
+  },
+  {
+    "file": "7be1b0a8a8c83bf5853aec7b74057c05.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      1190,
+      1395
+    ]
+  },
+  {
+    "file": "86409266e1df0b959411fc5e44b9e0de.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      979,
+      1169
+    ]
+  },
+  {
+    "file": "8b93459eebd9944f31e14b22fb22ce54.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      705,
+      882
+    ]
+  },
+  {
+    "file": "9edb3d78f87794960d82c82dafae789b.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      473,
+      551
+    ]
+  },
+  {
+    "file": "a75977b661c3ea427f87b4015974e8ba.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      1169,
+      1278
+    ]
+  },
+  {
+    "file": "a7f37f4720aabdbcb3408193b48355e9.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      983,
+      1474
+    ]
+  },
+  {
+    "file": "acc0baa45e373961f2c43ca8a6414d67.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      1023,
+      1337
+    ]
+  },
+  {
+    "file": "c605df4d5d8581d9f7d4a7ec118ecea8.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      1152,
+      1475
+    ]
+  },
+  {
+    "file": "cd5e7dc87e824501cf4b316d10e599a3.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      552,
+      639
+    ]
+  },
+  {
+    "file": "d3cf989c6cd73a3a4aee05534eac398f.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      699,
+      850
+    ]
+  },
+  {
+    "file": "d5550fb8626cddd9b76789b823a59e8f.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      743,
+      869
+    ]
+  },
+  {
+    "file": "d8e38eadf07c14a6fa706883f444ea0c.jpg",
+    "rectify_ok": true,
+    "method": "auto_line_intersections",
+    "confidence": 0.95,
+    "size": [
+      468,
+      572
+    ]
+  },
+  {
+    "file": "da5b79a2b2db4e061c37b403468c3106.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      1152,
+      1264
+    ]
+  },
+  {
+    "file": "ef473f5e864c9d375a93515f8535e157.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      1151,
+      1293
+    ]
+  },
+  {
+    "file": "f6b7c5c2b9bd63cdb2e848c9b59627ff.jpg",
+    "rectify_ok": true,
+    "method": "auto_full_frame",
+    "confidence": 0.95,
+    "size": [
+      649,
+      960
+    ]
+  }
+]

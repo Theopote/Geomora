@@ -328,6 +328,35 @@ body {
   text-transform: uppercase;
 }
 
+.storey-window-bar {
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #34363b;
+  border-radius: 6px;
+  background: #151619;
+}
+
+.storey-bar-title {
+  font-size: 11px;
+  color: #9aa0a6;
+  margin-bottom: 8px;
+}
+
+.storey-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.storey-tab.active {
+  border-color: #8ab4f8;
+  color: #8ab4f8;
+}
+
+.storey-bar-actions {
+  margin-top: 8px;
+}
+
 .window-row {
   border: 1px solid #34363b;
   border-radius: 6px;

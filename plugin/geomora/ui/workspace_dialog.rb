@@ -413,9 +413,22 @@ module Geomora
         end
 
         def payload_from_ir(data)
-          wall = data.dig('buildings', 0, 'storeys', 0, 'elements', 0, 'geometry') || {}
+          storeys = data.dig('buildings', 0, 'storeys') || []
+          wall = storeys.dig(0, 'elements', 0, 'geometry') || {}
           openings = data['openings'] || []
-          windows = openings.select { |o| o['type'] == 'window' }.map do |win|
+          storey_windows = storeys.map do |storey|
+            facade_wall = (storey['elements'] || []).find { |element| element['type'] == 'wall' }
+            wall_id = facade_wall ? facade_wall['id'] : nil
+            openings.select { |opening| opening['type'] == 'window' && opening['parent_id'] == wall_id }.map do |win|
+              {
+                'offset' => win.dig('geometry', 'offset'),
+                'width' => win.dig('geometry', 'width'),
+                'height' => win.dig('geometry', 'height'),
+                'sill_height' => win.dig('geometry', 'sill_height')
+              }
+            end
+          end
+          windows = storey_windows[0] || openings.select { |o| o['type'] == 'window' }.map do |win|
             {
               'offset' => win.dig('geometry', 'offset'),
               'width' => win.dig('geometry', 'width'),
@@ -439,6 +452,8 @@ module Geomora
             'wall_length' => distance(wall['baseline']),
             'wall_height' => wall['height'],
             'wall_thickness' => wall['thickness'],
+            'storey_count' => storeys.length.positive? ? storeys.length : 1,
+            'storey_windows' => storey_windows,
             'windows' => windows,
             'door' => door_payload,
             'source_path' => nil,

@@ -1,6 +1,6 @@
 # Geomora Phase 10 — LOD + Structural Grid
 
-**Status:** Phase 10 bootstrap **COMPLETE** (v0.18.0)
+**Status:** Phase 10 **COMPLETE** (v0.18.0) · Per-floor windows (v0.19.0)
 
 | Step | Status |
 |---|---|
@@ -10,6 +10,7 @@
 | 10.4 LOD 300 trim / railing / eaves | ✅ |
 | 10.5 Window mullion at LOD 300 | ✅ |
 | 10.6 Workspace LOD + grid UI | ✅ |
+| 10.7 Per-floor window editor | ✅ |
 
 ---
 
@@ -46,15 +47,24 @@ When **Structural column grid** is enabled (requires **Columns**):
 
 ---
 
-## 4. Deferred (Phase 10+)
+## 4. Per-floor windows (v0.19.0)
 
-- Per-storey independent window editors
+- Set **Storey count** > 1 → floor tabs appear above the window list
+- **Repeat openings on** (default): upper floors copy ground floor; only Ground is editable
+- **Repeat openings off**: edit each floor independently; overlay shows active floor only
+- **Copy ground to all floors** — one-click sync
+- IR: `storey_windows[]` array; Generate uses per-floor layouts
+
+---
+
+## 5. Deferred (Phase 11+)
+
 - LOD-driven layer visibility in SketchUp
 - Interior partition walls
 - Full frame / sill / jamb trim sets
 
 ---
 
-## 5. Gate to Phase 11
+## 6. Gate to Phase 11
 
 LOD + structural grid enable semantic refinement pipelines and interior layout on stacked shells.

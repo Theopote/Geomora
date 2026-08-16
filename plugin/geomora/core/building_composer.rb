@@ -241,10 +241,16 @@ module Geomora
       end
 
       def first_window
-        windows = @params['windows']
-        return nil unless windows.is_a?(Array)
+        windows_for_storey.find { |win| win.is_a?(Hash) && win['width'].to_f.positive? }
+      end
 
-        windows.find { |win| win.is_a?(Hash) && win['width'].to_f.positive? }
+      def windows_for_storey
+        storey_windows = @params['storey_windows']
+        if storey_windows.is_a?(Array) && storey_windows[@storey_index].is_a?(Array)
+          return storey_windows[@storey_index]
+        end
+
+        @params['windows'] || []
       end
 
       def balcony_element
@@ -312,9 +318,7 @@ module Geomora
       end
 
       def trim_elements
-        return [] unless facade_storey?
-
-        windows = @params['windows']
+        windows = windows_for_storey
         return [] unless windows.is_a?(Array)
 
         projection = float_param('trim_projection', 80)

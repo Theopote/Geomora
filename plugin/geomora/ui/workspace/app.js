@@ -25,7 +25,9 @@
     secondarySourceId: null,
     secondaryImageUrl: null,
     multiview: null,
-    fusion: null
+    fusion: null,
+    activeStoreyIndex: 0,
+    storeyWindows: [[]]
   };
 
   const els = {
@@ -52,8 +54,174 @@
     btnViewOverlay: document.getElementById('btn-view-overlay'),
     detectMethod: document.getElementById('detect-method'),
     registerMethod: document.getElementById('register-method'),
-    depthMethod: document.getElementById('depth-method')
+    depthMethod: document.getElementById('depth-method'),
+    storeyWindowBar: document.getElementById('storey-window-bar')
   };
+
+  function cloneWindows(windows) {
+    return (windows || []).map(function (win) {
+      return Object.assign({}, win);
+    });
+  }
+
+  function getStoreyCount() {
+    const el = els.form.elements.namedItem('storey_count');
+    const count = Number(el && el.value) || 1;
+    return count < 1 ? 1 : count;
+  }
+
+  function isRepeatOpenings() {
+    const el = els.form.elements.namedItem('repeat_openings');
+    return el && el.checked;
+  }
+
+  function storeyLabel(index) {
+    return index === 0 ? 'Ground' : 'Floor ' + (index + 1);
+  }
+
+  function persistActiveStoreyWindows() {
+    state.storeyWindows[state.activeStoreyIndex] = cloneWindows(state.windows);
+  }
+
+  function syncStoreyWindowsLength() {
+    const count = getStoreyCount();
+    while (state.storeyWindows.length < count) {
+      const seed = cloneWindows(state.storeyWindows[0] || []);
+      state.storeyWindows.push(seed);
+    }
+    if (state.storeyWindows.length > count) {
+      state.storeyWindows.length = count;
+    }
+    if (state.activeStoreyIndex >= count) {
+      state.activeStoreyIndex = count - 1;
+    }
+  }
+
+  function copyGroundWindowsToUpperStoreys() {
+    const ground = cloneWindows(state.storeyWindows[0] || []);
+    const count = getStoreyCount();
+    for (let i = 1; i < count; i++) {
+      state.storeyWindows[i] = cloneWindows(ground);
+    }
+  }
+
+  function setActiveStorey(index) {
+    if (isRepeatOpenings() && index > 0) {
+      return;
+    }
+    persistActiveStoreyWindows();
+    state.activeStoreyIndex = index;
+    state.windows = cloneWindows(state.storeyWindows[index] || []);
+    clearSelection();
+    renderStoreySelector();
+    renderWindows(state.windows);
+  }
+
+  function renderStoreySelector() {
+    const bar = els.storeyWindowBar;
+    if (!bar) return;
+
+    const count = getStoreyCount();
+    const repeat = isRepeatOpenings();
+    bar.innerHTML = '';
+
+    if (count <= 1) {
+      bar.hidden = true;
+      return;
+    }
+
+    bar.hidden = false;
+
+    const title = document.createElement('div');
+    title.className = 'storey-bar-title';
+    title.textContent = repeat
+      ? 'Upper floors repeat ground-floor windows'
+      : 'Edit windows per floor';
+    bar.appendChild(title);
+
+    const tabs = document.createElement('div');
+    tabs.className = 'storey-tabs';
+    for (let i = 0; i < count; i++) {
+      const wins = state.storeyWindows[i] || [];
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn secondary storey-tab';
+      if (state.activeStoreyIndex === i) {
+        btn.classList.add('active');
+      }
+      btn.textContent = storeyLabel(i) + ' (' + wins.length + ')';
+      btn.disabled = repeat && i > 0;
+      btn.addEventListener('click', function () {
+        setActiveStorey(i);
+      });
+      tabs.appendChild(btn);
+    }
+    bar.appendChild(tabs);
+
+    if (!repeat && count > 1) {
+      const actions = document.createElement('div');
+      actions.className = 'storey-bar-actions';
+      const copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'btn-link';
+      copyBtn.textContent = 'Copy ground to all floors';
+      copyBtn.addEventListener('click', function () {
+        persistActiveStoreyWindows();
+        copyGroundWindowsToUpperStoreys();
+        state.windows = cloneWindows(state.storeyWindows[state.activeStoreyIndex] || []);
+        renderStoreySelector();
+        renderWindows(state.windows);
+        setStatus('', 'Copied ground-floor windows to all upper floors.');
+      });
+      actions.appendChild(copyBtn);
+      bar.appendChild(actions);
+    }
+  }
+
+  function initStoreyWindowsFromPayload(payload) {
+    if (payload.storey_windows && payload.storey_windows.length) {
+      state.storeyWindows = payload.storey_windows.map(cloneWindows);
+    } else {
+      state.storeyWindows = [cloneWindows(payload.windows || [])];
+    }
+    syncStoreyWindowsLength();
+    state.activeStoreyIndex = 0;
+    state.windows = cloneWindows(state.storeyWindows[0] || []);
+  }
+
+  function summarizeStoreyWindows() {
+    persistActiveStoreyWindows();
+    const count = getStoreyCount();
+    if (count <= 1) {
+      return String((state.storeyWindows[0] || []).length);
+    }
+    return state.storeyWindows
+      .map(function (wins, index) {
+        return storeyLabel(index) + ':' + (wins || []).length;
+      })
+      .join(', ');
+  }
+
+  function onRepeatOpeningsChange() {
+    persistActiveStoreyWindows();
+    if (isRepeatOpenings()) {
+      copyGroundWindowsToUpperStoreys();
+      setActiveStorey(0);
+    } else {
+      renderStoreySelector();
+    }
+  }
+
+  function onStoreyCountChange() {
+    persistActiveStoreyWindows();
+    syncStoreyWindowsLength();
+    if (isRepeatOpenings()) {
+      copyGroundWindowsToUpperStoreys();
+    }
+    state.windows = cloneWindows(state.storeyWindows[state.activeStoreyIndex] || []);
+    renderStoreySelector();
+    renderWindows(state.windows);
+  }
 
   function sketchupCall(name, arg) {
     if (!window.sketchup || typeof window.sketchup[name] !== 'function') return;
@@ -755,6 +923,7 @@
 
   function renderWindows(windows) {
     state.windows = windows || [];
+    state.storeyWindows[state.activeStoreyIndex] = cloneWindows(state.windows);
     els.windowsContainer.innerHTML = '';
 
     state.windows.forEach(function (win, index) {
@@ -766,7 +935,7 @@
       }
       row.innerHTML =
         '<div class="window-row-header">' +
-        '<h3>Window ' + (index + 1) + '</h3>' +
+        '<h3>' + storeyLabel(state.activeStoreyIndex) + ' · Window ' + (index + 1) + '</h3>' +
         '<button type="button" class="btn-link" data-remove-win="' + index + '">Remove</button>' +
         '</div>' +
         '<label>Offset (mm)<input data-win="' + index + '" data-field="offset" type="number" step="1" value="' + win.offset + '"></label>' +
@@ -795,6 +964,7 @@
     renderTree();
     renderDetectionOverlay();
     updateViewerToolbar();
+    renderStoreySelector();
   }
 
   function onRemoveWindow(event) {
@@ -819,7 +989,7 @@
       'Wall: ' + params.wall_length + ' × ' + params.wall_height + ' × ' + params.wall_thickness + ' mm',
       'Storeys: ' + params.storey_count + (params.storey_height ? ' @ ' + params.storey_height + ' mm' : ''),
       'LOD: ' + (params.lod_level || 'lod_200'),
-      'Windows: ' + params.windows.length,
+      'Windows: ' + summarizeStoreyWindows(),
       'Door: ' + params.door.width + ' × ' + params.door.height + ' mm @ ' + params.door.offset
     ];
 
@@ -890,15 +1060,19 @@
   }
 
   function collectParams() {
+    persistActiveStoreyWindows();
     const formData = new FormData(els.form);
-    const windows = state.windows.map(function (win) {
-      return {
-        offset: Number(win.offset),
-        width: Number(win.width),
-        height: Number(win.height),
-        sill_height: Number(win.sill_height)
-      };
+    const storeyWindows = state.storeyWindows.map(function (storeyWins) {
+      return (storeyWins || []).map(function (win) {
+        return {
+          offset: Number(win.offset),
+          width: Number(win.width),
+          height: Number(win.height),
+          sill_height: Number(win.sill_height)
+        };
+      });
     });
+    const windows = storeyWindows[state.activeStoreyIndex] || storeyWindows[0] || [];
 
     return {
       project_name: formData.get('project_name'),
@@ -936,6 +1110,7 @@
         grid_mm: Number(formData.get('doctor_grid_mm') || 10)
       },
       windows: windows,
+      storey_windows: storeyWindows,
       door: {
         offset: Number(formData.get('door_offset')),
         width: Number(formData.get('door_width')),
@@ -1013,7 +1188,12 @@
     els.form.elements.namedItem('wall_height').value = payload.wall_height || 3300;
     els.form.elements.namedItem('wall_thickness').value = payload.wall_thickness || 240;
 
-    renderWindows(payload.windows || []);
+    if (payload.storey_count) {
+      els.form.elements.namedItem('storey_count').value = payload.storey_count;
+    }
+
+    initStoreyWindowsFromPayload(payload);
+    renderWindows(state.windows);
 
     const door = payload.door || {};
     els.form.elements.namedItem('door_offset').value = door.offset || 0;
@@ -1157,8 +1337,17 @@
         bbox_norm: win.bbox_norm
       };
     });
+    state.storeyWindows[0] = cloneWindows(windows);
+    if (isRepeatOpenings()) {
+      copyGroundWindowsToUpperStoreys();
+    }
     clearSelection();
-    renderWindows(windows);
+    if (state.activeStoreyIndex === 0) {
+      state.windows = cloneWindows(windows);
+      renderWindows(state.windows);
+    } else {
+      renderStoreySelector();
+    }
 
     const door = payload.door || {};
     const doorWidth = Number(door.width) || 0;
@@ -1424,7 +1613,18 @@
     setActiveView('overlay');
   });
 
-  els.form.addEventListener('change', renderTree);
+  els.form.addEventListener('change', function (event) {
+    const target = event.target;
+    if (target && target.name === 'storey_count') {
+      onStoreyCountChange();
+      return;
+    }
+    if (target && target.name === 'repeat_openings') {
+      onRepeatOpeningsChange();
+      return;
+    }
+    renderTree();
+  });
 
   document.addEventListener('DOMContentLoaded', function () {
     sketchupCall('ready');

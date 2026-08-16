@@ -130,4 +130,29 @@ class IRBuilderTest < Minitest::Test
     assert_includes types, 'trim'
     assert_includes types, 'eaves'
   end
+
+  def test_independent_storey_windows
+    params = {
+      'project_name' => 'Per-floor windows',
+      'wall_length' => 10_000,
+      'wall_height' => 3300,
+      'wall_thickness' => 240,
+      'storey_count' => 2,
+      'repeat_openings' => false,
+      'storey_windows' => [
+        [{ 'offset' => 500, 'width' => 1500, 'height' => 1500, 'sill_height' => 900 }],
+        [{ 'offset' => 2500, 'width' => 1200, 'height' => 1200, 'sill_height' => 1000 }]
+      ],
+      'windows' => [{ 'offset' => 500, 'width' => 1500, 'height' => 1500, 'sill_height' => 900 }],
+      'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    doc = Geomora::IR::Parser.parse(ir)
+
+    assert Geomora::IR::Validator.validate(doc)
+    offsets = ir['openings'].select { |o| o['type'] == 'window' }.map { |o| o.dig('geometry', 'offset') }
+    assert_includes offsets, 500.0
+    assert_includes offsets, 2500.0
+  end
 end

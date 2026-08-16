@@ -91,7 +91,7 @@ module Geomora
         openings = []
         opening_ids = []
 
-        if LodPolicy.include_openings?(lod_level) && repeat_openings_for_storey?(storey_index)
+        if LodPolicy.include_openings?(lod_level) && should_build_windows?(storey_index)
           windows = build_windows(facade_wall_id, storey_index)
           openings.concat(windows)
           opening_ids.concat(windows.map { |window| window['id'] })
@@ -184,6 +184,35 @@ module Geomora
         index.zero? || repeat_openings?
       end
 
+      def should_build_windows?(storey_index)
+        if storey_index.positive? && !repeat_openings? && independent_storey_windows?
+          return windows_for_storey(storey_index).any?
+        end
+
+        storey_index.zero? || repeat_openings?
+      end
+
+      def independent_storey_windows?
+        storey_windows = @params['storey_windows']
+        storey_windows.is_a?(Array) && storey_windows.length > 1 && !repeat_openings?
+      end
+
+      def windows_for_storey(storey_index)
+        storey_windows = @params['storey_windows']
+        if storey_windows.is_a?(Array) && storey_windows[storey_index].is_a?(Array)
+          return storey_windows[storey_index]
+        end
+
+        if storey_index.zero?
+          raw = @params['windows']
+          return raw.is_a?(Array) ? raw : []
+        end
+
+        return windows_for_storey(0) if repeat_openings?
+
+        []
+      end
+
       def repeat_openings?
         option_enabled('repeat_openings', true)
       end
@@ -218,7 +247,7 @@ module Geomora
       end
 
       def build_windows(wall_id, storey_index)
-        raw = @params['windows']
+        raw = windows_for_storey(storey_index)
         return [] unless raw.is_a?(Array)
         return [] if raw.empty?
 

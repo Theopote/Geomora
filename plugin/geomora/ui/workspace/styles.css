@@ -486,6 +486,52 @@ body {
   color: #9aa0a6;
 }
 
+.layout-item-size {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: end;
+  margin: 8px 0;
+  font-size: 11px;
+}
+
+.layout-item-size label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.layout-item-size input {
+  width: 72px;
+}
+
+.layout-item-size-label {
+  align-self: center;
+  color: #9aa0a6;
+}
+
+.viewport-snapshot-panel {
+  margin-top: 8px;
+}
+
+.viewport-snapshot-panel img {
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid #3c4043;
+  background: #111;
+}
+
+.viewport-placeholder {
+  font-size: 11px;
+  color: #9aa0a6;
+  padding: 12px 0;
+}
+
+.checkbox-label.compact {
+  font-size: 11px;
+  margin: 0;
+}
+
 .view-toggle {
   display: flex;
   gap: 6px;

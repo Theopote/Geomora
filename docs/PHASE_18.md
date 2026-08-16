@@ -75,15 +75,17 @@ tests/core/fixture_catalog_palette_test.rb
 
 ---
 
-## 7. Deferred (Phase 19+)
+## 7. Deferred (Phase 19 — delivered in v0.28.0)
 
-- MP4/WebM video export via external encoder hook
-- Palette search/filter and custom item sizing in editor
-- Snap-to-grid and wall magnet in layout canvas
-- SketchUp live viewport embed in Workspace HtmlDialog
+See `docs/PHASE_19.md` for MP4/WebM export, palette search, snap/magnet, and viewport snapshot.
+
+Remaining for Phase 20+:
+
+- In-dialog live viewport streaming
+- Native MP4 without ffmpeg
 
 ---
 
 ## 8. Gate to Phase 19
 
-GIF export and polished layout editing complete the interior presentation toolchain for client deliverables.
+Video export and live viewport preview complete the presentation pipeline for client deliverables.

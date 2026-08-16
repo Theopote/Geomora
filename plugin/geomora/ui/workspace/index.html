@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.27.0 — GIF Export + Layout Palette</div>
+    <div class="subtitle">v0.28.0 — Video Export + Live View</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -57,6 +57,16 @@
       <div id="source-meta" class="meta">No image loaded</div>
       <div id="secondary-meta" class="meta">Secondary: not loaded</div>
       <div id="multiview-meta" class="meta">Multi-view: not registered</div>
+
+      <div class="section-title">Live View (Phase 19)</div>
+      <div id="viewport-snapshot-panel" class="viewport-snapshot-panel">
+        <img id="viewport-snapshot-image" alt="SketchUp viewport snapshot" hidden>
+        <div id="viewport-snapshot-placeholder" class="viewport-placeholder">Click Refresh to capture the active SketchUp view</div>
+        <div class="inline-actions">
+          <button type="button" id="btn-refresh-viewport" class="btn-link">Refresh viewport</button>
+          <label class="checkbox-label compact"><input id="viewport-auto-refresh" type="checkbox"> Auto (3s)</label>
+        </div>
+      </div>
     </aside>
 
     <section class="panel viewer">
@@ -154,8 +164,10 @@
           <button type="button" id="btn-preview-catalog-diff" class="btn-link">Preview catalog diff</button>
         </div>
 
-        <div class="section-title">Layout Editor (Phase 17–18)</div>
+        <div class="section-title">Layout Editor (Phase 17–19)</div>
         <label class="checkbox-label"><input name="include_furniture_wall_align" type="checkbox"> Wall-aligned furniture placement</label>
+        <label class="checkbox-label"><input id="layout-snap-grid" type="checkbox" checked> Snap to grid (100 mm)</label>
+        <label class="checkbox-label"><input id="layout-wall-magnet" type="checkbox" checked> Wall magnet</label>
         <div class="inline-actions">
           <button type="button" id="btn-open-layout-editor" class="btn-link">Open layout editor</button>
           <button type="button" id="btn-sync-layout-field" class="btn-link">Apply editor to layouts field</button>
@@ -170,7 +182,15 @@
               <select id="layout-editor-room"></select>
             </label>
           </div>
+          <label>Palette search<input id="layout-palette-search" type="search" placeholder="Filter sofa, sink…"></label>
           <div id="layout-catalog-palette" class="layout-catalog-palette" aria-label="Fixture catalog palette"></div>
+          <div id="layout-item-size" class="layout-item-size" hidden>
+            <span class="layout-item-size-label">Selected item</span>
+            <label>W<input id="layout-item-width" type="number" step="10" min="100"></label>
+            <label>D<input id="layout-item-depth" type="number" step="10" min="100"></label>
+            <label>H<input id="layout-item-height" type="number" step="10" min="100"></label>
+            <button type="button" id="btn-apply-item-size" class="btn-link">Apply size</button>
+          </div>
           <div class="layout-editor-split">
             <canvas id="layout-editor-canvas" width="320" height="220" aria-label="Room layout editor"></canvas>
             <canvas id="layout-preview-3d-canvas" width="220" height="220" aria-label="Isometric furniture preview"></canvas>

@@ -123,6 +123,15 @@ module Geomora
         LodPresentation.export_tour_gif(model, path, delay_centiseconds: delay_centiseconds)
       end
 
+      def self.export_lod_tour_video(path, format: 'mp4')
+        model = Sketchup.active_model
+        LodPresentation.export_tour_video(model, path, format: format)
+      end
+
+      def self.viewport_snapshot
+        ViewportSnapshot.capture
+      end
+
       def self.reload_fixture_catalog(params = {})
         FixtureCatalog.reload!(params)
       end

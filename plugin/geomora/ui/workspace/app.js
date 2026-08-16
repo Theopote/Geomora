@@ -1574,6 +1574,7 @@
     setRoomLayoutPreview: setRoomLayoutPreview,
     setLayoutCatalogPalette: setLayoutCatalogPalette,
     setCatalogDiffPreview: setCatalogDiffPreview,
+    setViewportSnapshot: setViewportSnapshot,
     setDetectionMeta: setDetectionMeta,
     onDetectionEmpty: onDetectionEmpty,
     setIrPreview: setIrPreview,
@@ -1612,6 +1613,32 @@
   function setCatalogDiffPreview(diff) {
     if (window.geomoraLayoutEditor) {
       window.geomoraLayoutEditor.setCatalogDiff(diff);
+    }
+  }
+
+  let viewportRefreshTimer = null;
+
+  function setViewportSnapshot(snapshot) {
+    const image = document.getElementById('viewport-snapshot-image');
+    const placeholder = document.getElementById('viewport-snapshot-placeholder');
+    if (!image || !snapshot || !snapshot.data_url) return;
+    image.src = snapshot.data_url;
+    image.hidden = false;
+    if (placeholder) placeholder.hidden = true;
+  }
+
+  function refreshViewportSnapshot() {
+    sketchupCall('refresh_viewport_snapshot');
+  }
+
+  function setViewportAutoRefresh(enabled) {
+    if (viewportRefreshTimer) {
+      clearInterval(viewportRefreshTimer);
+      viewportRefreshTimer = null;
+    }
+    if (enabled) {
+      refreshViewportSnapshot();
+      viewportRefreshTimer = setInterval(refreshViewportSnapshot, 3000);
     }
   }
 
@@ -1713,6 +1740,17 @@
   document.getElementById('btn-reload-catalog').addEventListener('click', function () {
     sketchupCall('reload_fixture_catalog', JSON.stringify(collectParams()));
   });
+
+  document.getElementById('btn-refresh-viewport').addEventListener('click', function () {
+    refreshViewportSnapshot();
+  });
+
+  const viewportAutoRefresh = document.getElementById('viewport-auto-refresh');
+  if (viewportAutoRefresh) {
+    viewportAutoRefresh.addEventListener('change', function () {
+      setViewportAutoRefresh(viewportAutoRefresh.checked);
+    });
+  }
 
   els.btnDeleteSelected.addEventListener('click', function () {
     removeSelected();

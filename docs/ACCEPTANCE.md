@@ -184,6 +184,17 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 18.4 | Rotate selected 90° | Item rotation updates in serialized layout |
 | 18.5 | 3D preview canvas | Isometric boxes update while dragging |
 
+## Phase 19 — Video export + live view
+
+| # | Step | Expected |
+|---|---|---|
+| 19.1 | Export LOD Tour MP4 (ffmpeg installed) | `.mp4` file created |
+| 19.2 | Export without ffmpeg | Frames + `encode_lod_tour.ps1` / `.sh` |
+| 19.3 | Palette search | Chips filter by keyword |
+| 19.4 | Apply custom W/D/H | Serialized layout includes dimensions |
+| 19.5 | Snap + wall magnet on drag | Positions align to grid/walls |
+| 19.6 | Refresh viewport | PNG preview in Sources panel |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos

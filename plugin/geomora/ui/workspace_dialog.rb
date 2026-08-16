@@ -435,6 +435,14 @@ module Geomora
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)
           end
+
+          dialog.add_action_callback('refresh_viewport_snapshot') do |_ctx, _json|
+            snapshot = Core::ViewportSnapshot.capture
+            dialog.execute_script("window.geomora.setViewportSnapshot(#{snapshot.to_json})")
+            post_message(dialog, 'success', 'Viewport snapshot refreshed.')
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
         end
 
         def enrich_params(params)

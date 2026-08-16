@@ -188,6 +188,10 @@ module Geomora
         LodCapture.export_gif(model, path, delay_centiseconds: delay_centiseconds, width: width, height: height)
       end
 
+      def self.export_tour_video(model, path, format: 'mp4', fps: LodVideoExporter::DEFAULT_FPS)
+        LodVideoExporter.export(model, path, format: format, fps: fps)
+      end
+
       def self.escape_html(text)
         text.to_s
             .gsub('&', '&amp;')

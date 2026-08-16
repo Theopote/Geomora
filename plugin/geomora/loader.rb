@@ -73,7 +73,9 @@ module Geomora
     core/lod_presentation
     core/png_reader
     core/gif_encoder
-    core/lod_capture
+    core/layout_snap
+    core/viewport_snapshot
+    core/lod_video_exporter
     core/constraint_solver
     core/lod_scenes
     core/lod_scene_pages

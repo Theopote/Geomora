@@ -50,6 +50,8 @@ module Geomora
           lod_menu.add_item('Export LOD Capture HTML...') { export_lod_tour_capture_html }
           lod_menu.add_item('Export LOD Tour Frames...') { export_lod_tour_frames }
           lod_menu.add_item('Export LOD Tour GIF...') { export_lod_tour_gif }
+          lod_menu.add_item('Export LOD Tour MP4...') { export_lod_tour_mp4 }
+          lod_menu.add_item('Export LOD Tour WebM...') { export_lod_tour_webm }
           lod_menu.add_item('Play LOD Tour') { play_lod_tour }
           lod_menu.add_separator
           lod_menu.add_item('Reload Fixture Catalog') { reload_fixture_catalog }
@@ -104,6 +106,28 @@ module Geomora
           ::UI.messagebox("LOD tour GIF exported:\n\n#{saved}")
         rescue GeomoraError => e
           ::UI.messagebox("LOD GIF export failed:\n\n#{e.message}")
+        end
+
+        def export_lod_tour_mp4
+          path = ::UI.savepanel('Export LOD tour MP4', '', 'geomora_lod_tour.mp4')
+          return unless path
+
+          saved = Core::Project.export_lod_tour_video(path, format: 'mp4')
+          message = saved.to_s.end_with?('.ps1', '.sh') ? "Frames exported. Run encoder script:\n\n#{saved}" : "LOD tour MP4 exported:\n\n#{saved}"
+          ::UI.messagebox(message)
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD MP4 export failed:\n\n#{e.message}")
+        end
+
+        def export_lod_tour_webm
+          path = ::UI.savepanel('Export LOD tour WebM', '', 'geomora_lod_tour.webm')
+          return unless path
+
+          saved = Core::Project.export_lod_tour_video(path, format: 'webm')
+          message = saved.to_s.end_with?('.ps1', '.sh') ? "Frames exported. Run encoder script:\n\n#{saved}" : "LOD tour WebM exported:\n\n#{saved}"
+          ::UI.messagebox(message)
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD WebM export failed:\n\n#{e.message}")
         end
 
         def reload_fixture_catalog

@@ -1,13 +1,21 @@
 (function () {
   'use strict';
 
+  const GRID_MM = 100;
+  const MAGNET_MM = 80;
+  const WALL_INSET = 600;
+
   const state = {
     storeys: [],
     activeStoreyIndex: 0,
     activeRoomIndex: 0,
     palette: [],
+    paletteFilter: '',
     drag: null,
-    paletteDrag: null
+    paletteDrag: null,
+    selectedItemIndex: null,
+    snapGrid: true,
+    wallMagnet: true
   };
 
   function initLayoutEditor(deps) {
@@ -17,6 +25,10 @@
     const storeySelect = document.getElementById('layout-editor-storey');
     const panel = document.getElementById('layout-editor-panel');
     const paletteEl = document.getElementById('layout-catalog-palette');
+    const paletteSearch = document.getElementById('layout-palette-search');
+    const itemSizePanel = document.getElementById('layout-item-size');
+    const snapGridInput = document.getElementById('layout-snap-grid');
+    const wallMagnetInput = document.getElementById('layout-wall-magnet');
     if (!canvas || !roomSelect || !panel) return;
 
     const ctx = canvas.getContext('2d');
@@ -25,6 +37,21 @@
     const syncBtn = document.getElementById('btn-sync-layout-field');
     const previewBtn = document.getElementById('btn-preview-catalog-diff');
     const rotateBtn = document.getElementById('btn-rotate-selected');
+    const applySizeBtn = document.getElementById('btn-apply-item-size');
+    const widthInput = document.getElementById('layout-item-width');
+    const depthInput = document.getElementById('layout-item-depth');
+    const heightInput = document.getElementById('layout-item-height');
+
+    if (snapGridInput) {
+      snapGridInput.addEventListener('change', function () {
+        state.snapGrid = snapGridInput.checked;
+      });
+    }
+    if (wallMagnetInput) {
+      wallMagnetInput.addEventListener('change', function () {
+        state.wallMagnet = wallMagnetInput.checked;
+      });
+    }
 
     if (openBtn) {
       openBtn.addEventListener('click', function () {
@@ -49,9 +76,29 @@
       });
     }
 
+    if (paletteSearch) {
+      paletteSearch.addEventListener('input', function () {
+        state.paletteFilter = paletteSearch.value.trim().toLowerCase();
+        renderPalette();
+      });
+    }
+
+    if (applySizeBtn) {
+      applySizeBtn.addEventListener('click', function () {
+        const item = getSelectedItem();
+        if (!item) return;
+        item.width = Number(widthInput.value) || item.width;
+        item.depth = Number(depthInput.value) || item.depth;
+        item.height = Number(heightInput.value) || item.height;
+        item.customSize = true;
+        render();
+        render3d();
+      });
+    }
+
     if (rotateBtn) {
       rotateBtn.addEventListener('click', function () {
-        const item = selectedItem();
+        const item = getSelectedItem();
         if (!item) return;
         item.rotation = ((item.rotation || 0) + 90) % 360;
         render();
@@ -63,7 +110,9 @@
       storeySelect.addEventListener('change', function () {
         state.activeStoreyIndex = Number(storeySelect.value) || 0;
         state.activeRoomIndex = 0;
+        state.selectedItemIndex = null;
         rebuildRoomSelect();
+        updateItemSizePanel();
         render();
         render3d();
       });
@@ -71,18 +120,28 @@
 
     roomSelect.addEventListener('change', function () {
       state.activeRoomIndex = Number(roomSelect.value) || 0;
+      state.selectedItemIndex = null;
+      updateItemSizePanel();
       render();
       render3d();
     });
 
     canvas.addEventListener('mousedown', function (event) {
       const hit = hitTest(event);
-      if (!hit) return;
+      if (!hit) {
+        state.selectedItemIndex = null;
+        updateItemSizePanel();
+        render();
+        return;
+      }
+      state.selectedItemIndex = hit.index;
       state.drag = {
         itemIndex: hit.index,
         offsetX: hit.localX - hit.item.position[0],
         offsetY: hit.localY - hit.item.position[1]
       };
+      updateItemSizePanel();
+      render();
     });
 
     canvas.addEventListener('dragover', function (event) {
@@ -96,15 +155,19 @@
       const room = currentRoom();
       if (!room) return;
       const point = canvasToModel(event, room);
-      room.items.push({
+      const snapped = applySnap(point.x, point.y, room, state.paletteDrag);
+      const item = {
         kind: state.paletteDrag.kind,
         width: state.paletteDrag.width,
         depth: state.paletteDrag.depth,
         height: state.paletteDrag.height,
-        position: [Math.round(point.x), Math.round(point.y), 0],
+        position: [snapped[0], snapped[1], 0],
         rotation: 0
-      });
+      };
+      room.items.push(item);
+      state.selectedItemIndex = room.items.length - 1;
       state.paletteDrag = null;
+      updateItemSizePanel();
       render();
       render3d();
     });
@@ -115,11 +178,13 @@
       if (!room) return;
       const point = canvasToModel(event, room);
       const item = room.items[state.drag.itemIndex];
-      item.position = [
-        Math.round(point.x - state.drag.offsetX),
-        Math.round(point.y - state.drag.offsetY),
-        0
-      ];
+      const snapped = applySnap(
+        point.x - state.drag.offsetX,
+        point.y - state.drag.offsetY,
+        room,
+        item
+      );
+      item.position = [snapped[0], snapped[1], 0];
       render();
       render3d();
     });
@@ -133,18 +198,29 @@
       state.storeys = payload;
       state.activeStoreyIndex = 0;
       state.activeRoomIndex = 0;
+      state.selectedItemIndex = null;
       rebuildStoreySelect();
       rebuildRoomSelect();
       panel.hidden = false;
+      updateItemSizePanel();
       render();
       render3d();
     }
 
     function setPalette(items) {
       state.palette = items || [];
+      renderPalette();
+    }
+
+    function renderPalette() {
       if (!paletteEl) return;
       paletteEl.innerHTML = '';
+      const filter = state.paletteFilter;
       state.palette.forEach(function (entry) {
+        const label = (entry.label || entry.kind || '').toLowerCase();
+        const kind = (entry.kind || '').toLowerCase();
+        if (filter && label.indexOf(filter) === -1 && kind.indexOf(filter) === -1) return;
+
         const chip = document.createElement('button');
         chip.type = 'button';
         chip.className = 'layout-palette-chip';
@@ -165,14 +241,21 @@
         chip.addEventListener('click', function () {
           const room = currentRoom();
           if (!room) return;
-          room.items.push({
+          const snapped = applySnap(600, 600, room, {
+            width: Number(entry.width),
+            depth: Number(entry.depth)
+          });
+          const item = {
             kind: entry.kind,
             width: Number(entry.width),
             depth: Number(entry.depth),
             height: Number(entry.height),
-            position: [600, 600, 0],
+            position: [snapped[0], snapped[1], 0],
             rotation: 0
-          });
+          };
+          room.items.push(item);
+          state.selectedItemIndex = room.items.length - 1;
+          updateItemSizePanel();
           render();
           render3d();
         });
@@ -223,7 +306,8 @@
               0
             ],
             rotation: item.rotation ? Number(item.rotation) : null,
-            orientation: item.orientation || null
+            orientation: item.orientation || null,
+            customSize: !!item.customSize
           };
         })
       };
@@ -250,10 +334,49 @@
       return storey.rooms[state.activeRoomIndex] || null;
     }
 
-    function selectedItem() {
-      if (!state.drag) return null;
+    function getSelectedItem() {
       const room = currentRoom();
-      return room ? room.items[state.drag.itemIndex] : null;
+      if (!room || state.selectedItemIndex === null) return null;
+      return room.items[state.selectedItemIndex] || null;
+    }
+
+    function updateItemSizePanel() {
+      if (!itemSizePanel) return;
+      const item = getSelectedItem();
+      if (!item) {
+        itemSizePanel.hidden = true;
+        return;
+      }
+      itemSizePanel.hidden = false;
+      if (widthInput) widthInput.value = Math.round(item.width);
+      if (depthInput) depthInput.value = Math.round(item.depth);
+      if (heightInput) heightInput.value = Math.round(item.height);
+    }
+
+    function applySnap(x, y, room, item) {
+      let sx = x;
+      let sy = y;
+      if (state.snapGrid) {
+        sx = Math.round(sx / GRID_MM) * GRID_MM;
+        sy = Math.round(sy / GRID_MM) * GRID_MM;
+      }
+      if (state.wallMagnet && room && item) {
+        const bounds = room.bounds;
+        const width = item.width || 0;
+        const depth = item.depth || 0;
+        const magnets = [
+          { x: bounds.x_min + WALL_INSET, y: sy, dist: Math.abs(sx - (bounds.x_min + WALL_INSET)) },
+          { x: bounds.x_max - WALL_INSET - width, y: sy, dist: Math.abs(sx - (bounds.x_max - WALL_INSET - width)) },
+          { x: sx, y: bounds.y_min + WALL_INSET, dist: Math.abs(sy - (bounds.y_min + WALL_INSET)) },
+          { x: sx, y: bounds.y_max - WALL_INSET - depth, dist: Math.abs(sy - (bounds.y_max - WALL_INSET - depth)) }
+        ];
+        const best = magnets.sort(function (a, b) { return a.dist - b.dist; })[0];
+        if (best.dist <= MAGNET_MM) {
+          sx = best.x;
+          sy = best.y;
+        }
+      }
+      return [Math.round(sx), Math.round(sy)];
     }
 
     function rebuildStoreySelect() {
@@ -293,6 +416,9 @@
 
     function serializeItem(item) {
       let base = item.kind + '@' + Math.round(item.position[0]) + ',' + Math.round(item.position[1]);
+      if (item.customSize) {
+        base += ',' + Math.round(item.width) + 'x' + Math.round(item.depth) + 'x' + Math.round(item.height);
+      }
       if (item.rotation) base += '@' + item.rotation;
       return base;
     }
@@ -305,6 +431,10 @@
       const offsetX = 12;
       const offsetY = 12;
 
+      if (state.snapGrid) {
+        drawGrid(ctx, room, scale, offsetX, offsetY);
+      }
+
       ctx.fillStyle = '#1f2430';
       ctx.strokeStyle = '#5f6b7c';
       ctx.lineWidth = 1;
@@ -314,8 +444,35 @@
       ctx.strokeRect(offsetX, offsetY, roomWidth, roomHeight);
 
       room.items.forEach(function (item, index) {
-        drawPlanItem(ctx, item, room, scale, offsetX, offsetY, index === (state.drag && state.drag.itemIndex));
+        drawPlanItem(
+          ctx,
+          item,
+          room,
+          scale,
+          offsetX,
+          offsetY,
+          index === state.selectedItemIndex || index === (state.drag && state.drag.itemIndex)
+        );
       });
+    }
+
+    function drawGrid(ctx2d, room, scale, offsetX, offsetY) {
+      ctx2d.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx2d.lineWidth = 1;
+      for (let x = room.bounds.x_min; x <= room.bounds.x_max; x += GRID_MM) {
+        const px = offsetX + (x - room.bounds.x_min) * scale;
+        ctx2d.beginPath();
+        ctx2d.moveTo(px, offsetY);
+        ctx2d.lineTo(px, offsetY + (room.bounds.y_max - room.bounds.y_min) * scale);
+        ctx2d.stroke();
+      }
+      for (let y = room.bounds.y_min; y <= room.bounds.y_max; y += GRID_MM) {
+        const py = offsetY + (y - room.bounds.y_min) * scale;
+        ctx2d.beginPath();
+        ctx2d.moveTo(offsetX, py);
+        ctx2d.lineTo(offsetX + (room.bounds.x_max - room.bounds.x_min) * scale, py);
+        ctx2d.stroke();
+      }
     }
 
     function drawPlanItem(ctx2d, item, room, scale, offsetX, offsetY, selected) {
@@ -376,8 +533,6 @@
       const h = Math.max(8, (item.height / 3000) * 60);
       const base = isoPoints(x, y, w, d, originX, originY);
       const top = base.map(function (point) { return { x: point.x, y: point.y - h }; });
-      ctx2d.fillStyle = '#8ab4f8';
-      ctx2d.strokeStyle = '#1a1a1a';
       drawIsoFace(ctx2d, base[0], base[1], top[1], top[0], '#6f9be0');
       drawIsoFace(ctx2d, base[1], base[2], top[2], top[1], '#4f7ec4');
       drawIsoFace(ctx2d, base[0], base[1], base[2], base[3], '#8ab4f8', true);

@@ -1,0 +1,7 @@
+{
+  "model_file": "mobile_sam_v1.onnx",
+  "preferred_backend": "grabcut_v1",
+  "grabcut_iterations": 4,
+  "inner_margin": 0.06,
+  "notes": "Optional MobileSAM ONNX — set GEOMORA_SAM_MODEL or place file in models/. GrabCut+threshold runs without it."
+}

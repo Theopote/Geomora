@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.34.0 — Photo/Video Reconstruction</div>
+    <div class="subtitle">v0.35.0 — Photo/Video Reconstruction</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -35,6 +35,7 @@
       <label class="detect-method-label" for="detect-method">Detection</label>
       <select id="detect-method" class="detect-method">
         <option value="auto" selected>Auto (YOLO → Facade row → Contour)</option>
+        <option value="sam_v1">SAM refine (Auto + mask)</option>
         <option value="facade_row_v1">Facade row (rectified photos)</option>
         <option value="yolo_v1">YOLO</option>
         <option value="contour_v1">Contour (fallback)</option>

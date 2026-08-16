@@ -6,11 +6,12 @@ import cv2
 
 from .contour_detector import detect_contour_elements
 from .facade_row_detector import detect_facade_row_elements
+from .mask_refiner import refine_detection_result
 from .models import DetectionResult
 from .scale_estimator import estimate_scale
 from .yolo_detector import detect_yolo_elements, model_available
 
-SUPPORTED_METHODS = ("auto", "contour_v1", "facade_row_v1", "yolo_v1")
+SUPPORTED_METHODS = ("auto", "contour_v1", "facade_row_v1", "yolo_v1", "sam_v1")
 
 
 def _with_scale_hint(result: DetectionResult) -> DetectionResult:
@@ -19,6 +20,17 @@ def _with_scale_hint(result: DetectionResult) -> DetectionResult:
         result.scale_hint = hint
         result.debug = {**result.debug, "scale_hint": hint}
     return result
+
+
+def _detect_auto(image, *, return_overlay: bool = True) -> DetectionResult:
+    if model_available():
+        yolo_result = detect_yolo_elements(image, return_overlay=return_overlay)
+        if yolo_result.elements:
+            return yolo_result
+    row_result = detect_facade_row_elements(image, return_overlay=return_overlay)
+    if row_result.elements:
+        return row_result
+    return detect_contour_elements(image, return_overlay=return_overlay)
 
 
 def detect_facade(
@@ -51,12 +63,10 @@ def detect_facade(
     if normalized_method == "yolo_v1":
         return _with_scale_hint(detect_yolo_elements(image, return_overlay=return_overlay))
 
+    if normalized_method == "sam_v1":
+        base = _detect_auto(image, return_overlay=False)
+        refined = refine_detection_result(image, base, return_overlay=return_overlay)
+        return _with_scale_hint(refined)
+
     if normalized_method == "auto":
-        if model_available():
-            yolo_result = detect_yolo_elements(image, return_overlay=return_overlay)
-            if yolo_result.elements:
-                return _with_scale_hint(yolo_result)
-        row_result = detect_facade_row_elements(image, return_overlay=return_overlay)
-        if row_result.elements:
-            return _with_scale_hint(row_result)
-        return _with_scale_hint(detect_contour_elements(image, return_overlay=return_overlay))
+        return _with_scale_hint(_detect_auto(image, return_overlay=return_overlay))

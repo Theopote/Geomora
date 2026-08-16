@@ -31,7 +31,8 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 3.2 | Overlay view | Click box selects window; Delete removes it |
 | 3.3 | Draw window | Drag creates new window box on rectified image |
 | 3.4 | Resize / move | Corner handles resize; drag moves box |
-| 3.5 | >8 windows | Generate blocked with review message |
+| 3.6 | **SAM refine** (`sam_v1`) | Tighter boxes; overlay shows green mask tint; `debug.base_method` set |
+| 3.7 | >8 windows | Generate blocked with review message |
 | 3.6 | **Export YOLO Labels** (after rectify + overlay boxes) | Writes `{dataset}/{split}/images/*.jpg` + matching `labels/*.txt` |
 
 ## IR + Generate

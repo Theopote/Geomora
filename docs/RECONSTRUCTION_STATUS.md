@@ -1,6 +1,6 @@
 # Geomora Reconstruction Status (Master Doc Alignment)
 
-**Updated:** v0.34.0  
+**Updated:** v0.35.0  
 **Canonical references:** `docs/Geomora Phase 0 — Cursor Master Prompt v0.1.md`, `docs/Geomora 技术架构与开发手册 v0.1.md`
 
 Geomora's core mission:
@@ -25,6 +25,16 @@ Presentation features (LOD tours, layout PDF, MP4 export) are **secondary** and 
 | Phase 5 | Pattern / component reuse | ✅ Core complete |
 | Phase 6 | Multi-view + fusion + depth | ✅ Core complete |
 | Phase 7+ | Full building from params | ✅ Code complete (not vision-driven) |
+
+---
+
+### Phase 3.6 — SAM mask refinement
+
+| Feature | Description |
+|---------|-------------|
+| `sam_v1` | Auto detect → GrabCut/threshold mask → tighter `bbox_norm` |
+| Workspace | Detection: **SAM refine (Auto + mask)** |
+| Overlay | Green mask tint on refined regions |
 
 ---
 
@@ -89,7 +99,7 @@ Synthetic acceptance assets:
 |----------|------|
 | P0 | Fine-tune `yolo_v1` on **real** rectified facades — label with `docs/YOLO_LABELING.md`, train via `docs/YOLO_TRAINING.md` |
 | P0 | Complete **real photo Stage A** sign-off — `docs/REAL_PHOTO_ACCEPTANCE.md` §7 |
-| P1 | SAM mask refinement (Phase 3.6) |
+| P1 | Optional MobileSAM ONNX backend (model file + export script) |
 | P1 | Video metadata in IR `sources[]` (video_id, frame_index, timestamp) |
 | P2 | Full constraint graph solver |
 | P2 | Vision-driven floor plan / storey inference |

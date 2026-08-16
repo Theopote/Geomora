@@ -38,3 +38,11 @@ $env:GEOMORA_DETECTION_CONFIG = "D:\models\custom_detection_config.json"
 - **Training:** `ultralytics` (see `requirements-dev.txt`)
 
 When the ONNX file is missing, `method=auto` falls back to `contour_v1`.
+
+## SAM refinement (Phase 3.6)
+
+See **`docs/PHASE_3_6.md`**. Runs without extra models (GrabCut + threshold). Optional:
+
+```powershell
+$env:GEOMORA_SAM_MODEL = "D:\models\mobile_sam_v1.onnx"
+```

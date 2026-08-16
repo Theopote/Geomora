@@ -761,7 +761,7 @@ module Geomora
         end
 
         def contour_fallback?(method)
-          %w[auto yolo_v1].include?(method.to_s.strip.downcase)
+          %w[auto yolo_v1 sam_v1].include?(method.to_s.strip.downcase)
         end
 
         def detection_overlay_url(result)

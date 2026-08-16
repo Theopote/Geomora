@@ -9,7 +9,7 @@
 | 3.3 Ruby DetectClient + DetectionMapper | ✅ |
 | 3.4 Workspace UI (Detect + Overlay) | ✅ |
 | 3.5 YOLO ONNX (`yolo_v1`) | ✅ bootstrap — train via `backend/scripts/train_yolo_facade.py` |
-| 3.6 SAM refinement | ⏳ deferred |
+| 3.6 SAM refinement | ✅ v0.35.0 (`sam_v1` — GrabCut + threshold; see `docs/PHASE_3_6.md`) |
 | 3.7 `facade_row_v1` row detector | ✅ v0.33.0 |
 | 3.8 Auto wall scale from detection | ✅ v0.33.0 |
 
@@ -125,7 +125,7 @@ POST /detect
 Content-Type: multipart/form-data
 
 image: <file>   # rectified facade recommended
-method: auto | yolo_v1 | contour_v1   # optional, default auto
+method: auto | yolo_v1 | facade_row_v1 | contour_v1 | sam_v1   # optional, default auto
 ```
 
 **Response:**
@@ -181,7 +181,7 @@ tests/backend/
 | **3.3** | Ruby client + mapper | Unit smoke in SketchUp |
 | **3.4** | Workspace UI | Detect → form populated |
 | **3.5** | YOLO ONNX (`yolo_v1`) | Train script + pytest when model present |
-| **3.6** | SAM refinement (optional) | Mask → tighter bbox |
+| **3.6** | SAM refinement (`sam_v1`) | Mask → tighter bbox — ✅ v0.35.0 |
 
 ---
 

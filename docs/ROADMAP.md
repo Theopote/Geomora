@@ -19,8 +19,9 @@ Phase design docs (`docs/PHASE_*.md`) explain *what* each layer does. They do **
 | 20 real building photos curated | 5 res / 3 office / 3 old / 3 commercial / 2 occluded / 2 perspective / 2 low-light | ⚠️ 28 local, manifest selecting 20 |
 | Split: train / val / hold-out | 10 / 5 / 5 (hold-out never in training) | ⚠️ manifest created |
 | Run full Photo → SketchUp workflow | All 20 | ☐ SketchUp manual pass pending |
-| Record failures (no code fixes yet) | `cache/benchmark_a1_e2e.json` | ☐ pending |
-| Detection CLI baseline | `cache/benchmark_a1_detection.json` | ✅ 26/28 auto-detect pass |
+| Export checklist pack | `cache/benchmark_a1/index.html` | ✅ ready |
+| Record failures (no code fixes yet) | `cache/benchmark_a1_e2e.json` | ✅ detection baseline done |
+| Detection CLI baseline | 18/20 smoke pass (hold-out 3/5) | ✅ see `docs/A1_BASELINE_REPORT.md` |
 
 **Exit:** Failure taxonomy populated; RQS scores recorded per image; hold-out untouched.
 
@@ -95,6 +96,7 @@ Phase design docs (`docs/PHASE_*.md`) explain *what* each layer does. They do **
 | Doc | Role |
 |-----|------|
 | `docs/REAL_PHOTO_ACCEPTANCE.md` | Stage A workflow + RQS rubric |
+| `docs/A1_BASELINE_REPORT.md` | A1 detection baseline snapshot |
 | `docs/MODEL_ARTIFACT_POLICY.md` | What stays in git vs releases |
 | `docs/OBSERVATION_LAYER.md` | Perception → Understanding boundary |
 | `docs/ARCHITECTURE.md` | Layer design (no progress claims) |

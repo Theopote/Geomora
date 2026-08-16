@@ -241,15 +241,23 @@ Stage B：多视角 Fuse、证据驱动的 SAM — 不在本清单范围。
 # 健康检查
 curl http://127.0.0.1:8765/health
 
-# A1 检测基线（20 张 manifest）
+# A1 检测基线（自动）
+
+```powershell
 .\.venv\Scripts\python scripts\run_real_photo_benchmark.py
-.\.venv\Scripts\python scripts\run_real_photo_benchmark.py --split holdout
-
-# 全量检测 smoke（本地 cache 全部图）
 .\.venv\Scripts\python scripts\accept_real_photos.py --images cache\real_photo_desktop_rectified --method auto --report cache\benchmark_a1_detection.json
+```
 
-# 可视化验收包（P0 优先）
-.\.venv\Scripts\python scripts\export_real_photo_review.py --images cache\real_photo_desktop_rectified --report cache\benchmark_a1_detection.json --rectify-log cache\real_photo_rectify_log.json --out cache\real_photo_review
+# A1 SketchUp 人工验收
+
+```powershell
+# 生成验收包（hold-out 优先排序 + overlay + CSV 模板）
+.\.venv\Scripts\python scripts\export_a1_checklist.py
+# 浏览器打开 cache\benchmark_a1\index.html
+
+# SketchUp 跑完 20 张后，填写 cache\benchmark_a1\checklist_scores.csv，再导入：
+.\.venv\Scripts\python scripts\import_a1_e2e_scores.py --csv cache\benchmark_a1\checklist_scores.csv
+```
 
 # 合成 YOLO 验证
 .\.venv\Scripts\python scripts\validate_yolo_facade.py

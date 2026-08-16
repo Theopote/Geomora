@@ -1591,6 +1591,9 @@
     requestCatalogDiff: function () {
       sketchupCall('preview_fixture_catalog_diff', JSON.stringify(collectParams()));
     },
+    exportLayoutReport: function () {
+      sketchupCall('export_layout_report', JSON.stringify(collectParams()));
+    },
     syncLayoutField: function (layout) {
       const field = els.form.querySelector('[name="room_furniture_layouts"]');
       if (field) field.value = layout || '';
@@ -1631,16 +1634,30 @@
     sketchupCall('refresh_viewport_snapshot');
   }
 
-  function setViewportAutoRefresh(enabled) {
+  function startViewportStream(interval) {
+    sketchupCall('start_viewport_stream', JSON.stringify({ interval: interval || 1.0 }));
+  }
+
+  function stopViewportStream() {
+    sketchupCall('stop_viewport_stream');
+    stopViewportStreamFallback();
+  }
+
+  function startViewportStreamFallback(interval) {
+    stopViewportStreamFallback();
+    refreshViewportSnapshot();
+    viewportRefreshTimer = setInterval(refreshViewportSnapshot, (interval || 1) * 1000);
+  }
+
+  function stopViewportStreamFallback() {
     if (viewportRefreshTimer) {
       clearInterval(viewportRefreshTimer);
       viewportRefreshTimer = null;
     }
-    if (enabled) {
-      refreshViewportSnapshot();
-      viewportRefreshTimer = setInterval(refreshViewportSnapshot, 3000);
-    }
   }
+
+  window.geomora.startViewportStreamFallback = startViewportStreamFallback;
+  window.geomora.stopViewportStreamFallback = stopViewportStreamFallback;
 
   document.getElementById('btn-pick-image').addEventListener('click', function () {
     sketchupCall('pick_image');
@@ -1745,12 +1762,20 @@
     refreshViewportSnapshot();
   });
 
-  const viewportAutoRefresh = document.getElementById('viewport-auto-refresh');
-  if (viewportAutoRefresh) {
-    viewportAutoRefresh.addEventListener('change', function () {
-      setViewportAutoRefresh(viewportAutoRefresh.checked);
+  const viewportLiveStream = document.getElementById('viewport-live-stream');
+  if (viewportLiveStream) {
+    viewportLiveStream.addEventListener('change', function () {
+      if (viewportLiveStream.checked) {
+        startViewportStream(1.0);
+      } else {
+        stopViewportStream();
+      }
     });
   }
+
+  document.getElementById('btn-export-layout-report').addEventListener('click', function () {
+    sketchupCall('export_layout_report', JSON.stringify(collectParams()));
+  });
 
   els.btnDeleteSelected.addEventListener('click', function () {
     removeSelected();

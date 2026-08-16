@@ -195,6 +195,16 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 19.5 | Snap + wall magnet on drag | Positions align to grid/walls |
 | 19.6 | Refresh viewport | PNG preview in Sources panel |
 
+## Phase 20 — Stream + native video + layout report
+
+| # | Step | Expected |
+|---|---|---|
+| 20.1 | Live stream (1s) | Viewport updates via Ruby timer |
+| 20.2 | Export LOD Tour AVI (native) | `.avi` without ffmpeg |
+| 20.3 | Export MP4 without ffmpeg | Falls back to `.avi` |
+| 20.4 | Layout Undo / Redo | Prior positions restored |
+| 20.5 | Export layout report | HTML with SVG per room |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos

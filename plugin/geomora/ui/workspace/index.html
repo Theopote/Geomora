@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.28.0 — Video Export + Live View</div>
+    <div class="subtitle">v0.29.0 — Stream + Layout Report</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -58,13 +58,13 @@
       <div id="secondary-meta" class="meta">Secondary: not loaded</div>
       <div id="multiview-meta" class="meta">Multi-view: not registered</div>
 
-      <div class="section-title">Live View (Phase 19)</div>
+      <div class="section-title">Live View (Phase 19–20)</div>
       <div id="viewport-snapshot-panel" class="viewport-snapshot-panel">
         <img id="viewport-snapshot-image" alt="SketchUp viewport snapshot" hidden>
-        <div id="viewport-snapshot-placeholder" class="viewport-placeholder">Click Refresh to capture the active SketchUp view</div>
+        <div id="viewport-snapshot-placeholder" class="viewport-placeholder">Click Refresh or enable Live stream</div>
         <div class="inline-actions">
           <button type="button" id="btn-refresh-viewport" class="btn-link">Refresh viewport</button>
-          <label class="checkbox-label compact"><input id="viewport-auto-refresh" type="checkbox"> Auto (3s)</label>
+          <label class="checkbox-label compact"><input id="viewport-live-stream" type="checkbox"> Live stream (1s)</label>
         </div>
       </div>
     </aside>
@@ -164,7 +164,7 @@
           <button type="button" id="btn-preview-catalog-diff" class="btn-link">Preview catalog diff</button>
         </div>
 
-        <div class="section-title">Layout Editor (Phase 17–19)</div>
+        <div class="section-title">Layout Editor (Phase 17–20)</div>
         <label class="checkbox-label"><input name="include_furniture_wall_align" type="checkbox"> Wall-aligned furniture placement</label>
         <label class="checkbox-label"><input id="layout-snap-grid" type="checkbox" checked> Snap to grid (100 mm)</label>
         <label class="checkbox-label"><input id="layout-wall-magnet" type="checkbox" checked> Wall magnet</label>
@@ -172,6 +172,9 @@
           <button type="button" id="btn-open-layout-editor" class="btn-link">Open layout editor</button>
           <button type="button" id="btn-sync-layout-field" class="btn-link">Apply editor to layouts field</button>
           <button type="button" id="btn-rotate-selected" class="btn-link">Rotate selected 90°</button>
+          <button type="button" id="btn-layout-undo" class="btn-link">Undo</button>
+          <button type="button" id="btn-layout-redo" class="btn-link">Redo</button>
+          <button type="button" id="btn-export-layout-report" class="btn-link">Export layout report</button>
         </div>
         <div id="layout-editor-panel" class="layout-editor-panel" hidden>
           <div class="layout-editor-row">

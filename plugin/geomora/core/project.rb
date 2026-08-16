@@ -128,6 +128,23 @@ module Geomora
         LodPresentation.export_tour_video(model, path, format: format)
       end
 
+      def self.export_lod_tour_avi(path)
+        model = Sketchup.active_model
+        LodPresentation.export_tour_avi(model, path)
+      end
+
+      def self.export_layout_report(path, params)
+        LayoutReportExporter.export_html(params, path)
+      end
+
+      def self.start_viewport_stream(dialog, interval: 1.0)
+        ViewportStream.start(dialog, interval: interval)
+      end
+
+      def self.stop_viewport_stream
+        ViewportStream.stop
+      end
+
       def self.viewport_snapshot
         ViewportSnapshot.capture
       end

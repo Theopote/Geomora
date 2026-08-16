@@ -82,15 +82,17 @@ tests/core/layout_snap_test.rb
 
 ---
 
-## 7. Deferred (Phase 20+)
+## 7. Deferred (Phase 20 — delivered in v0.29.0)
 
-- In-dialog live viewport streaming (no manual refresh)
-- MP4 export without ffmpeg (native encoder)
-- Layout editor undo/redo stack
-- Batch export all storeys as layout PDF
+See `docs/PHASE_20.md` for live stream, native AVI, undo/redo, and layout report.
+
+Remaining for Phase 21+:
+
+- True MP4 mux without ffmpeg
+- PDF export without browser print
 
 ---
 
 ## 8. Gate to Phase 20
 
-Video export and live viewport preview complete the presentation pipeline for client deliverables beyond static GIF/HTML.
+Streaming viewport and native video close the presentation loop for offline client deliverables.

@@ -18,6 +18,12 @@
     wallMagnet: true
   };
 
+  const history = {
+    stack: [],
+    index: -1,
+    max: 50
+  };
+
   function initLayoutEditor(deps) {
     const canvas = document.getElementById('layout-editor-canvas');
     const canvas3d = document.getElementById('layout-preview-3d-canvas');
@@ -37,6 +43,9 @@
     const syncBtn = document.getElementById('btn-sync-layout-field');
     const previewBtn = document.getElementById('btn-preview-catalog-diff');
     const rotateBtn = document.getElementById('btn-rotate-selected');
+    const undoBtn = document.getElementById('btn-layout-undo');
+    const redoBtn = document.getElementById('btn-layout-redo');
+    const reportBtn = document.getElementById('btn-export-layout-report');
     const applySizeBtn = document.getElementById('btn-apply-item-size');
     const widthInput = document.getElementById('layout-item-width');
     const depthInput = document.getElementById('layout-item-depth');
@@ -91,8 +100,7 @@
         item.depth = Number(depthInput.value) || item.depth;
         item.height = Number(heightInput.value) || item.height;
         item.customSize = true;
-        render();
-        render3d();
+        commitHistory();
       });
     }
 
@@ -101,8 +109,21 @@
         const item = getSelectedItem();
         if (!item) return;
         item.rotation = ((item.rotation || 0) + 90) % 360;
-        render();
-        render3d();
+        commitHistory();
+      });
+    }
+
+    if (undoBtn) {
+      undoBtn.addEventListener('click', undo);
+    }
+
+    if (redoBtn) {
+      redoBtn.addEventListener('click', redo);
+    }
+
+    if (reportBtn) {
+      reportBtn.addEventListener('click', function () {
+        deps.exportLayoutReport();
       });
     }
 
@@ -168,8 +189,7 @@
       state.selectedItemIndex = room.items.length - 1;
       state.paletteDrag = null;
       updateItemSizePanel();
-      render();
-      render3d();
+      commitHistory();
     });
 
     window.addEventListener('mousemove', function (event) {
@@ -190,8 +210,55 @@
     });
 
     window.addEventListener('mouseup', function () {
+      if (state.drag) commitHistory();
       state.drag = null;
     });
+
+    function snapshotStoreys() {
+      return JSON.stringify(state.storeys);
+    }
+
+    function restoreStoreys(json) {
+      state.storeys = JSON.parse(json);
+      rebuildStoreySelect();
+      rebuildRoomSelect();
+      updateItemSizePanel();
+      render();
+      render3d();
+    }
+
+    function pushHistory() {
+      const snap = snapshotStoreys();
+      if (history.stack[history.index] === snap) return;
+      history.stack = history.stack.slice(0, history.index + 1);
+      history.stack.push(snap);
+      if (history.stack.length > history.max) history.stack.shift();
+      history.index = history.stack.length - 1;
+    }
+
+    function commitHistory() {
+      pushHistory();
+      render();
+      render3d();
+    }
+
+    function undo() {
+      if (history.index <= 0) return;
+      history.index -= 1;
+      restoreStoreys(history.stack[history.index]);
+    }
+
+    function redo() {
+      if (history.index >= history.stack.length - 1) return;
+      history.index += 1;
+      restoreStoreys(history.stack[history.index]);
+    }
+
+    function resetHistory() {
+      history.stack = [];
+      history.index = -1;
+      pushHistory();
+    }
 
     function setPreview(storeys) {
       const payload = normalizeStoreys(storeys);
@@ -202,6 +269,7 @@
       rebuildStoreySelect();
       rebuildRoomSelect();
       panel.hidden = false;
+      resetHistory();
       updateItemSizePanel();
       render();
       render3d();
@@ -256,8 +324,7 @@
           room.items.push(item);
           state.selectedItemIndex = room.items.length - 1;
           updateItemSizePanel();
-          render();
-          render3d();
+          commitHistory();
         });
         paletteEl.appendChild(chip);
       });

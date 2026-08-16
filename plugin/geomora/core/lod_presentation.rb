@@ -192,6 +192,10 @@ module Geomora
         LodVideoExporter.export(model, path, format: format, fps: fps)
       end
 
+      def self.export_tour_avi(model, path, fps: LodVideoExporter::DEFAULT_FPS)
+        LodVideoExporter.export_native_avi(model, path, fps: fps)
+      end
+
       def self.escape_html(text)
         text.to_s
             .gsub('&', '&amp;')

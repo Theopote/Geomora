@@ -114,6 +114,13 @@ module Geomora
         end
         GifEncoder.encode(frames, path, delay_centiseconds: delay_centiseconds)
       end
+
+      def self.export_avi(model, path, fps: LodVideoExporter::DEFAULT_FPS, width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT)
+        frames = capture_pages(model, width: width, height: height).map do |frame|
+          frame_rgb(frame['path'])
+        end
+        AviEncoder.encode(frames, path, fps: fps)
+      end
     end
   end
 end

@@ -16,12 +16,21 @@ module Geomora
         if ffmpeg
           encode_with_ffmpeg(ffmpeg, frames, path, format: format, fps: fps)
           path
+        elsif format.to_s.downcase == 'mp4'
+          avi_path = path.sub(/\.mp4\z/i, '.avi')
+          rgb_frames = frames.map { |frame| LodCapture.frame_rgb(frame['path']) }
+          AviEncoder.encode(rgb_frames, avi_path, fps: fps)
+          Logger.warn("ffmpeg not found; exported native AVI: #{avi_path}")
+          avi_path
         else
           script_path = write_encode_script(frames, path, format: format, fps: fps)
           Logger.warn("ffmpeg not found; wrote encoder script: #{script_path}")
           script_path
         end
       end
+
+      def self.export_native_avi(model, path, fps: DEFAULT_FPS, width: LodCapture::DEFAULT_WIDTH, height: LodCapture::DEFAULT_HEIGHT)
+        LodCapture.export_avi(model, path, fps: fps, width: width, height: height)
 
       def self.ffmpeg_path
         FFMPEG_NAMES.each do |name|

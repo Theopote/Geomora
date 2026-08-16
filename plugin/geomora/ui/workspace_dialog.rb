@@ -443,6 +443,32 @@ module Geomora
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)
           end
+
+          dialog.add_action_callback('start_viewport_stream') do |_ctx, json|
+            payload = JSON.parse(json || '{}')
+            interval = payload['interval'] || 1.0
+            Core::ViewportStream.start(dialog, interval: interval)
+            post_message(dialog, 'success', format('Viewport stream started (%ss).', interval))
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
+          dialog.add_action_callback('stop_viewport_stream') do |_ctx, _json|
+            Core::ViewportStream.stop
+            dialog.execute_script('window.geomora.stopViewportStreamFallback()')
+            post_message(dialog, 'success', 'Viewport stream stopped.')
+          end
+
+          dialog.add_action_callback('export_layout_report') do |_ctx, json|
+            params = enrich_params(JSON.parse(json))
+            path = ::UI.savepanel('Export layout report', '', 'geomora_layout_report.html')
+            return unless path
+
+            saved = Core::LayoutReportExporter.export_html(params, path)
+            post_message(dialog, 'success', "Layout report exported:\n#{saved}")
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
         end
 
         def enrich_params(params)

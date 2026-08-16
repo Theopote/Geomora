@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 module Geomora
-  VERSION = '0.11.0'
+  VERSION = '0.13.0'
   SCHEMA_VERSION = '0.1'
 end

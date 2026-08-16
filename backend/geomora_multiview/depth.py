@@ -3,20 +3,51 @@ from __future__ import annotations
 import cv2
 import numpy as np
 
-from .neural_depth import MidasModelNotFoundError, model_available, relative_depth_map_midas
+from .colmap_depth import load_colmap_depth_map
+from .depth_registry import available_models, resolve_auto_neural_method
+from .neural_depth import DepthModelNotFoundError, model_available, relative_depth_map_neural
 
-DEPTH_METHODS = ("auto", "gradient_laplacian_v1", "midas_v21_v1")
+DEPTH_METHODS = (
+    "auto",
+    "gradient_laplacian_v1",
+    "colmap_dense_v1",
+    "depth_anything_v2_small_v1",
+    "depth_anything_v2_small_q4_v1",
+    "marigold_v1_1_v1",
+    "midas_v21_v1",
+)
+
+NEURAL_METHODS = {
+    "depth_anything_v2_small_v1",
+    "depth_anything_v2_small_q4_v1",
+    "marigold_v1_1_v1",
+    "midas_v21_v1",
+}
 
 
 def resolve_depth_method(method: str) -> str:
     normalized = (method or "auto").strip().lower()
     if normalized == "auto":
-        return "midas_v21_v1" if model_available() else "gradient_laplacian_v1"
+        return resolve_auto_neural_method() or "gradient_laplacian_v1"
     if normalized not in DEPTH_METHODS:
         raise ValueError(f"Unsupported depth method: {method}")
-    if normalized == "midas_v21_v1" and not model_available():
-        raise ValueError("MiDaS depth model not found. Run backend/scripts/download_midas_model.py")
+    if normalized in NEURAL_METHODS and not model_available(normalized):
+        raise ValueError(_missing_model_message(normalized))
     return normalized
+
+
+def _missing_model_message(method: str) -> str:
+    if method == "depth_anything_v2_small_v1":
+        return "Depth Anything V2 model not found. Run backend/scripts/download_depth_models.py --model da2"
+    if method == "depth_anything_v2_small_q4_v1":
+        return "Depth Anything V2 Q4 model not found. Run backend/scripts/download_depth_models.py --model da2-q4"
+    if method == "marigold_v1_1_v1":
+        return "Marigold backend unavailable. Install: pip install -r backend/requirements-depth.txt"
+    if method == "midas_v21_v1":
+        return "MiDaS depth model not found. Run backend/scripts/download_depth_models.py --model midas"
+    if method == "colmap_dense_v1":
+        return "COLMAP dense depth unavailable. Use register_method=colmap_dense_v1 during fusion."
+    return f"Depth model unavailable: {method}"
 
 
 def gradient_laplacian_v1(gray: np.ndarray) -> np.ndarray:
@@ -36,12 +67,29 @@ def gradient_laplacian_v1(gray: np.ndarray) -> np.ndarray:
     return np.clip(depth, 0.0, 1.0)
 
 
-def compute_depth_map(image_bgr: np.ndarray, method: str = "auto") -> tuple[np.ndarray, str]:
-    resolved = resolve_depth_method(method)
-    if resolved == "midas_v21_v1":
+def compute_depth_map(
+    image_bgr: np.ndarray,
+    method: str = "auto",
+    *,
+    colmap_depth_path: str | None = None,
+) -> tuple[np.ndarray, str]:
+    normalized = (method or "auto").strip().lower()
+
+    if normalized in {"auto", "colmap_dense_v1"} and colmap_depth_path:
         try:
-            return relative_depth_map_midas(image_bgr), "midas_v21_v1"
-        except MidasModelNotFoundError as error:
+            return load_colmap_depth_map(colmap_depth_path), "colmap_dense_v1"
+        except FileNotFoundError as error:
+            if normalized == "colmap_dense_v1":
+                raise ValueError(str(error)) from error
+
+    if normalized == "colmap_dense_v1":
+        raise ValueError(_missing_model_message("colmap_dense_v1"))
+
+    resolved = resolve_depth_method(method)
+    if resolved in NEURAL_METHODS:
+        try:
+            return relative_depth_map_neural(resolved, image_bgr), resolved
+        except (DepthModelNotFoundError, RuntimeError) as error:
             if method == "auto":
                 gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
                 return gradient_laplacian_v1(gray), "gradient_laplacian_v1"
@@ -69,3 +117,15 @@ def opening_depth_score(depth_map: np.ndarray, bbox_norm: list[float]) -> float:
     if region.size == 0:
         return 0.5
     return float(region.mean())
+
+
+def depth_capabilities() -> dict[str, object]:
+    from .onnx_providers import onnx_device_info
+
+    models = available_models()
+    return {
+        "depth_models": models,
+        "depth_auto": resolve_auto_neural_method() or "gradient_laplacian_v1",
+        "depth_methods": list(DEPTH_METHODS),
+        "onnx_device": onnx_device_info(),
+    }

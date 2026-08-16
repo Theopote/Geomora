@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.11.0 — Neural Depth + COLMAP</div>
+    <div class="subtitle">v0.13.0 — COLMAP Dense + GPU ONNX</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -34,12 +34,17 @@
         <option value="auto" selected>Auto (COLMAP if available)</option>
         <option value="feature_homography_v1">ORB homography</option>
         <option value="colmap_sparse_v1">COLMAP sparse</option>
+        <option value="colmap_dense_v1">COLMAP dense</option>
       </select>
       <label class="detect-method-label" for="depth-method">Depth</label>
       <select id="depth-method" class="detect-method">
-        <option value="auto" selected>Auto (MiDaS if available)</option>
+        <option value="auto" selected>Auto (DA2/Q4 → Marigold → MiDaS)</option>
+        <option value="colmap_dense_v1">COLMAP dense</option>
+        <option value="depth_anything_v2_small_v1">Depth Anything V2</option>
+        <option value="depth_anything_v2_small_q4_v1">Depth Anything V2 (Q4)</option>
+        <option value="marigold_v1_1_v1">Marigold (diffusers)</option>
+        <option value="midas_v21_v1">MiDaS</option>
         <option value="gradient_laplacian_v1">Gradient proxy</option>
-        <option value="midas_v21_v1">MiDaS neural</option>
       </select>
       <button id="btn-load-template" class="btn secondary">Load Phase 0 Template</button>
       <div class="view-toggle">

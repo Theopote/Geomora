@@ -51,5 +51,6 @@ def test_multiview_capabilities_endpoint(client: TestClient):
     assert response.status_code == 200
     payload = response.json()
     assert "colmap_available" in payload
-    assert "midas_available" in payload
+    assert "depth_models" in payload
+    assert "depth_auto" in payload
     assert "depth_methods" in payload

@@ -1,0 +1,33 @@
+{
+  "depth_anything_v2_small_v1": {
+    "label": "Depth Anything V2 Small",
+    "model_file": "depth_anything_v2_small.onnx",
+    "model_data_file": "depth_anything_v2_small.onnx_data",
+    "preprocess": "dpt_v2",
+    "input_size": 518,
+    "ensure_multiple_of": 14,
+    "mean": [0.485, 0.456, 0.406],
+    "std": [0.229, 0.224, 0.225],
+    "env_var": "GEOMORA_DEPTH_ANYTHING_MODEL"
+  },
+  "depth_anything_v2_small_q4_v1": {
+    "label": "Depth Anything V2 Small (Q4)",
+    "model_file": "depth_anything_v2_small_q4.onnx",
+    "model_data_file": "depth_anything_v2_small_q4.onnx_data",
+    "preprocess": "dpt_v2",
+    "input_size": 518,
+    "ensure_multiple_of": 14,
+    "mean": [0.485, 0.456, 0.406],
+    "std": [0.229, 0.224, 0.225],
+    "env_var": "GEOMORA_DEPTH_ANYTHING_Q4_MODEL"
+  },
+  "midas_v21_v1": {
+    "label": "MiDaS v2.1 Small",
+    "model_file": "midas_v21_small.onnx",
+    "preprocess": "imagenet_square",
+    "input_size": 256,
+    "mean": [0.485, 0.456, 0.406],
+    "std": [0.229, 0.224, 0.225],
+    "env_var": "GEOMORA_MIDAS_MODEL"
+  }
+}

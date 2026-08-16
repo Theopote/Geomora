@@ -86,15 +86,19 @@ POST /multiview/register
 method: auto | feature_homography_v1 | colmap_sparse_v1
 
 POST /multiview/fuse
-depth_method: auto | gradient_laplacian_v1 | midas_v21_v1
-register_method: auto | feature_homography_v1 | colmap_sparse_v1
+depth_method: auto | colmap_dense_v1 | depth_anything_v2_small_v1 | depth_anything_v2_small_q4_v1 | marigold_v1_1_v1 | midas_v21_v1 | gradient_laplacian_v1
+register_method: auto | feature_homography_v1 | colmap_sparse_v1 | colmap_dense_v1
 ```
 
-Optional MiDaS model:
+Optional depth models:
 
 ```bat
-.venv\Scripts\python.exe scripts\download_midas_model.py
+.venv\Scripts\python.exe scripts\download_depth_models.py --model all
+pip install -r requirements-depth.txt   # Marigold via diffusers
+pip install onnxruntime-gpu             # NVIDIA CUDA provider (optional)
 ```
+
+GPU provider env: `GEOMORA_ONNX_DEVICE=auto|cuda|dml|cpu`
 
 COLMAP: install the CLI and ensure `colmap` is on PATH for `colmap_sparse_v1`.
 

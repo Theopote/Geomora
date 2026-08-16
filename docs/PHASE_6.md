@@ -1,6 +1,6 @@
 # Geomora Phase 6 — Multi-view Reconstruction
 
-**Status:** Phase 6 **COMPLETE** (v0.9.0) · Phase 6.5 **COMPLETE** (v0.10.0) · Phase 6.5+ **COMPLETE** (v0.11.0)
+**Status:** Phase 6 **COMPLETE** (v0.9.0) · 6.5 **COMPLETE** (v0.10.0) · 6.5+ **COMPLETE** (v0.11.0) · 6.5++ **COMPLETE** (v0.12.0) · 6.5+++ **COMPLETE** (v0.13.0)
 
 | Step | Status |
 |---|---|
@@ -98,11 +98,11 @@ tests/backend/
 
 ---
 
-## 5. Future (Phase 6.5++)
+## 5. Future (Phase 7+)
 
-- Depth Anything v2 / Marigold ONNX exports
-- COLMAP dense reconstruction and mesh export
 - Cross-session multi-photo opening graph fusion
+- COLMAP mesh export to SketchUp
+- TensorRT / CoreML ONNX providers
 
 ---
 
@@ -119,21 +119,21 @@ Phase 6 links multiple **photos** to one facade session. See **Phase 6.5** below
 | 6.5.6 MiDaS ONNX depth (`midas_v21_v1`) with auto fallback | ✅ |
 | 6.5.7 COLMAP sparse registration (`colmap_sparse_v1`) | ✅ |
 | 6.5.8 `GET /multiview/capabilities` + Workspace method selectors | ✅ |
-| 6.5.9 Depth Anything / COLMAP dense / full SfM export | ⏳ deferred |
+| 6.5.9 Depth Anything / Marigold upgrade | ✅ (see Phase 6.5++ below); COLMAP dense deferred |
 
-### Depth methods
+### Depth methods (v0.11 baseline)
 
 | Method | Description |
 |---|---|
-| `auto` | MiDaS if `backend/models/midas_v21_small.onnx` exists, else gradient |
+| `auto` | Best available neural model, else gradient (see 6.5++ for priority) |
 | `gradient_laplacian_v1` | Fast Laplacian + radial proxy (default without model) |
-| `midas_v21_v1` | Monocular neural depth via ONNX Runtime |
+| `midas_v21_v1` | MiDaS v2.1 small ONNX |
 
-Download model:
+Download MiDaS:
 
 ```bat
 cd backend
-.venv\Scripts\python.exe scripts\download_midas_model.py
+.venv\Scripts\python.exe scripts\download_depth_models.py --model midas
 ```
 
 Or set `GEOMORA_MIDAS_MODEL` to a custom ONNX path.
@@ -158,9 +158,101 @@ method: auto | feature_homography_v1 | colmap_sparse_v1
 
 POST /multiview/fuse
 method: auto | yolo_v1 | contour_v1
-depth_method: auto | gradient_laplacian_v1 | midas_v21_v1
+depth_method: auto | depth_anything_v2_small_v1 | marigold_v1_1_v1 | midas_v21_v1 | gradient_laplacian_v1
 register_method: auto | feature_homography_v1 | colmap_sparse_v1
 homography: optional JSON 3x3 matrix
+```
+
+---
+
+## Phase 6.5++ — Depth Model Upgrade (v0.12.0)
+
+| Step | Status |
+|---|---|
+| 6.5.10 Depth Anything V2 Small ONNX (`depth_anything_v2_small_v1`) | ✅ |
+| 6.5.11 Marigold v1-1 optional diffusers backend (`marigold_v1_1_v1`) | ✅ |
+| 6.5.12 Depth model registry + DPT preprocessing | ✅ |
+| 6.5.13 Unified downloader `download_depth_models.py` | ✅ |
+
+### Auto depth priority
+
+```text
+auto → depth_anything_v2_small_v1 → marigold_v1_1_v1 → midas_v21_v1 → gradient_laplacian_v1
+```
+
+### Depth methods (v0.12.0)
+
+| Method | Description |
+|---|---|
+| `auto` | Best available neural model, else gradient |
+| `depth_anything_v2_small_v1` | Depth Anything V2 Small (ONNX, ~99 MB + weights) |
+| `marigold_v1_1_v1` | Marigold v1-1 via diffusers (optional torch stack) |
+| `midas_v21_v1` | MiDaS v2.1 small ONNX (legacy fallback) |
+| `gradient_laplacian_v1` | Fast Laplacian + radial proxy |
+
+Download ONNX models:
+
+```bat
+cd backend
+.venv\Scripts\python.exe scripts\download_depth_models.py --model all
+```
+
+Marigold (optional, downloads weights on first use):
+
+```bat
+pip install -r requirements-depth.txt
+```
+
+`GET /multiview/capabilities` returns `depth_models`, `depth_auto`, and per-model availability flags.
+
+---
+
+## Phase 6.5+++ — COLMAP Dense + Quantized DA2 + GPU ONNX (v0.13.0)
+
+| Step | Status |
+|---|---|
+| 6.5.14 COLMAP dense registration (`colmap_dense_v1`) | ✅ |
+| 6.5.15 COLMAP dense depth map for fusion (`colmap_dense_v1`) | ✅ |
+| 6.5.16 Depth Anything V2 Q4 ONNX (`depth_anything_v2_small_q4_v1`) | ✅ |
+| 6.5.17 GPU ONNX Runtime providers (CUDA / DirectML) | ✅ |
+
+### Registration
+
+| Method | Description |
+|---|---|
+| `colmap_dense_v1` | Sparse COLMAP + undistort + patch-match stereo + fusion; falls back to sparse depth if dense fails |
+
+### Depth
+
+| Method | Description |
+|---|---|
+| `colmap_dense_v1` | Use COLMAP fused/sparse depth from dense registration workspace |
+| `depth_anything_v2_small_q4_v1` | Quantized DA2 (~27 MB weights, faster on CPU) |
+
+### Auto depth priority
+
+```text
+GPU:  DA2 full → DA2 Q4 → Marigold → MiDaS → gradient
+CPU:  DA2 Q4 → DA2 full → Marigold → MiDaS → gradient
+```
+
+When `register_method=colmap_dense_v1`, fusion auto-prefers COLMAP dense depth if available.
+
+### GPU ONNX
+
+Set execution provider via environment variable:
+
+```bat
+set GEOMORA_ONNX_DEVICE=auto    :: CUDA → DirectML → CPU
+set GEOMORA_ONNX_DEVICE=cuda    :: NVIDIA GPU (requires onnxruntime-gpu)
+set GEOMORA_ONNX_DEVICE=dml     :: Windows DirectML
+set GEOMORA_ONNX_DEVICE=cpu
+```
+
+Download quantized DA2:
+
+```bat
+.venv\Scripts\python.exe scripts\download_depth_models.py --model da2-q4
 ```
 
 ---

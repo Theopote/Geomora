@@ -9,9 +9,10 @@ import numpy as np
 from geomora_detect.overlays import draw_overlay, encode_overlay_jpeg
 from geomora_detect.pipeline import detect_facade
 
-from .colmap_sparse import colmap_available, register_views_colmap
-from .depth import DEPTH_METHODS, compute_depth_map
-from .neural_depth import model_available as midas_model_available
+from .colmap_common import colmap_available
+from .colmap_dense import register_views_colmap_dense
+from .colmap_sparse import register_views_colmap
+from .depth import DEPTH_METHODS, compute_depth_map, depth_capabilities
 from .feature_match import (
     detect_and_match,
     estimate_planar_homography,
@@ -20,8 +21,14 @@ from .feature_match import (
 )
 from .fusion import fuse_elements, transform_element
 from .models import FusionResult, MultiviewResult, ViewRegistration
+from .onnx_providers import onnx_device_info
 
-REGISTER_METHODS = ("auto", "feature_homography_v1", "colmap_sparse_v1")
+REGISTER_METHODS = (
+    "auto",
+    "feature_homography_v1",
+    "colmap_sparse_v1",
+    "colmap_dense_v1",
+)
 
 
 def resolve_register_method(method: str) -> str:
@@ -30,7 +37,7 @@ def resolve_register_method(method: str) -> str:
         return "colmap_sparse_v1" if colmap_available() else "feature_homography_v1"
     if normalized not in REGISTER_METHODS:
         raise ValueError(f"Unsupported registration method: {method}")
-    if normalized == "colmap_sparse_v1" and not colmap_available():
+    if normalized in {"colmap_sparse_v1", "colmap_dense_v1"} and not colmap_available():
         raise ValueError("COLMAP executable not found on PATH")
     return normalized
 
@@ -87,6 +94,8 @@ def register_views_orb(primary_path: str, secondary_path: str) -> MultiviewResul
 
 def register_views(primary_path: str, secondary_path: str, *, method: str = "auto") -> MultiviewResult:
     resolved = resolve_register_method(method)
+    if resolved == "colmap_dense_v1":
+        return register_views_colmap_dense(primary_path, secondary_path)
     if resolved == "colmap_sparse_v1":
         return register_views_colmap(primary_path, secondary_path)
     return register_views_orb(primary_path, secondary_path)
@@ -140,7 +149,15 @@ def fuse_openings(
 
     primary_h, primary_w = primary_bgr.shape[:2]
     secondary_h, secondary_w = secondary_bgr.shape[:2]
-    depth_map, resolved_depth_method = compute_depth_map(primary_bgr, method=depth_method)
+    colmap_depth_path = None
+    if registration and registration.debug:
+        colmap_depth_path = registration.debug.get("depth_map_path")
+
+    depth_map, resolved_depth_method = compute_depth_map(
+        primary_bgr,
+        method=depth_method,
+        colmap_depth_path=colmap_depth_path,
+    )
 
     primary_detection = detect_facade(str(primary), method=detect_method, return_overlay=False)
     secondary_detection = detect_facade(str(secondary), method=detect_method, return_overlay=False)
@@ -187,14 +204,23 @@ def fuse_openings(
             "primary_elements": len(primary_detection.elements),
             "secondary_elements": len(secondary_detection.elements),
             "fused_elements": len(fused_elements),
+            "colmap_dense_vertices": registration.debug.get("dense_vertices") if registration else None,
+            "colmap_dense_status": registration.debug.get("dense_status") if registration else None,
         },
     )
 
 
 def multiview_capabilities() -> dict[str, object]:
+    depth_info = depth_capabilities()
     return {
         "colmap_available": colmap_available(),
-        "midas_available": midas_model_available(),
+        "depth_models": depth_info["depth_models"],
+        "depth_auto": depth_info["depth_auto"],
+        "onnx_device": depth_info.get("onnx_device", onnx_device_info()),
         "register_methods": list(REGISTER_METHODS),
         "depth_methods": list(DEPTH_METHODS),
+        "midas_available": depth_info["depth_models"].get("midas_v21_v1", False),
+        "depth_anything_available": depth_info["depth_models"].get("depth_anything_v2_small_v1", False),
+        "depth_anything_q4_available": depth_info["depth_models"].get("depth_anything_v2_small_q4_v1", False),
+        "marigold_available": depth_info["depth_models"].get("marigold_v1_1_v1", False),
     }

@@ -1,39 +1,25 @@
 from __future__ import annotations
 
-import shutil
-import subprocess
 from pathlib import Path
 
 import cv2
 import numpy as np
 
-from .colmap_model import read_images_text, read_points3d_text
+from .colmap_common import (
+    colmap_available,
+    copy_view_images,
+    load_primary_secondary_images,
+    prepare_workspace,
+    read_image_shape,
+    run_sparse_reconstruction,
+)
+from .colmap_geometry import rasterize_depth_from_points
+from .colmap_model import read_cameras_text
 from .feature_match import estimate_planar_homography, homography_confidence
 from .models import MultiviewResult, ViewRegistration
 
 
-def colmap_available() -> bool:
-    return shutil.which("colmap") is not None
-
-
-def _run_colmap(args: list[str], *, cwd: Path) -> None:
-    command = ["colmap", *args]
-    completed = subprocess.run(
-        command,
-        cwd=str(cwd),
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if completed.returncode != 0:
-        stderr = (completed.stderr or completed.stdout or "").strip()
-        raise RuntimeError(stderr or f"COLMAP failed: {' '.join(command)}")
-
-
-def _shared_observations(
-    primary_image,
-    secondary_image,
-) -> tuple[np.ndarray, np.ndarray, int]:
+def _shared_observations(primary_image, secondary_image) -> tuple[np.ndarray, np.ndarray, int]:
     primary_lookup = {
         point3d_id: (x, y)
         for x, y, point3d_id in primary_image.points2d
@@ -64,81 +50,18 @@ def register_views_colmap(primary_path: str, secondary_path: str) -> MultiviewRe
     if not secondary.exists():
         raise ValueError(f"Secondary image not found: {secondary_path}")
 
-    workspace = primary.parent / "colmap_workspace"
-    image_dir = workspace / "images"
-    database_path = workspace / "database.db"
-    sparse_dir = workspace / "sparse"
-    if workspace.exists():
-        shutil.rmtree(workspace)
-    image_dir.mkdir(parents=True)
-    sparse_dir.mkdir(parents=True)
+    workspace = prepare_workspace(primary.parent)
+    copy_view_images(workspace, primary, secondary)
+    sparse_model_dir = run_sparse_reconstruction(workspace)
+    images, points3d, primary_image, secondary_image = load_primary_secondary_images(sparse_model_dir)
 
-    shutil.copy2(primary, image_dir / "primary.jpg")
-    shutil.copy2(secondary, image_dir / "secondary.jpg")
-
-    _run_colmap(
-        [
-            "feature_extractor",
-            "--database_path",
-            str(database_path),
-            "--image_path",
-            str(image_dir),
-            "--ImageReader.single_camera_per_image",
-            "1",
-            "--SiftExtraction.max_num_features",
-            "4096",
-        ],
-        cwd=workspace,
-    )
-    _run_colmap(
-        [
-            "exhaustive_matcher",
-            "--database_path",
-            str(database_path),
-        ],
-        cwd=workspace,
-    )
-    _run_colmap(
-        [
-            "mapper",
-            "--database_path",
-            str(database_path),
-            "--image_path",
-            str(image_dir),
-            "--output_path",
-            str(sparse_dir),
-        ],
-        cwd=workspace,
-    )
-
-    model_dir = sparse_dir / "0"
-    images_path = model_dir / "images.txt"
-    points_path = model_dir / "points3D.txt"
-    if not images_path.exists() or not points_path.exists():
-        raise RuntimeError("COLMAP mapper did not produce a sparse reconstruction")
-
-    images = read_images_text(images_path)
-    points3d = read_points3d_text(points_path)
-    primary_image = next((image for image in images.values() if image.name.endswith("primary.jpg")), None)
-    secondary_image = next((image for image in images.values() if image.name.endswith("secondary.jpg")), None)
-    if primary_image is None or secondary_image is None:
-        raise RuntimeError("COLMAP reconstruction missing one or both input images")
-
-    points_primary, points_secondary, match_count = _shared_observations(
-        primary_image,
-        secondary_image,
-    )
+    points_primary, points_secondary, match_count = _shared_observations(primary_image, secondary_image)
     homography, inlier_count = estimate_planar_homography(points_primary, points_secondary)
     if homography is None:
         raise RuntimeError("Unable to estimate homography from COLMAP observations")
 
-    primary_bgr = cv2.imread(str(primary))
-    secondary_bgr = cv2.imread(str(secondary))
-    if primary_bgr is None or secondary_bgr is None:
-        raise ValueError("Unable to read one or both images")
-
-    primary_h, primary_w = primary_bgr.shape[:2]
-    secondary_h, secondary_w = secondary_bgr.shape[:2]
+    primary_h, primary_w = read_image_shape(primary)
+    secondary_h, secondary_w = read_image_shape(secondary)
     homography_list = homography.astype(float).tolist()
     confidence = homography_confidence(match_count, inlier_count)
 
@@ -176,5 +99,6 @@ def register_views_colmap(primary_path: str, secondary_path: str) -> MultiviewRe
                 "tvec": list(secondary_image.tvec),
             },
             "sparse_points": len(points3d),
+            "workspace": str(workspace.root),
         },
     )

@@ -1,0 +1,9 @@
+# Optional depth backends for Phase 6.5++ (Marigold via diffusers).
+# Install only when neural depth beyond ONNX is needed:
+#   pip install -r requirements-depth.txt
+torch>=2.1.0
+diffusers>=0.28.0
+transformers>=4.36.0
+accelerate>=0.25.0
+safetensors>=0.4.0
+pillow>=10.0.0

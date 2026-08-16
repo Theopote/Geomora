@@ -1,93 +1,96 @@
 from __future__ import annotations
 
-import json
-import os
 from functools import lru_cache
-from pathlib import Path
 
 import cv2
 import numpy as np
 
-BACKEND_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_CONFIG_PATH = BACKEND_ROOT / "models" / "depth_config.json"
+from .depth_preprocess import dpt_v2, imagenet_square, resize_depth_to_image
+from .depth_registry import (
+    DepthModelNotFoundError,
+    load_registry,
+    marigold_model_available,
+    model_available,
+    onnx_model_available,
+    resolve_auto_neural_method,
+    resolve_model_paths,
+)
+from .onnx_providers import active_onnx_provider, resolve_onnx_providers
 
 
-class MidasModelNotFoundError(FileNotFoundError):
-    """Raised when the MiDaS ONNX model file is missing."""
-
-
-@lru_cache(maxsize=1)
-def _load_config(config_path: str) -> dict:
-    path = Path(config_path)
-    with path.open(encoding="utf-8") as handle:
-        return json.load(handle)
-
-
-@lru_cache(maxsize=1)
-def _load_session(model_path: str):
+@lru_cache(maxsize=8)
+def _load_session(model_path: str, provider_key: str):
     import onnxruntime as ort
 
     return ort.InferenceSession(
         model_path,
-        providers=["CPUExecutionProvider"],
+        providers=resolve_onnx_providers(),
     )
 
 
-def load_depth_config(config_path: str | None = None) -> dict:
-    path = Path(config_path or os.environ.get("GEOMORA_DEPTH_CONFIG", DEFAULT_CONFIG_PATH))
-    if not path.exists():
-        raise FileNotFoundError(f"Depth config not found: {path}")
-    return _load_config(str(path))
+def _resolve_io_names(session, config: dict) -> tuple[str, str]:
+    input_name = config.get("input_name") or session.get_inputs()[0].name
+    output_name = config.get("output_name") or session.get_outputs()[0].name
+    return input_name, output_name
 
 
-def resolve_model_path(config: dict) -> Path:
-    env_path = os.environ.get("GEOMORA_MIDAS_MODEL")
-    if env_path:
-        path = Path(env_path)
-        if path.exists():
-            return path
+def relative_depth_map_onnx(model_id: str, image_bgr: np.ndarray) -> np.ndarray:
+    registry = load_registry()
+    if model_id not in registry:
+        raise DepthModelNotFoundError(f"Unknown depth model: {model_id}")
 
-    model_file = config.get("model_file", "midas_v21_small.onnx")
-    path = BACKEND_ROOT / "models" / model_file
-    if path.exists():
-        return path
+    config = registry[model_id]
+    model_path, _data_path = resolve_model_paths(model_id)
+    provider_key = active_onnx_provider()
+    session = _load_session(str(model_path), provider_key)
+    input_name, output_name = _resolve_io_names(session, config)
 
-    raise MidasModelNotFoundError(f"MiDaS model not found: {path}")
+    preprocess = config.get("preprocess", "imagenet_square")
+    model_size: tuple[int, int] | None = None
+    if preprocess == "dpt_v2":
+        tensor, model_size = dpt_v2(
+            image_bgr,
+            int(config.get("input_size", 518)),
+            int(config.get("ensure_multiple_of", 14)),
+            config.get("mean", [0.485, 0.456, 0.406]),
+            config.get("std", [0.229, 0.224, 0.225]),
+        )
+    else:
+        tensor = imagenet_square(
+            image_bgr,
+            int(config.get("input_size", 256)),
+            config.get("mean", [0.485, 0.456, 0.406]),
+            config.get("std", [0.229, 0.224, 0.225]),
+        )
 
-
-def model_available(config_path: str | None = None) -> bool:
-    try:
-        config = load_depth_config(config_path)
-        resolve_model_path(config)
-        return True
-    except (MidasModelNotFoundError, FileNotFoundError, json.JSONDecodeError):
-        return False
-
-
-def _preprocess(image_bgr: np.ndarray, input_size: int, mean: list[float], std: list[float]) -> np.ndarray:
-    rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
-    resized = cv2.resize(rgb, (input_size, input_size), interpolation=cv2.INTER_CUBIC)
-    normalized = (resized - np.array(mean, dtype=np.float32)) / np.array(std, dtype=np.float32)
-    return np.transpose(normalized, (2, 0, 1))[np.newaxis, ...]
-
-
-def relative_depth_map_midas(image_bgr: np.ndarray, config_path: str | None = None) -> np.ndarray:
-    config = load_depth_config(config_path)
-    model_path = resolve_model_path(config)
-    session = _load_session(str(model_path))
-
-    input_size = int(config.get("input_size", 256))
-    mean = config.get("mean", [0.485, 0.456, 0.406])
-    std = config.get("std", [0.229, 0.224, 0.225])
-    input_name = config.get("input_name", "input")
-    output_name = config.get("output_name", "output")
-
-    tensor = _preprocess(image_bgr, input_size, mean, std)
     output = session.run([output_name], {input_name: tensor})[0]
     depth = output.squeeze().astype(np.float32)
+    return resize_depth_to_image(depth, image_bgr, model_size)
 
-    height, width = image_bgr.shape[:2]
-    depth = cv2.resize(depth, (width, height), interpolation=cv2.INTER_CUBIC)
-    depth = depth - depth.min()
-    depth = depth / (depth.max() + 1e-6)
-    return np.clip(depth, 0.0, 1.0)
+
+def relative_depth_map_midas(image_bgr: np.ndarray) -> np.ndarray:
+    return relative_depth_map_onnx("midas_v21_v1", image_bgr)
+
+
+def relative_depth_map_depth_anything_v2(image_bgr: np.ndarray) -> np.ndarray:
+    return relative_depth_map_onnx("depth_anything_v2_small_v1", image_bgr)
+
+
+def relative_depth_map_neural(model_id: str, image_bgr: np.ndarray) -> np.ndarray:
+    if model_id == "marigold_v1_1_v1":
+        from .marigold_depth import relative_depth_map_marigold
+
+        return relative_depth_map_marigold(image_bgr)
+    return relative_depth_map_onnx(model_id, image_bgr)
+
+
+__all__ = [
+    "DepthModelNotFoundError",
+    "marigold_model_available",
+    "model_available",
+    "onnx_model_available",
+    "resolve_auto_neural_method",
+    "relative_depth_map_depth_anything_v2",
+    "relative_depth_map_midas",
+    "relative_depth_map_neural",
+]

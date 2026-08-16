@@ -23,5 +23,6 @@ backend/.venv/
 backend/runs/
 backend/data/
 backend/models/*.onnx
+backend/models/*.onnx_data
 .pytest_tmp/
 plugin/geomora/cache/

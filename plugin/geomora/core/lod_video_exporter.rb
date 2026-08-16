@@ -42,6 +42,26 @@ module Geomora
         Mp4Encoder.encode(frames, path, fps: fps)
       end
 
+      def self.export_h264_mp4(model, path, fps: DEFAULT_FPS, width: LodCapture::DEFAULT_WIDTH, height: LodCapture::DEFAULT_HEIGHT)
+        frames = LodCapture.capture_pages(model, width: width, height: height).map do |frame|
+          LodCapture.frame_rgb(frame['path'])
+        end
+        raise GeomoraError, 'No Geomora LOD scenes found. Create LOD Scene Pages first.' if frames.empty?
+
+        ffmpeg = ffmpeg_path
+        if ffmpeg
+          workspace = frames_workspace(path)
+          png_frames = LodCapture.export_frames(model, workspace, width: width, height: height)
+          encode_with_ffmpeg(ffmpeg, png_frames, path, format: 'mp4', fps: fps)
+          Logger.info("H.264 MP4 exported via ffmpeg: #{path}")
+          return path
+        end
+
+        H264Mp4Encoder.encode(frames, path, fps: fps)
+        Logger.info("Native H.264 MP4 exported: #{path}")
+        path
+      end
+
       def self.ffmpeg_path
         FFMPEG_NAMES.each do |name|
           path = executable_on_path(name)

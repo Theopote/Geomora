@@ -493,6 +493,17 @@ module Geomora
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)
           end
+
+          dialog.add_action_callback('export_layout_report_pdf_booklet') do |_ctx, json|
+            params = enrich_params(JSON.parse(json))
+            path = ::UI.savepanel('Export layout booklet PDF', '', 'geomora_layout_booklet.pdf')
+            return unless path
+
+            saved = Core::LayoutReportExporter.export_pdf_booklet(params, path)
+            post_message(dialog, 'success', "Layout booklet PDF exported:\n#{saved}")
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
         end
 
         def enrich_params(params)

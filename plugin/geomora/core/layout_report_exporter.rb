@@ -50,6 +50,10 @@ module Geomora
         PdfReportExporter.export(params, path)
       end
 
+      def self.export_pdf_booklet(params, path)
+        PdfReportExporter.export_booklet(params, path)
+      end
+
       def self.render_room_page(storey, room)
         bounds = symbolize_bounds(room['bounds'])
         svg = render_svg(bounds, room['items'] || [])

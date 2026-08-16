@@ -200,6 +200,10 @@ module Geomora
         LodVideoExporter.export_native_mp4(model, path, fps: fps)
       end
 
+      def self.export_tour_h264_mp4(model, path, fps: LodVideoExporter::DEFAULT_FPS)
+        LodVideoExporter.export_h264_mp4(model, path, fps: fps)
+      end
+
       def self.escape_html(text)
         text.to_s
             .gsub('&', '&amp;')

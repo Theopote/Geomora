@@ -146,6 +146,15 @@ module Geomora
         LodPresentation.export_tour_mp4_native(model, path)
       end
 
+      def self.export_lod_tour_h264_mp4(path)
+        model = Sketchup.active_model
+        LodPresentation.export_tour_h264_mp4(model, path)
+      end
+
+      def self.export_layout_report_pdf_booklet(path, params)
+        LayoutReportExporter.export_pdf_booklet(params, path)
+      end
+
       def self.pause_viewport_stream
         ViewportStream.pause
       end

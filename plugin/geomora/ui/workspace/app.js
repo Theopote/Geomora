@@ -1659,17 +1659,26 @@
   window.geomora.startViewportStreamFallback = startViewportStreamFallback;
   window.geomora.stopViewportStreamFallback = stopViewportStreamFallback;
 
+  let viewportStreamWanted = false;
+
   function pauseViewportStream() {
+    const live = document.getElementById('viewport-live-stream');
+    viewportStreamWanted = !!(live && live.checked);
     sketchupCall('pause_viewport_stream');
     stopViewportStreamFallback();
-    const live = document.getElementById('viewport-live-stream');
     if (live) live.checked = false;
   }
 
   function resumeViewportStream() {
     const live = document.getElementById('viewport-live-stream');
     if (live) live.checked = true;
-    startViewportStream(1.0);
+    viewportStreamWanted = true;
+    sketchupCall('resume_viewport_stream', JSON.stringify({ interval: 1.0 }));
+  }
+
+  function resumeViewportStreamIfWanted() {
+    if (!viewportStreamWanted) return;
+    resumeViewportStream();
   }
 
   window.geomora.pauseViewportStream = pauseViewportStream;
@@ -1678,11 +1687,17 @@
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
       pauseViewportStream();
+    } else {
+      resumeViewportStreamIfWanted();
     }
   });
 
   window.addEventListener('blur', function () {
     pauseViewportStream();
+  });
+
+  window.addEventListener('focus', function () {
+    resumeViewportStreamIfWanted();
   });
 
   document.getElementById('btn-pick-image').addEventListener('click', function () {
@@ -1805,6 +1820,10 @@
 
   document.getElementById('btn-export-layout-pdf').addEventListener('click', function () {
     sketchupCall('export_layout_report_pdf', JSON.stringify(collectParams()));
+  });
+
+  document.getElementById('btn-export-layout-booklet').addEventListener('click', function () {
+    sketchupCall('export_layout_report_pdf_booklet', JSON.stringify(collectParams()));
   });
 
   els.btnDeleteSelected.addEventListener('click', function () {

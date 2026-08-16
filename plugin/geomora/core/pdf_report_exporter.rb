@@ -20,6 +20,64 @@ module Geomora
         path
       end
 
+      def self.export_booklet(params, path)
+        storeys = RoomLayoutEditor.preview_all_storeys(params)
+        raise GeomoraError, 'No rooms to export' if storeys.empty?
+
+        room_pages = storeys.flat_map do |storey|
+          (storey['rooms'] || []).map do |room|
+            { 'storey' => storey, 'room' => room }
+          end
+        end
+        pages = [render_cover_page(room_pages.length), render_toc_page(room_pages)]
+        room_pages.each_slice(2) do |pair|
+          pages << render_spread_page(pair)
+        end
+        write_pdf(path, pages)
+        path
+      end
+
+      def self.render_cover_page(room_count)
+        lines = [
+          title_commands('Geomora Layout Booklet'),
+          "BT /F1 12 Tf #{MARGIN} #{PAGE_HEIGHT - MARGIN - 40} Td (#{escape_pdf('Room layout reference')}) Tj ET",
+          "BT /F1 10 Tf #{MARGIN} #{PAGE_HEIGHT - MARGIN - 64} Td (#{escape_pdf(Time.now.utc.strftime('%Y-%m-%d %H:%M UTC'))}) Tj ET",
+          "BT /F1 10 Tf #{MARGIN} #{PAGE_HEIGHT - MARGIN - 80} Td (#{escape_pdf("#{room_count} rooms")}) Tj ET"
+        ]
+        lines.join("\n")
+      end
+
+      def self.render_toc_page(room_pages)
+        lines = [title_commands('Contents')]
+        room_pages.each_with_index do |entry, index|
+          label = "#{entry['storey']['label']} — #{entry['room']['name']}"
+          y = PAGE_HEIGHT - MARGIN - 48 - (index * 16)
+          lines << "BT /F1 10 Tf #{MARGIN} #{y} Td (#{escape_pdf("#{index + 1}. #{label}")}) Tj ET"
+        end
+        lines.join("\n")
+      end
+
+      def self.render_spread_page(pair)
+        pair.map.with_index do |entry, column|
+          render_page_column(entry['storey'], entry['room'], column)
+        end.join("\n")
+      end
+
+      def self.render_page_column(storey, room, column)
+        bounds = LayoutReportExporter.send(:symbolize_bounds, room['bounds'])
+        scale = scale_for(bounds) * 0.85
+        column_width = (PAGE_WIDTH - (MARGIN * 3)) / 2
+        origin_x = MARGIN + (column * (column_width + MARGIN))
+        origin_y = PAGE_HEIGHT - MARGIN - 80
+        commands = []
+        commands << "BT /F1 11 Tf #{origin_x} #{PAGE_HEIGHT - MARGIN - 24} Td (#{escape_pdf("#{storey['label']} — #{room['name']}")}) Tj ET"
+        commands << room_commands(bounds, origin_x, origin_y, scale)
+        (room['items'] || []).each do |item|
+          commands << item_commands(item, bounds, origin_x, origin_y, scale)
+        end
+        commands.join("\n")
+      end
+
       def self.render_page(storey, room)
         bounds = LayoutReportExporter.send(:symbolize_bounds, room['bounds'])
         scale = scale_for(bounds)

@@ -36,13 +36,12 @@ module Geomora
       def self.pause
         return unless active?
 
-        if timer_id && sketchup_timer?
+        if timer_id.is_a?(Integer) && sketchup_timer?
           ::UI.stop_timer(timer_id)
-          self.timer_id = :paused
         elsif dialog
           dialog.execute_script('window.geomora.stopViewportStreamFallback()')
-          self.timer_id = :paused
         end
+        self.timer_id = :paused
         Logger.info('Viewport stream paused')
       end
 
@@ -74,6 +73,7 @@ module Geomora
 
       def self.start_js_fallback(interval)
         dialog.execute_script("window.geomora.startViewportStreamFallback(#{interval.to_f})")
+        self.timer_id = :js
         true
       end
     end

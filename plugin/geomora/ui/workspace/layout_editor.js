@@ -15,7 +15,8 @@
     paletteDrag: null,
     selectedItemIndex: null,
     snapGrid: true,
-    wallMagnet: true
+    wallMagnet: true,
+    clipboard: null
   };
 
   const history = {
@@ -663,6 +664,35 @@
       return null;
     }
 
+    function removeSelected() {
+      const room = currentRoom();
+      if (!room || state.selectedItemIndex === null) return;
+      room.items.splice(state.selectedItemIndex, 1);
+      state.selectedItemIndex = null;
+      updateItemSizePanel();
+      commitHistory();
+    }
+
+    function copySelected() {
+      const item = getSelectedItem();
+      if (!item) return;
+      state.clipboard = JSON.parse(JSON.stringify(item));
+    }
+
+    function pasteClipboard() {
+      if (!state.clipboard) return;
+      const room = currentRoom();
+      if (!room) return;
+      const item = JSON.parse(JSON.stringify(state.clipboard));
+      const pos = item.position || [0, 0, 0];
+      const offset = applySnap(pos[0] + 200, pos[1] + 200, room, item);
+      item.position = [offset[0], offset[1], 0];
+      room.items.push(item);
+      state.selectedItemIndex = room.items.length - 1;
+      updateItemSizePanel();
+      commitHistory();
+    }
+
     window.geomoraLayoutEditor = {
       setPreview: setPreview,
       setPalette: setPalette,
@@ -670,6 +700,8 @@
       undo: undo,
       redo: redo,
       removeSelected: removeSelected,
+      copySelected: copySelected,
+      pasteClipboard: pasteClipboard,
       rotateSelected: function () {
         const item = getSelectedItem();
         if (!item) return;
@@ -691,6 +723,12 @@
       } else if (event.ctrlKey && event.key.toLowerCase() === 'y') {
         event.preventDefault();
         redo();
+      } else if (event.ctrlKey && event.key.toLowerCase() === 'c') {
+        event.preventDefault();
+        copySelected();
+      } else if (event.ctrlKey && event.key.toLowerCase() === 'v') {
+        event.preventDefault();
+        pasteClipboard();
       } else if (!event.ctrlKey && event.key.toLowerCase() === 'r') {
         event.preventDefault();
         window.geomoraLayoutEditor.rotateSelected();
@@ -699,15 +737,6 @@
         removeSelected();
       }
     });
-
-    function removeSelected() {
-      const room = currentRoom();
-      if (!room || state.selectedItemIndex === null) return;
-      room.items.splice(state.selectedItemIndex, 1);
-      state.selectedItemIndex = null;
-      updateItemSizePanel();
-      commitHistory();
-    }
   }
 
   document.addEventListener('DOMContentLoaded', function () {

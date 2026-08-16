@@ -75,15 +75,16 @@ tests/core/jpeg_frame_encoder_test.rb
 
 ---
 
-## 7. Deferred (Phase 22+)
+## 7. Deferred (Phase 22 — delivered in v0.31.0)
 
-- H.264 MP4 for broader player compatibility
-- Layout editor copy/paste
-- PDF multi-page booklet layout
-- Viewport stream resume on focus automatically
+See `docs/PHASE_22.md` for H.264 MP4, PDF booklet, copy/paste, and viewport auto-resume.
+
+Remaining for Phase 23+:
+
+- Smaller native H.264 file size (DCT intra encoding)
 
 ---
 
 ## 8. Gate to Phase 22
 
-Native MP4 and PDF deliverables complete the offline presentation package for client handoff.
+H.264 video and printable booklet complete the client presentation package.

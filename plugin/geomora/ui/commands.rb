@@ -53,6 +53,7 @@ module Geomora
           lod_menu.add_item('Export LOD Tour MP4...') { export_lod_tour_mp4 }
           lod_menu.add_item('Export LOD Tour WebM...') { export_lod_tour_webm }
           lod_menu.add_item('Export LOD Tour MP4 (native)...') { export_lod_tour_mp4_native }
+          lod_menu.add_item('Export LOD Tour MP4 (H.264)...') { export_lod_tour_h264_mp4 }
           lod_menu.add_item('Export LOD Tour AVI (native)...') { export_lod_tour_avi }
           lod_menu.add_item('Play LOD Tour') { play_lod_tour }
           lod_menu.add_separator
@@ -150,6 +151,18 @@ module Geomora
           ::UI.messagebox("LOD tour MP4 exported (no ffmpeg required):\n\n#{saved}")
         rescue GeomoraError => e
           ::UI.messagebox("LOD MP4 export failed:\n\n#{e.message}")
+        end
+
+        def export_lod_tour_h264_mp4
+          path = ::UI.savepanel('Export LOD tour MP4 (H.264)', '', 'geomora_lod_tour_h264.mp4')
+          return unless path
+
+          saved = Core::Project.export_lod_tour_h264_mp4(path)
+          ffmpeg = Core::LodVideoExporter.ffmpeg_path
+          note = ffmpeg ? 'libx264 via ffmpeg' : 'native baseline H.264 (no ffmpeg)'
+          ::UI.messagebox("LOD tour H.264 MP4 exported (#{note}):\n\n#{saved}")
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD H.264 MP4 export failed:\n\n#{e.message}")
         end
 
         def reload_fixture_catalog

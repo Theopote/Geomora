@@ -75,6 +75,9 @@ module Geomora
     core/gif_encoder
     core/jpeg_frame_encoder
     core/mp4_encoder
+    core/h264_bitstream
+    core/h264_frame_encoder
+    core/h264_mp4_encoder
     core/pdf_report_exporter
     core/avi_encoder
     core/viewport_stream

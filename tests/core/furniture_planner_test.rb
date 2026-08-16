@@ -81,4 +81,36 @@ class FurniturePlannerTest < Minitest::Test
     items = Geomora::Core::FurniturePlanner.plan(rooms: rooms, params: params, storey_index: 0)
     assert_equal [], items
   end
+
+  def test_collision_avoidance_separates_fixture_set_items
+    rooms = [
+      {
+        'id' => 'room_01_01',
+        'storey_id' => 'storey_01',
+        'semantic' => { 'room_type' => 'living' },
+        'geometry' => {
+          'polygon' => [
+            [0, 0, 0],
+            [5000, 0, 0],
+            [5000, 4000, 0],
+            [0, 4000, 0]
+          ]
+        }
+      }
+    ]
+    params = {
+      'lod_level' => 'lod_300',
+      'building_elements' => {
+        'furniture' => true,
+        'fixture_sets' => true,
+        'furniture_collision' => true
+      }
+    }
+
+    items = Geomora::Core::FurniturePlanner.plan(rooms: rooms, params: params, storey_index: 0)
+    assert_operator items.length, :>=, 2
+    first = items[0]['geometry']['position']
+    second = items[1]['geometry']['position']
+    refute_equal first[0..1], second[0..1]
+  end
 end

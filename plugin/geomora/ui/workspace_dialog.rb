@@ -389,6 +389,24 @@ module Geomora
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)
           end
+
+          dialog.add_action_callback('reload_fixture_catalog') do |_ctx, json|
+            params = enrich_params(JSON.parse(json))
+            catalog = Core::FixtureCatalog.reload!(params)
+            sets = catalog['sets'].is_a?(Hash) ? catalog['sets'].keys : []
+            post_message(dialog, 'success', format('Fixture catalog reloaded (%d sets)', sets.length))
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
+          dialog.add_action_callback('suggest_room_layout') do |_ctx, json|
+            params = enrich_params(JSON.parse(json))
+            suggestion = Core::RoomLayoutPresets.suggest(params)
+            dialog.execute_script("window.geomora.applyRoomLayoutSuggestion(#{suggestion.to_json})")
+            post_message(dialog, 'success', 'Room layout presets applied to form.')
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
         end
 
         def enrich_params(params)

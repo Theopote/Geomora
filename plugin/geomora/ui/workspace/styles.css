@@ -417,6 +417,12 @@ body {
   text-decoration: underline;
 }
 
+.inline-actions {
+  display: flex;
+  gap: 12px;
+  margin: 4px 0 10px;
+}
+
 .view-toggle {
   display: flex;
   gap: 6px;

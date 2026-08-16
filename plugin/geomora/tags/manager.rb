@@ -14,6 +14,9 @@ module Geomora
       Geomora_Balconies
       Geomora_Parapets
       Geomora_Cornices
+      Geomora_Trim
+      Geomora_Railings
+      Geomora_Eaves
       Geomora_Reference
     ].freeze
 

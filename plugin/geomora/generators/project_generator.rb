@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'building_generator'
+require_relative '../core/lod_policy'
 require_relative '../metadata/attributes'
 
 module Geomora
@@ -30,11 +31,13 @@ module Geomora
       private
 
       def build_context(document)
+        lod_level = Core::LodPolicy.normalize(document.project.lod_level)
         {
           tags: Tags::Manager.new(@model),
           component_manager: Components::ComponentManager.new(@model),
           project_id: document.project.id,
-          schema_version: document.schema_version
+          schema_version: document.schema_version,
+          lod_level: lod_level
         }
       end
 
@@ -46,7 +49,8 @@ module Geomora
           entity_id: document.project.id,
           entity_type: 'project',
           schema_version: document.schema_version,
-          project_id: document.project.id
+          project_id: document.project.id,
+          lod_level: Core::LodPolicy.normalize(document.project.lod_level)
         })
 
         @tags = Tags::Manager.new(@model)

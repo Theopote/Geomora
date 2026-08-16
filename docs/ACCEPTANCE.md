@@ -5,7 +5,7 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 ## Prerequisites
 
 - [ ] Python backend responds at `http://127.0.0.1:8765/health`
-- [ ] SketchUp extension **Geomora** enabled (v0.17.0+)
+- [ ] SketchUp extension **Geomora** enabled (v0.18.0+)
 - [ ] Fixture available: `examples/facade_perspective_synthetic.jpg`
 
 ## Phase 2 — Rectification
@@ -93,6 +93,15 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 9.3 | Perimeter walls on | Four walls per storey; corners intersect |
 | 9.4 | Roof / parapet | Only on top storey |
 | 9.5 | Validate | Passes with cumulative storey elevations |
+
+## Phase 10 — LOD + structural grid
+
+| # | Step | Expected |
+|---|---|---|
+| 10.1 | LOD 100 → Generate | Walls + slabs only; no window cuts |
+| 10.2 | LOD 300 + balcony → Generate | Trim, railing, eaves tags present |
+| 10.3 | Structural grid + columns → Generate | Multiple `grid_col_*` columns |
+| 10.4 | Element tree | Shows selected LOD level |
 
 ## Known limitations (acceptable for Stage A)
 

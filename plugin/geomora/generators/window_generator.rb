@@ -4,16 +4,18 @@ require_relative '../geometry/units'
 require_relative '../geometry/vectors'
 require_relative '../metadata/attributes'
 require_relative '../components/component_manager'
+require_relative '../core/lod_policy'
 
 module Geomora
   module Generators
     class WindowGenerator
-      def initialize(model, component_manager:, tags:, project_id:, schema_version:)
+      def initialize(model, component_manager:, tags:, project_id:, schema_version:, lod_level: 200)
         @model = model
         @component_manager = component_manager
         @tags = tags
         @project_id = project_id
         @schema_version = schema_version
+        @lod_level = lod_level
       end
 
       def generate(window, wall, storey_elevation, parent_entities)
@@ -62,6 +64,18 @@ module Geomora
           point(frame, 0, height - frame)
         ]
         ents.add_face(inner)
+
+        if Core::LodPolicy.include_lod300_details?(@lod_level)
+          mullion_half = 25.0
+          mid_x = width / 2.0
+          mullion = [
+            point(mid_x - mullion_half, 0, frame),
+            point(mid_x + mullion_half, 0, frame),
+            point(mid_x + mullion_half, 0, height - frame),
+            point(mid_x - mullion_half, 0, height - frame)
+          ]
+          ents.add_face(mullion)
+        end
       end
 
       def instance_transform(window, wall, storey_elevation)

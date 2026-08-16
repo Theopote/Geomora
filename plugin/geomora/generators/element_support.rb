@@ -8,13 +8,15 @@ module Geomora
     module ElementSupport
       private
 
-      def write_metadata(group, element)
-        Metadata::Attributes.write(group, {
+      def write_metadata(group, element, lod_level: nil)
+        attrs = {
           entity_id: element.id,
           entity_type: element.type,
           schema_version: @schema_version,
           project_id: @project_id
-        })
+        }
+        attrs['lod_level'] = lod_level if lod_level
+        Metadata::Attributes.write(group, attrs)
       end
 
       def to_len(mm)

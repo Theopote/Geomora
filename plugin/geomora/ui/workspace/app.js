@@ -818,6 +818,7 @@
       'Project: ' + params.project_name,
       'Wall: ' + params.wall_length + ' × ' + params.wall_height + ' × ' + params.wall_thickness + ' mm',
       'Storeys: ' + params.storey_count + (params.storey_height ? ' @ ' + params.storey_height + ' mm' : ''),
+      'LOD: ' + (params.lod_level || 'lod_200'),
       'Windows: ' + params.windows.length,
       'Door: ' + params.door.width + ' × ' + params.door.height + ' mm @ ' + params.door.offset
     ];
@@ -914,11 +915,15 @@
         balcony: formData.get('include_balcony') === 'on',
         parapet: formData.get('include_parapet') === 'on',
         cornice: formData.get('include_cornice') === 'on',
-        perimeter_walls: formData.get('include_perimeter_walls') === 'on'
+        perimeter_walls: formData.get('include_perimeter_walls') === 'on',
+        structural_grid: formData.get('include_structural_grid') === 'on'
       },
       storey_count: Number(formData.get('storey_count') || 1),
       storey_height: formData.get('storey_height') ? Number(formData.get('storey_height')) : null,
       repeat_openings: formData.get('repeat_openings') === 'on',
+      lod_level: formData.get('lod_level') || 'lod_200',
+      grid_x_spacing: formData.get('grid_x_spacing') ? Number(formData.get('grid_x_spacing')) : null,
+      grid_y_spacing: formData.get('grid_y_spacing') ? Number(formData.get('grid_y_spacing')) : null,
       geometry_doctor: {
         tiny_edges: formData.get('doctor_tiny_edges') === 'on',
         tiny_faces: formData.get('doctor_tiny_faces') === 'on',

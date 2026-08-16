@@ -25,7 +25,8 @@ module Geomora
             'name' => @params.fetch('project_name', 'Manual Facade'),
             'unit' => 'mm',
             'coordinate_system' => 'z_up',
-            'default_wall_thickness' => wall_thickness
+            'default_wall_thickness' => wall_thickness,
+            'lod_level' => lod_level
           },
           'buildings' => [
             {
@@ -90,13 +91,13 @@ module Geomora
         openings = []
         opening_ids = []
 
-        if repeat_openings_for_storey?(storey_index)
+        if LodPolicy.include_openings?(lod_level) && repeat_openings_for_storey?(storey_index)
           windows = build_windows(facade_wall_id, storey_index)
           openings.concat(windows)
           opening_ids.concat(windows.map { |window| window['id'] })
         end
 
-        if storey_index.zero?
+        if storey_index.zero? && LodPolicy.include_openings?(lod_level)
           door = build_door(facade_wall_id)
           if door
             openings << door
@@ -173,6 +174,10 @@ module Geomora
 
       def perimeter_walls_enabled?
         Core::WallEnclosure.enabled?(@params)
+      end
+
+      def lod_level
+        LodPolicy.normalize(@params['lod_level'])
       end
 
       def repeat_openings_for_storey?(index)

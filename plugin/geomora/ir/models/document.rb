@@ -4,7 +4,7 @@ module Geomora
   module IR
     module Models
       Project = Struct.new(
-        :id, :name, :unit, :coordinate_system, :default_wall_thickness,
+        :id, :name, :unit, :coordinate_system, :default_wall_thickness, :lod_level,
         keyword_init: true
       )
 
@@ -48,6 +48,9 @@ module Geomora
       Balcony = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
       Parapet = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
       Cornice = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
+      Trim = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
+      Railing = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
+      Eaves = Struct.new(:id, :type, :storey_id, :geometry, :semantic, :confidence, keyword_init: true)
 
       Opening = Struct.new(
         :id, :type, :parent_id, :geometry, :component, :confidence, :source,

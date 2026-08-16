@@ -93,4 +93,41 @@ class IRBuilderTest < Minitest::Test
     assert_equal 4, walls.length
     assert_equal 'perimeter', walls.first['semantic']['join_group']
   end
+
+  def test_lod_100_excludes_openings
+    params = {
+      'project_name' => 'LOD 100',
+      'wall_length' => 8000,
+      'wall_height' => 3000,
+      'wall_thickness' => 240,
+      'lod_level' => 'lod_100',
+      'windows' => [{ 'offset' => 500, 'width' => 1500, 'height' => 1500, 'sill_height' => 900 }],
+      'door' => { 'offset' => 0, 'width' => 900, 'height' => 2100 }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    assert_equal 'lod_100', ir['project']['lod_level']
+    assert_equal [], ir['openings']
+  end
+
+  def test_lod_300_adds_trim_when_windows_present
+    params = {
+      'project_name' => 'LOD 300',
+      'wall_length' => 8000,
+      'wall_height' => 3000,
+      'wall_thickness' => 240,
+      'lod_level' => 'lod_300',
+      'building_elements' => { 'roof' => true, 'balcony' => true },
+      'windows' => [{ 'offset' => 500, 'width' => 1500, 'height' => 1500, 'sill_height' => 900 }],
+      'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    doc = Geomora::IR::Parser.parse(ir)
+
+    assert Geomora::IR::Validator.validate(doc)
+    types = ir['buildings'][0]['storeys'][0]['elements'].map { |element| element['type'] }
+    assert_includes types, 'trim'
+    assert_includes types, 'eaves'
+  end
 end

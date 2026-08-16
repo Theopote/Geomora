@@ -121,6 +121,12 @@ module Geomora
               validate_parapet(element, storey)
             when 'cornice'
               validate_cornice(element, storey)
+            when 'trim'
+              validate_trim(element, storey)
+            when 'railing'
+              validate_railing(element, storey)
+            when 'eaves'
+              validate_eaves(element, storey)
             else
               @errors << "Unsupported element type: #{element.type}"
             end
@@ -320,6 +326,30 @@ module Geomora
         baseline = element.geometry[:baseline]
         @errors << "Invalid baseline for #{element.id}" if baseline.nil? || baseline.length != 2
         %i[width height projection].each do |dim|
+          val = element.geometry[dim]
+          @errors << "Zero #{dim} on #{element.id}" if val.to_f.zero?
+        end
+      end
+
+      def validate_trim(element, storey)
+        validate_storey_reference(element, storey)
+        position = element.geometry[:position]
+        @errors << "Invalid position for #{element.id}" if position.nil? || position.length != 3
+        %i[width height depth].each do |dim|
+          val = element.geometry[dim]
+          @errors << "Zero #{dim} on #{element.id}" if val.to_f.zero?
+        end
+      end
+
+      def validate_railing(element, storey)
+        validate_parapet(element, storey)
+      end
+
+      def validate_eaves(element, storey)
+        validate_storey_reference(element, storey)
+        polygon = element.geometry[:polygon]
+        @errors << "Invalid polygon for #{element.id}" if polygon.nil? || polygon.length < 3
+        %i[thickness elevation projection].each do |dim|
           val = element.geometry[dim]
           @errors << "Zero #{dim} on #{element.id}" if val.to_f.zero?
         end

@@ -12,7 +12,11 @@ require_relative 'stair_generator'
 require_relative 'balcony_generator'
 require_relative 'parapet_generator'
 require_relative 'cornice_generator'
+require_relative 'trim_generator'
+require_relative 'railing_generator'
+require_relative 'eaves_generator'
 require_relative 'wall_join_processor'
+require_relative '../core/lod_policy'
 require_relative '../metadata/attributes'
 
 module Geomora
@@ -21,6 +25,8 @@ module Geomora
       def initialize(model, context)
         @model = model
         @context = context
+        @lod_level = context[:lod_level] || Core::LodPolicy::DEFAULT_LEVEL
+
         @wall_gen = WallGenerator.new(
           model,
           tags: context[:tags],
@@ -33,7 +39,8 @@ module Geomora
           component_manager: context[:component_manager],
           tags: context[:tags],
           project_id: context[:project_id],
-          schema_version: context[:schema_version]
+          schema_version: context[:schema_version],
+          lod_level: @lod_level
         )
         @door_gen = DoorGenerator.new(
           model,
@@ -90,6 +97,27 @@ module Geomora
           project_id: context[:project_id],
           schema_version: context[:schema_version]
         )
+        @trim_gen = TrimGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version],
+          lod_level: @lod_level
+        )
+        @railing_gen = RailingGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version],
+          lod_level: @lod_level
+        )
+        @eaves_gen = EavesGenerator.new(
+          model,
+          tags: context[:tags],
+          project_id: context[:project_id],
+          schema_version: context[:schema_version],
+          lod_level: @lod_level
+        )
       end
 
       def generate(storey, building_group, document)
@@ -102,7 +130,8 @@ module Geomora
           entity_id: storey.id,
           entity_type: 'storey',
           schema_version: @context[:schema_version],
-          project_id: @context[:project_id]
+          project_id: @context[:project_id],
+          lod_level: @lod_level
         })
 
         joinable_wall_groups = []
@@ -128,6 +157,12 @@ module Geomora
             @parapet_gen.generate(element, storey.elevation, storey_group.entities)
           when 'cornice'
             @cornice_gen.generate(element, storey.elevation, storey_group.entities)
+          when 'trim'
+            @trim_gen.generate(element, storey.elevation, storey_group.entities)
+          when 'railing'
+            @railing_gen.generate(element, storey.elevation, storey_group.entities)
+          when 'eaves'
+            @eaves_gen.generate(element, storey.elevation, storey_group.entities)
           end
         end
 
@@ -150,6 +185,10 @@ module Geomora
 
       def generate_wall(wall, storey, storey_group, document)
         wall_group = @wall_gen.generate(wall, storey.elevation, storey_group.entities)
+
+        unless Core::LodPolicy.include_openings?(@lod_level)
+          return wall_group
+        end
 
         openings = document.openings.select { |o| wall.opening_ids.include?(o.id) }
         @opening_gen.cut_openings(wall_group, wall, openings, storey.elevation)

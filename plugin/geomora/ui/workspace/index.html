@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.17.0 — Multi-Storey + Wall Joins</div>
+    <div class="subtitle">v0.18.0 — LOD + Structural Grid</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -105,6 +105,17 @@
         <label>Storey height (mm)<input name="storey_height" type="number" step="1" placeholder="same as wall height"></label>
         <label class="checkbox-label"><input name="repeat_openings" type="checkbox" checked> Repeat openings on upper floors</label>
         <label class="checkbox-label"><input name="include_perimeter_walls" type="checkbox"> Perimeter walls + corner joins</label>
+        <label class="checkbox-label"><input name="include_structural_grid" type="checkbox"> Structural column grid</label>
+        <label>Grid X spacing (mm)<input name="grid_x_spacing" type="number" step="1" placeholder="auto"></label>
+        <label>Grid Y spacing (mm)<input name="grid_y_spacing" type="number" step="1" placeholder="auto"></label>
+
+        <div class="section-title">LOD (Phase 10)</div>
+        <label for="lod-level">Detail level</label>
+        <select id="lod-level" name="lod_level">
+          <option value="lod_100">LOD 100 — Massing</option>
+          <option value="lod_200" selected>LOD 200 — Openings + structure</option>
+          <option value="lod_300">LOD 300 — Details (trim, eaves, railing)</option>
+        </select>
 
         <div class="section-title">Geometry Doctor (Phase 8)</div>
         <label class="checkbox-label"><input name="doctor_tiny_edges" type="checkbox" checked> Remove tiny edges</label>

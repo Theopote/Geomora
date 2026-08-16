@@ -76,4 +76,4 @@ Wall semantic when perimeter enabled:
 
 ## 6. Gate to Phase 10
 
-Multi-storey shells with joined perimeter walls enable structural grids, LOD refinement, and interior partitioning on stacked volumes.
+Multi-storey shells with joined perimeter walls enable **LOD refinement and structural grids** — see `docs/PHASE_10.md`.

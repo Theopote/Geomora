@@ -29,6 +29,9 @@ module Geomora
     generators/balcony_generator
     generators/parapet_generator
     generators/cornice_generator
+    generators/trim_generator
+    generators/railing_generator
+    generators/eaves_generator
     generators/opening_generator
     generators/window_generator
     generators/door_generator
@@ -47,6 +50,8 @@ module Geomora
     core/rationalizer
     core/pattern_analyzer
     core/building_composer
+    core/lod_policy
+    core/structural_grid
     core/wall_enclosure
     core/geometry_doctor
     core/ir_builder

@@ -6,7 +6,7 @@ module Geomora
   module IR
     class Parser
       OPENING_TYPES = %w[window door opening].freeze
-      ELEMENT_TYPES = %w[wall floor roof column beam stair balcony parapet cornice].freeze
+      ELEMENT_TYPES = %w[wall floor roof column beam stair balcony parapet cornice trim railing eaves].freeze
 
       def self.parse(data)
         new(data).parse
@@ -36,7 +36,8 @@ module Geomora
           name: p['name'],
           unit: p['unit'],
           coordinate_system: p['coordinate_system'],
-          default_wall_thickness: p['default_wall_thickness']
+          default_wall_thickness: p['default_wall_thickness'],
+          lod_level: p['lod_level']
         )
       end
 
@@ -69,6 +70,9 @@ module Geomora
         when 'balcony' then parse_balcony(e)
         when 'parapet' then parse_parapet(e)
         when 'cornice' then parse_cornice(e)
+        when 'trim' then parse_trim(e)
+        when 'railing' then parse_railing(e)
+        when 'eaves' then parse_eaves(e)
         else
           raise UnsupportedSchemaError, "Unsupported element type: #{e['type']}"
         end
@@ -165,6 +169,39 @@ module Geomora
 
       def parse_cornice(e)
         Models::Cornice.new(
+          id: e['id'],
+          type: e['type'],
+          storey_id: e['storey_id'],
+          geometry: symbolize_geometry(e['geometry']),
+          semantic: e['semantic'] || {},
+          confidence: e['confidence']
+        )
+      end
+
+      def parse_trim(e)
+        Models::Trim.new(
+          id: e['id'],
+          type: e['type'],
+          storey_id: e['storey_id'],
+          geometry: symbolize_geometry(e['geometry']),
+          semantic: e['semantic'] || {},
+          confidence: e['confidence']
+        )
+      end
+
+      def parse_railing(e)
+        Models::Railing.new(
+          id: e['id'],
+          type: e['type'],
+          storey_id: e['storey_id'],
+          geometry: symbolize_geometry(e['geometry']),
+          semantic: e['semantic'] || {},
+          confidence: e['confidence']
+        )
+      end
+
+      def parse_eaves(e)
+        Models::Eaves.new(
           id: e['id'],
           type: e['type'],
           storey_id: e['storey_id'],

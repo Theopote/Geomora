@@ -22,15 +22,19 @@ module Geomora
       end
 
       def compose
+        lod = lod_level
         elements = []
-        elements << floor_element if enabled?(:floor)
-        elements << roof_element if enabled?(:roof) && @top_storey
-        elements.concat(column_elements) if enabled?(:columns)
-        elements << beam_element if enabled?(:beam)
-        elements << stair_element if enabled?(:stair) && stair_for_storey?
-        elements << balcony_element if enabled?(:balcony) && facade_storey?
-        elements << parapet_element if enabled?(:parapet) && @top_storey
-        elements << cornice_element if enabled?(:cornice) && facade_storey?
+        elements << floor_element if lod_allows?(:floor) && enabled?(:floor)
+        elements << roof_element if lod_allows?(:roof) && enabled?(:roof) && @top_storey
+        elements.concat(column_elements) if lod_allows?(:column) && enabled?(:columns)
+        elements << beam_element if lod_allows?(:beam) && enabled?(:beam)
+        elements << stair_element if lod_allows?(:stair) && enabled?(:stair) && stair_for_storey?
+        elements << balcony_element if lod_allows?(:balcony) && enabled?(:balcony) && facade_storey?
+        elements << parapet_element if lod_allows?(:parapet) && enabled?(:parapet) && @top_storey
+        elements << cornice_element if lod_allows?(:cornice) && enabled?(:cornice) && facade_storey?
+        elements.concat(trim_elements) if lod_allows?(:trim)
+        elements << railing_element if lod_allows?(:railing) && enabled?(:balcony) && facade_storey?
+        elements << eaves_element if lod_allows?(:eaves) && enabled?(:roof) && @top_storey
         elements
       end
 
@@ -96,6 +100,18 @@ module Geomora
         enabled?(:perimeter_walls)
       end
 
+      def structural_grid_enabled?
+        Core::StructuralGrid.enabled?(@params)
+      end
+
+      def lod_level
+        Core::LodPolicy.normalize(@params['lod_level'] || @params[:lod_level])
+      end
+
+      def lod_allows?(element_type)
+        Core::LodPolicy.include_element?(element_type, lod_level)
+      end
+
       def footprint_polygon
         half_depth = building_depth / 2.0
         [
@@ -138,6 +154,19 @@ module Geomora
 
       def column_elements
         size = column_size
+        if structural_grid_enabled?
+          return Core::StructuralGrid.column_elements(
+            params: @params,
+            wall_length: @wall_length,
+            building_depth: building_depth,
+            column_size: size,
+            wall_height: @wall_height,
+            storey_id: @storey_id,
+            storey_index: @storey_index,
+            id_prefix: 'grid_col'
+          )
+        end
+
         if perimeter_walls_enabled?
           half_depth = building_depth / 2.0
           y_front = 0
@@ -275,6 +304,82 @@ module Geomora
             'baseline' => [[0, 0, z], [@wall_length, 0, z]],
             'width' => @wall_thickness,
             'height' => cornice_height,
+            'projection' => projection
+          },
+          'semantic' => { 'exterior' => true },
+          'confidence' => 1.0
+        }
+      end
+
+      def trim_elements
+        return [] unless facade_storey?
+
+        windows = @params['windows']
+        return [] unless windows.is_a?(Array)
+
+        projection = float_param('trim_projection', 80)
+        band_height = float_param('trim_height', 100)
+
+        windows.each_with_index.filter_map do |win, index|
+          next unless win.is_a?(Hash) && win['width'].to_f.positive?
+
+          offset = win['offset'].to_f
+          width = win['width'].to_f
+          sill = (win['sill_height'] || 900).to_f
+          height = win['height'].to_f
+
+          {
+            'id' => format('trim_%02d_%02d', @storey_index + 1, index + 1),
+            'type' => 'trim',
+            'storey_id' => @storey_id,
+            'geometry' => {
+              'position' => [offset, 0, sill + height],
+              'width' => width,
+              'height' => band_height,
+              'depth' => projection
+            },
+            'semantic' => { 'exterior' => true, 'detail' => 'lintel' },
+            'confidence' => 1.0
+          }
+        end
+      end
+
+      def railing_element
+        win = first_window
+        offset = win ? win['offset'].to_f : 2000
+        width = win ? win['width'].to_f : 2000
+        sill = win ? (win['sill_height'] || 900).to_f : 900
+        depth = float_param('balcony_depth', 1500)
+        rail_height = float_param('railing_height', 1100)
+        thickness = float_param('railing_thickness', 50)
+        y_front = sill
+
+        {
+          'id' => element_id('railing'),
+          'type' => 'railing',
+          'storey_id' => @storey_id,
+          'geometry' => {
+            'baseline' => [[offset, y_front - depth, sill], [offset + width, y_front - depth, sill]],
+            'height' => rail_height,
+            'thickness' => thickness
+          },
+          'semantic' => { 'exterior' => true },
+          'confidence' => 1.0
+        }
+      end
+
+      def eaves_element
+        projection = float_param('eaves_projection', 600)
+        thickness = float_param('eaves_thickness', 150)
+
+        {
+          'id' => element_id('eaves'),
+          'type' => 'eaves',
+          'storey_id' => @storey_id,
+          'geometry' => {
+            'polygon' => footprint_polygon,
+            'thickness' => thickness,
+            'elevation' => @wall_height,
             'projection' => projection
           },
           'semantic' => { 'exterior' => true },

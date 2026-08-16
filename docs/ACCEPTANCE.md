@@ -144,6 +144,26 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 | 14.4 | Next LOD Scene (menu) | Cycles Geomora LOD scenes |
 | 14.5 | Export LOD Tour Manifest | JSON with scene order + LOD level |
 
+## Phase 15 — Catalog + custom layouts
+
+| # | Step | Expected |
+|---|---|---|
+| 15.1 | Fixture catalog on → kitchen | Extra catalog items (e.g. island) in IR |
+| 15.2 | Room layout `1:sofa@600,600` | Custom position in `furniture[]` |
+| 15.3 | Override `s2:1:bedroom` | Floor 2 room 1 type = bedroom |
+| 15.4 | Perpendicular constraints on | `semantic.perpendicular` on partitions |
+| 15.5 | Save LOD Tour JSON | File written with 3 scenes |
+
+## Phase 16 — Presentation + layout tools
+
+| # | Step | Expected |
+|---|---|---|
+| 16.1 | Reload fixture catalog (menu or Workspace) | Cache cleared; updated JSON items appear on Generate |
+| 16.2 | Furniture collision on, fixture sets, LOD 300 | Multiple items per room without identical positions |
+| 16.3 | Suggest layout presets | `room_furniture_layouts` field populated |
+| 16.4 | Perpendicular repair on, skewed partition | Baseline axis-aligned; `semantic.repaired` set |
+| 16.5 | Export LOD Tour HTML | `.html` slideshow with auto-advance |
+
 ## Known limitations (acceptable for Stage A)
 
 - `contour_v1` detection is heuristic — expect false positives on real photos

@@ -1135,9 +1135,15 @@
         room_types: formData.get('include_room_types') === 'on',
         furniture: formData.get('include_furniture') === 'on',
         fixture_sets: formData.get('include_fixture_sets') === 'on',
-        structural_constraints: formData.get('include_structural_constraints') === 'on'
+        fixture_catalog: formData.get('include_fixture_catalog') === 'on',
+        structural_constraints: formData.get('include_structural_constraints') === 'on',
+        perpendicular_constraints: formData.get('include_perpendicular_constraints') === 'on',
+        perpendicular_repair: formData.get('include_perpendicular_repair') === 'on',
+        furniture_collision: formData.get('include_furniture_collision') === 'on'
       },
       room_type_overrides: formData.get('room_type_overrides') || '',
+      room_furniture_layouts: formData.get('room_furniture_layouts') || '',
+      fixture_catalog_path: formData.get('fixture_catalog_path') || '',
       partition_grid_spacing: formData.get('partition_grid_spacing')
         ? Number(formData.get('partition_grid_spacing'))
         : null,
@@ -1545,6 +1551,13 @@
     renderTree();
   }
 
+  function applyRoomLayoutSuggestion(layout) {
+    const field = els.form.querySelector('[name="room_furniture_layouts"]');
+    if (!field) return;
+    field.value = layout || '';
+    setStatus('success', 'Room layout presets filled — review and Generate.');
+  }
+
   window.geomora = {
     loadPayload: loadPayload,
     setImage: setImage,
@@ -1556,6 +1569,7 @@
     applyRationalization: applyRationalization,
     applyConstraintSolution: applyConstraintSolution,
     applyPattern: applyPattern,
+    applyRoomLayoutSuggestion: applyRoomLayoutSuggestion,
     setDetectionMeta: setDetectionMeta,
     onDetectionEmpty: onDetectionEmpty,
     setIrPreview: setIrPreview,
@@ -1651,6 +1665,14 @@
 
   document.getElementById('btn-repair-geometry').addEventListener('click', function () {
     sketchupCall('repair_geometry', JSON.stringify(collectParams()));
+  });
+
+  document.getElementById('btn-suggest-layout').addEventListener('click', function () {
+    sketchupCall('suggest_room_layout', JSON.stringify(collectParams()));
+  });
+
+  document.getElementById('btn-reload-catalog').addEventListener('click', function () {
+    sketchupCall('reload_fixture_catalog', JSON.stringify(collectParams()));
   });
 
   els.btnDeleteSelected.addEventListener('click', function () {

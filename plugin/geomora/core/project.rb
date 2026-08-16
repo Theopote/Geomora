@@ -86,6 +86,29 @@ module Geomora
         LodPresentation.tour_manifest(model)
       end
 
+      def self.export_lod_tour(path)
+        model = Sketchup.active_model
+        LodPresentation.export_tour_file(model, path)
+      end
+
+      def self.export_lod_tour_html(path, step_seconds: 2.0)
+        model = Sketchup.active_model
+        LodPresentation.export_tour_html(model, path, step_seconds: step_seconds)
+      end
+
+      def self.reload_fixture_catalog(params = {})
+        FixtureCatalog.reload!(params)
+      end
+
+      def self.suggest_room_layout(params)
+        RoomLayoutPresets.suggest(params)
+      end
+
+      def self.play_lod_tour(step_seconds: 2.0)
+        model = Sketchup.active_model
+        LodPresentation.play_tour(model, step_seconds: step_seconds)
+      end
+
       def self.build_manual_facade(params)
         IRBuilder.build_manual_facade(params)
       end

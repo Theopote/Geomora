@@ -61,6 +61,11 @@ module Geomora
     core/room_classifier
     core/furniture_planner
     core/fixture_library
+    core/room_layout
+    core/furniture_collision
+    core/room_layout_presets
+    core/fixture_catalog
+    core/perpendicular_constraint_solver
     core/room_overrides
     core/structural_constraint_solver
     core/lod_presentation

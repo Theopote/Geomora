@@ -45,6 +45,46 @@ module Geomora
           lod_menu.add_item('Create LOD Scene Pages') { create_lod_scenes }
           lod_menu.add_item('Next LOD Scene') { next_lod_scene }
           lod_menu.add_item('Export LOD Tour Manifest') { export_lod_tour }
+          lod_menu.add_item('Save LOD Tour JSON...') { save_lod_tour_file }
+          lod_menu.add_item('Export LOD Tour HTML...') { export_lod_tour_html }
+          lod_menu.add_item('Play LOD Tour') { play_lod_tour }
+          lod_menu.add_separator
+          lod_menu.add_item('Reload Fixture Catalog') { reload_fixture_catalog }
+        end
+
+        def save_lod_tour_file
+          path = ::UI.savepanel('Save LOD tour manifest', '', 'geomora_lod_tour.json')
+          return unless path
+
+          saved = Core::Project.export_lod_tour(path)
+          ::UI.messagebox("LOD tour saved:\n\n#{saved}")
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD tour save failed:\n\n#{e.message}")
+        end
+
+        def export_lod_tour_html
+          path = ::UI.savepanel('Export LOD tour HTML', '', 'geomora_lod_tour.html')
+          return unless path
+
+          saved = Core::Project.export_lod_tour_html(path)
+          ::UI.messagebox("LOD tour HTML exported:\n\n#{saved}")
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD tour HTML export failed:\n\n#{e.message}")
+        end
+
+        def reload_fixture_catalog
+          catalog = Core::Project.reload_fixture_catalog
+          sets = catalog['sets'].is_a?(Hash) ? catalog['sets'].keys.length : 0
+          ::UI.messagebox("Fixture catalog reloaded (#{sets} room sets).")
+        rescue GeomoraError => e
+          ::UI.messagebox("Fixture catalog reload failed:\n\n#{e.message}")
+        end
+
+        def play_lod_tour
+          pages = Core::Project.play_lod_tour
+          ::UI.messagebox("LOD tour started:\n\n#{pages.join("\n")}")
+        rescue GeomoraError => e
+          ::UI.messagebox("LOD tour failed:\n\n#{e.message}")
         end
 
         def export_lod_tour

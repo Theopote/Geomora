@@ -28,47 +28,85 @@ module Geomora
 
         suffix = format('%02d', storey_index + 1)
         rooms.flat_map.with_index do |room, index|
-          plan_for_room(room, params: params, suffix: suffix, index: index + 1)
+          plan_for_room(room, params: params, suffix: suffix, index: index + 1, storey_index: storey_index)
         end
       end
 
-      def self.plan_for_room(room, params:, suffix:, index:)
+      def self.plan_for_room(room, params:, suffix:, index:, storey_index: 0)
         room_type = room.dig('semantic', 'room_type') || 'generic'
         polygon = room.dig('geometry', 'polygon')
         return [] unless polygon.is_a?(Array) && polygon.length >= 3
 
+        custom_items = RoomLayout.items_for_room(
+          room_number: index,
+          room_id: room['id'],
+          params: params,
+          storey_index: storey_index
+        )
+        if custom_items.any?
+          return place_items(room, custom_items, bounds: room_bounds(polygon), params: params, suffix: suffix, index: index, room_type: room_type)
+        end
+
         bounds = room_bounds(polygon)
         specs = items_for_room(room_type, params)
-        specs.each_with_index.filter_map do |spec, spec_index|
+        drafts = specs.each_with_index.filter_map do |spec, _spec_index|
           position = placement_position(bounds, spec, params)
           next unless position
 
-          kind = spec[:kind]
-          category = spec[:category] || 'furniture'
-          {
-            'id' => format('furniture_%s_%02d_%s_%02d', suffix, index, kind, spec_index + 1),
-            'type' => category == 'fixture' ? 'fixture' : 'furniture',
-            'storey_id' => room['storey_id'],
-            'room_id' => room['id'],
-            'geometry' => {
-              'position' => position,
-              'width' => spec[:width],
-              'depth' => spec[:depth],
-              'height' => spec[:height]
-            },
-            'semantic' => {
-              'kind' => kind,
-              'room_type' => room_type,
-              'category' => category
-            },
-            'confidence' => 1.0
-          }
+          spec.merge(position: position)
         end
+        drafts = resolve_collisions(drafts, bounds, params)
+        drafts.each_with_index.map do |spec, spec_index|
+          build_item(room, spec, suffix: suffix, index: index, spec_index: spec_index, room_type: room_type)
+        end
+      end
+
+      def self.place_items(room, specs, bounds:, params:, suffix:, index:, room_type:)
+        drafts = specs.each_with_index.map do |spec, spec_index|
+          position = spec[:position] || placement_position(bounds, spec, params)
+          spec.merge(position: position)
+        end
+        drafts = resolve_collisions(drafts, bounds, params)
+        drafts.each_with_index.map do |spec, spec_index|
+          build_item(room, spec, suffix: suffix, index: index, spec_index: spec_index, room_type: room_type)
+        end
+      end
+
+      def self.resolve_collisions(drafts, bounds, params)
+        return drafts unless FurnitureCollision.enabled?(params)
+        return drafts if drafts.length < 2
+
+        FurnitureCollision.resolve(drafts, bounds)
+      end
+
+      def self.build_item(room, spec, suffix:, index:, spec_index:, room_type:)
+        kind = spec[:kind]
+        category = spec[:category] || 'furniture'
+        position = spec[:position] || [0, 0, 0]
+        {
+          'id' => format('furniture_%s_%02d_%s_%02d', suffix, index, kind, spec_index + 1),
+          'type' => category == 'fixture' ? 'fixture' : 'furniture',
+          'storey_id' => room['storey_id'],
+          'room_id' => room['id'],
+          'geometry' => {
+            'position' => position,
+            'width' => spec[:width],
+            'depth' => spec[:depth],
+            'height' => spec[:height]
+          },
+          'semantic' => {
+            'kind' => kind,
+            'room_type' => room_type,
+            'category' => category,
+            'custom_layout' => spec[:position] ? true : nil
+          }.compact,
+          'confidence' => 1.0
+        }
       end
 
       def self.items_for_room(room_type, params)
         if FixtureLibrary.use_sets?(params)
-          FixtureLibrary.items_for(room_type)
+          FixtureLibrary.items_for(room_type, params)
         else
           [LEGACY_CATALOG[room_type] || LEGACY_CATALOG['generic']]
         end

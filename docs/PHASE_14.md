@@ -103,14 +103,14 @@ tests/core/lod_presentation_test.rb
 
 ## 8. Deferred (Phase 15+)
 
-- Per-room custom furniture layouts
-- Animated LOD presentation export (video/GIF)
-- Fixture libraries from external JSON catalog
-- Multi-storey room override maps
-- Perpendicular wall constraint geometry solver
+- ~~Per-room custom furniture layouts~~ → Phase 15 ✅
+- ~~Animated LOD presentation export (video/GIF)~~ → Phase 15 play tour ✅ (video deferred)
+- ~~Fixture libraries from external JSON catalog~~ → Phase 15 ✅
+- ~~Multi-storey room override maps~~ → Phase 15 ✅
+- ~~Perpendicular wall constraint geometry solver~~ → Phase 15 validation ✅
 
 ---
 
 ## 9. Gate to Phase 15
 
-Fixture libraries + overrides enable catalog-driven interior furnishing and layout refinement.
+Fixture libraries + overrides enable catalog-driven interior furnishing and layout refinement. See [PHASE_15.md](PHASE_15.md).

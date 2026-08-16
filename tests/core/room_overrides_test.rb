@@ -15,4 +15,15 @@ class RoomOverridesTest < Minitest::Test
     assert_equal 'kitchen', result[1]['semantic']['room_type']
     assert_equal true, result[1]['semantic']['override']
   end
+
+  def test_storey_scoped_overrides
+    rooms = [{ 'id' => 'room_02_01', 'name' => 'Room 1', 'semantic' => { 'room_type' => 'generic' } }]
+    params = { 'room_type_overrides' => 's2:1:bedroom' }
+
+    ground = Geomora::Core::RoomOverrides.apply(rooms, params: params, storey_index: 0)
+    upper = Geomora::Core::RoomOverrides.apply(rooms, params: params, storey_index: 1)
+
+    assert_equal 'generic', ground[0]['semantic']['room_type']
+    assert_equal 'bedroom', upper[0]['semantic']['room_type']
+  end
 end

@@ -46,8 +46,11 @@ module Geomora
         value == true || value.to_s == 'true'
       end
 
-      def self.items_for(room_type)
-        SETS[room_type.to_s] || SETS['generic']
+      def self.items_for(room_type, params = nil)
+        base = (SETS[room_type.to_s] || SETS['generic']).dup
+        return base unless params.is_a?(Hash) && FixtureCatalog.enabled?(params)
+
+        base + FixtureCatalog.items_for(room_type, params)
       end
 
       def self.place_item(bounds, spec)

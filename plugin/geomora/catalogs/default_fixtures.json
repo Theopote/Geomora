@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "sets": {
+    "kitchen": [
+      { "kind": "island", "width": 1200, "depth": 800, "height": 900, "anchor": "front_centre", "category": "fixture" }
+    ],
+    "bathroom": [
+      { "kind": "bathtub", "width": 1700, "depth": 800, "height": 600, "anchor": "back_centre", "category": "fixture" }
+    ],
+    "living": [
+      { "kind": "tv_stand", "width": 1800, "depth": 450, "height": 500, "anchor": "front_right" }
+    ]
+  }
+}

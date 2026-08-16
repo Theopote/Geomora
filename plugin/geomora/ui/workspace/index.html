@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.23.0 — Fixtures + Room Overrides</div>
+    <div class="subtitle">v0.24.0 — Catalog + Room Layouts</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -135,9 +135,23 @@
 
         <div class="section-title">Fixtures + Overrides (Phase 14)</div>
         <label class="checkbox-label"><input name="include_fixture_sets" type="checkbox" checked> Kitchen / bath fixture sets</label>
-        <label>Room type overrides<input name="room_type_overrides" type="text" placeholder="1:kitchen,2:bathroom"></label>
+        <label>Room type overrides<input name="room_type_overrides" type="text" placeholder="1:kitchen,s2:1:bedroom"></label>
         <label class="checkbox-label"><input name="include_structural_constraints" type="checkbox"> Snap partitions to structural grid</label>
         <label>Partition grid spacing (mm)<input name="partition_grid_spacing" type="number" step="1" placeholder="300"></label>
+
+        <div class="section-title">Catalog + Layouts (Phase 15)</div>
+        <label class="checkbox-label"><input name="include_fixture_catalog" type="checkbox" checked> External fixture catalog</label>
+        <label>Fixture catalog path<input name="fixture_catalog_path" type="text" placeholder="default bundled catalog"></label>
+        <label>Room furniture layouts<input name="room_furniture_layouts" type="text" placeholder="1:sofa@600,600|s2:1:desk@800,800"></label>
+        <label class="checkbox-label"><input name="include_perpendicular_constraints" type="checkbox"> Validate perpendicular walls</label>
+
+        <div class="section-title">Presentation + Layout (Phase 16)</div>
+        <label class="checkbox-label"><input name="include_furniture_collision" type="checkbox" checked> Furniture collision avoidance</label>
+        <label class="checkbox-label"><input name="include_perpendicular_repair" type="checkbox"> Repair perpendicular partitions</label>
+        <div class="inline-actions">
+          <button type="button" id="btn-suggest-layout" class="btn-link">Suggest layout presets</button>
+          <button type="button" id="btn-reload-catalog" class="btn-link">Reload fixture catalog</button>
+        </div>
 
         <div class="section-title">Geometry Doctor (Phase 8)</div>
         <label class="checkbox-label"><input name="doctor_tiny_edges" type="checkbox" checked> Remove tiny edges</label>

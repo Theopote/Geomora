@@ -156,6 +156,12 @@ module Geomora
           height: height
         )
         partition_walls = Core::StructuralConstraintSolver.apply!(partition_walls, params: @params)
+        facade_wall = walls.find { |wall| wall.dig('semantic', 'join_role') == 'facade' } || walls.first
+        partition_walls = Core::PerpendicularConstraintSolver.apply!(
+          partition_walls,
+          params: @params,
+          facade_wall: facade_wall
+        )
         walls.concat(partition_walls)
         openings.concat(partition_openings)
 

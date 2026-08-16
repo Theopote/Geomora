@@ -46,7 +46,22 @@ module Geomora
         end
         return {} if raw.nil? || raw.to_s.strip.empty?
 
-        normalize_string(raw.to_s)
+        normalize_string(filter_storey_entries(raw.to_s, storey_index: storey_index))
+      end
+
+      def self.filter_storey_entries(value, storey_index:)
+        value.split(',').filter_map do |entry|
+          token = entry.strip
+          next if token.empty?
+
+          if (match = token.match(/\As(?<storey>\d+):(?<rest>.+)\z/i))
+            next unless match[:storey].to_i == storey_index + 1
+
+            match[:rest]
+          else
+            token
+          end
+        end.join(',')
       end
 
       def self.normalize_string(value)

@@ -259,4 +259,32 @@ class IRBuilderTest < Minitest::Test
     assert_equal 'kitchen', ir['rooms'][1]['semantic']['room_type']
     assert_operator ir['furniture'].length, :>=, 3
   end
+
+  def test_custom_room_layout_in_ir
+    params = {
+      'project_name' => 'Phase 15 layout',
+      'wall_length' => 9000,
+      'wall_height' => 3000,
+      'wall_thickness' => 240,
+      'building_depth' => 6000,
+      'lod_level' => 'lod_300',
+      'partition_count' => 1,
+      'room_furniture_layouts' => '1:sofa@600,600',
+      'building_elements' => {
+        'interior_partitions' => true,
+        'room_zones' => true,
+        'furniture' => true
+      },
+      'windows' => [],
+      'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    doc = Geomora::IR::Parser.parse(ir)
+
+    assert Geomora::IR::Validator.validate(doc)
+    custom = ir['furniture'].find { |item| item.dig('semantic', 'custom_layout') }
+    assert custom
+    assert_equal [600.0, 600.0, 0], custom.dig('geometry', 'position')
+  end
 end

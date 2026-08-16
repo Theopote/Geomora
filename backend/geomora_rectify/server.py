@@ -6,7 +6,8 @@ from pathlib import Path
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 
-from geomora_detect.pipeline import detect_facade
+from geomora_detect.pipeline import SUPPORTED_METHODS, detect_facade
+from geomora_capture.video_frames import extract_frames
 from geomora_multiview.pipeline import fuse_openings, multiview_capabilities, register_views
 
 from .pipeline import parse_corners, rectify_image
@@ -22,6 +23,8 @@ def root() -> dict[str, str]:
         "health": "/health",
         "rectify": "POST /rectify",
         "detect": "POST /detect",
+        "detect_capabilities": "GET /detect/capabilities",
+        "video_extract_frames": "POST /video/extract_frames",
         "multiview_register": "POST /multiview/register",
         "multiview_fuse": "POST /multiview/fuse",
         "multiview_capabilities": "GET /multiview/capabilities",
@@ -34,6 +37,14 @@ def health() -> dict[str, str]:
 
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}
+VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v"}
+
+
+def is_video_upload(upload: UploadFile) -> bool:
+    if upload.content_type and upload.content_type.startswith("video/"):
+        return True
+    suffix = Path(upload.filename or "").suffix.lower()
+    return suffix in VIDEO_EXTENSIONS
 
 
 def is_image_upload(upload: UploadFile) -> bool:
@@ -94,6 +105,59 @@ async def detect(
             raise HTTPException(status_code=500, detail=str(error)) from error
 
         return JSONResponse(result.to_dict())
+
+
+@app.get("/detect/capabilities")
+def detect_capabilities() -> dict[str, object]:
+    from geomora_detect.yolo_detector import model_available
+
+    return {
+        "methods": list(SUPPORTED_METHODS),
+        "yolo_available": model_available(),
+        "scale_hint": True,
+        "recommended_workflow": [
+            "Load image or video frame",
+            "Rectify facade",
+            "Detect elements",
+            "Review overlay",
+            "Rationalize",
+            "Generate",
+        ],
+    }
+
+
+@app.post("/video/extract_frames")
+async def video_extract_frames(
+    video: UploadFile = File(...),
+    max_frames: int = Form(default=12),
+) -> JSONResponse:
+    import base64
+
+    if not is_video_upload(video):
+        raise HTTPException(status_code=400, detail="Upload must be a video file")
+
+    suffix = Path(video.filename or "upload.mp4").suffix or ".mp4"
+    with tempfile.TemporaryDirectory(prefix="geomora_video_") as temp_dir:
+        input_path = Path(temp_dir) / f"input{suffix}"
+        input_path.write_bytes(await video.read())
+
+        try:
+            result = extract_frames(
+                str(input_path),
+                output_dir=str(Path(temp_dir) / "frames"),
+                max_frames=max_frames,
+            )
+        except ValueError as error:
+            raise HTTPException(status_code=400, detail=str(error)) from error
+        except Exception as error:  # pragma: no cover - safety net
+            raise HTTPException(status_code=500, detail=str(error)) from error
+
+        for frame in result["frames"]:
+            image_path = Path(frame["path"])
+            frame["image_base64"] = base64.b64encode(image_path.read_bytes()).decode("ascii")
+            del frame["path"]
+
+        return JSONResponse(result)
 
 
 @app.get("/multiview/capabilities")

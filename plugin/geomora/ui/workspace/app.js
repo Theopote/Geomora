@@ -1115,6 +1115,7 @@
       project_name: formData.get('project_name'),
       wall_length: Number(formData.get('wall_length')),
       wall_height: Number(formData.get('wall_height')),
+      auto_scale: formData.get('auto_scale') === 'on',
       wall_thickness: Number(formData.get('wall_thickness')),
       building_depth: Number(formData.get('building_depth') || 6000),
       building_elements: {
@@ -1290,7 +1291,46 @@
     }
   }
 
-  function setImage(fileUrl, sourcePath) {
+  function setVideoFrames(payload) {
+    const picker = document.getElementById('video-frame-picker');
+    if (!picker) return;
+    picker.innerHTML = '';
+    if (!payload || !payload.frames || !payload.frames.length) {
+      picker.hidden = true;
+      return;
+    }
+    picker.hidden = false;
+    const title = document.createElement('div');
+    title.className = 'meta';
+    title.textContent =
+      'Video frames: ' + payload.frames.length +
+      ' · ' + (payload.duration_sec || 0) + 's';
+    picker.appendChild(title);
+    const grid = document.createElement('div');
+    grid.className = 'video-frame-grid';
+    payload.frames.forEach(function (frame) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'video-frame-thumb';
+      button.title = 'Frame ' + (frame.frame_number + 1) + ' @ ' + frame.timestamp_sec + 's';
+      if (frame.thumb_url) {
+        const img = document.createElement('img');
+        img.src = frame.thumb_url;
+        img.alt = 'Video frame ' + (frame.index + 1);
+        button.appendChild(img);
+      } else {
+        button.textContent = '#' + (frame.index + 1);
+      }
+      button.addEventListener('click', function () {
+        sketchupCall('load_video_frame', JSON.stringify({ path: frame.path }));
+      });
+      grid.appendChild(button);
+    });
+    picker.appendChild(grid);
+    els.sourceMeta.textContent = payload.video_path || 'Video loaded';
+  }
+
+  function setImage(fileUrl, sourcePath, sourceKind) {
     state.sourcePath = sourcePath;
     state.sourceId = sourcePath ? 'photo_001' : null;
     state.originalImageUrl = fileUrl;
@@ -1323,7 +1363,9 @@
     els.form.elements.namedItem('project_name').value = 'Untitled Facade';
     setActiveView('original');
     renderTree();
-    setStatus('', 'Photo loaded — drag corners to frame facade, then Rectify');
+    setStatus('', sourceKind === 'video_frame'
+      ? 'Video frame loaded — drag corners to frame facade, then Rectify'
+      : 'Photo loaded — drag corners to frame facade, then Rectify');
   }
 
   function setSecondaryImage(fileUrl, sourcePath) {
@@ -1401,6 +1443,10 @@
   }
 
   function applyDetection(payload, overlayUrl) {
+    if (payload.scale_hint) {
+      els.form.elements.namedItem('wall_length').value = payload.scale_hint.wall_length_mm;
+      els.form.elements.namedItem('wall_height').value = payload.scale_hint.wall_height_mm;
+    }
     const windows = (payload.windows || []).map(function (win) {
       return {
         offset: Number(win.offset),
@@ -1562,6 +1608,7 @@
   window.geomora = {
     loadPayload: loadPayload,
     setImage: setImage,
+    setVideoFrames: setVideoFrames,
     setSecondaryImage: setSecondaryImage,
     setMultiviewRegistration: setMultiviewRegistration,
     setRectifiedImage: setRectifiedImage,
@@ -1702,6 +1749,10 @@
 
   document.getElementById('btn-pick-image').addEventListener('click', function () {
     sketchupCall('pick_image');
+  });
+
+  document.getElementById('btn-pick-video').addEventListener('click', function () {
+    sketchupCall('pick_video');
   });
 
   document.getElementById('btn-pick-secondary').addEventListener('click', function () {

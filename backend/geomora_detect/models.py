@@ -27,9 +27,10 @@ class DetectionResult:
     elements: list[DetectedElement] = field(default_factory=list)
     overlay_base64: str | None = None
     debug: dict[str, Any] = field(default_factory=dict)
+    scale_hint: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        payload = {
             "method": self.method,
             "confidence": round(self.confidence, 4),
             "image_width": self.image_width,
@@ -38,3 +39,6 @@ class DetectionResult:
             "overlay_base64": self.overlay_base64,
             "debug": self.debug,
         }
+        if self.scale_hint:
+            payload["scale_hint"] = self.scale_hint
+        return payload

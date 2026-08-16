@@ -8,13 +8,15 @@ Test assets for manual acceptance and backend CLI checks.
 |---|---|
 | `facade_phase0.json` | Phase 0 IR fixture — Load Phase 0 Template in workspace |
 | `facade_perspective_synthetic.jpg` | Synthetic oblique facade for rectification tests |
+| `generate_rectified_fixture.py` | Generates `facade_rectified_synthetic.jpg` for detection tests |
 
-## Regenerate synthetic perspective image
+## Regenerate synthetic images
 
 ```powershell
 cd F:\development\Geomora\backend
 .\.venv\Scripts\activate
 python ..\examples\generate_perspective_fixture.py
+python ..\examples\generate_rectified_fixture.py
 ```
 
 ## Suggested workflow (Stage A acceptance)

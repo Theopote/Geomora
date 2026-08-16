@@ -45,10 +45,12 @@ module Geomora
     perception/rectify_client
     perception/detection_result
     perception/detect_client
+    perception/video_frame_client
     perception/multiview_result
     perception/multiview_client
     perception/fusion_result
     core/detection_mapper
+    core/scale_estimator
     core/rationalizer
     core/pattern_analyzer
     core/building_composer

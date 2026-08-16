@@ -23,7 +23,9 @@ Use this checklist after installing `dist/geomora.rbz` and starting `backend/sta
 
 | # | Step | Expected |
 |---|---|---|
-| 3.1 | Detect Elements (after rectify) | Form populated; method shows `yolo_v1` or `contour_v1` |
+| 3.1 | Detect Elements (after rectify) | Form populated; method shows `yolo_v1`, `facade_row_v1`, or `contour_v1` |
+| 3.2 | Auto-estimate wall size | Checkbox on; wall length/height update after Detect |
+| 3.3 | Load Video → pick frame | Frame loads as primary image; Rectify works |
 | 3.2 | Overlay view | Click box selects window; Delete removes it |
 | 3.3 | Draw window | Drag creates new window box on rectified image |
 | 3.4 | Resize / move | Corner handles resize; drag moves box |

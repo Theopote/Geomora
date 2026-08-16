@@ -1,6 +1,6 @@
 # Geomora Phase 3 — Semantic Reconstruction
 
-**Status:** Core bootstrap **IN PROGRESS** (v0.6.0)
+**Status:** Core bootstrap **COMPLETE** (v0.6.0) · Real-photo path **v0.33.0**
 
 | Step | Status |
 |---|---|
@@ -10,6 +10,8 @@
 | 3.4 Workspace UI (Detect + Overlay) | ✅ |
 | 3.5 YOLO ONNX (`yolo_v1`) | ✅ bootstrap — train via `backend/scripts/train_yolo_facade.py` |
 | 3.6 SAM refinement | ⏳ deferred |
+| 3.7 `facade_row_v1` row detector | ✅ v0.33.0 |
+| 3.8 Auto wall scale from detection | ✅ v0.33.0 |
 
 ### Quick start
 

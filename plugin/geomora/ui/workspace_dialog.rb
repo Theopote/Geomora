@@ -170,6 +170,55 @@ module Geomora
             end
           end
 
+          dialog.add_action_callback('pick_video') do |_ctx, _|
+            path = ::UI.openpanel(
+              'Select facade video',
+              '',
+              'Videos|*.mp4;*.mov;*.avi;*.mkv;*.webm;||'
+            )
+            next unless path
+
+            data = Perception::VideoFrameClient.extract_frames(path)
+            frames = (data['frames'] || []).map do |frame|
+              {
+                'index' => frame['index'],
+                'frame_number' => frame['frame_number'],
+                'timestamp_sec' => frame['timestamp_sec'],
+                'path' => frame['path'],
+                'thumb_url' => frame['thumb_path'] ? path_to_file_url(frame['thumb_path']) : nil
+              }
+            end
+            payload = {
+              'video_path' => path,
+              'duration_sec' => data['duration_sec'],
+              'fps' => data['fps'],
+              'frames' => frames
+            }
+            dialog.execute_script("window.geomora.setVideoFrames(#{payload.to_json})")
+            post_message(
+              dialog,
+              'success',
+              format('Extracted %d frames from video. Pick a key frame below.', frames.length)
+            )
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
+          dialog.add_action_callback('load_video_frame') do |_ctx, json|
+            payload = JSON.parse(json)
+            path = payload['path']
+            raise GeomoraError, 'Video frame path missing' if path.nil? || path.empty?
+
+            @source_path = path
+            file_url = path_to_file_url(path)
+            dialog.execute_script(
+              "window.geomora.setImage(#{file_url.to_json}, #{path.to_json}, 'video_frame')"
+            )
+            post_message(dialog, 'success', 'Video frame loaded as primary image.')
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
           dialog.add_action_callback('rectify') do |_ctx, json|
             params = JSON.parse(json)
             source_path = params['source_path']
@@ -213,11 +262,20 @@ module Geomora
 
             Logger.info("Detecting facade elements: #{image_path} (method=#{detection_method})")
             result = Perception::DetectClient.detect(image_path, method: detection_method)
+            params = apply_detection_scale!(params, result)
             mapped = map_detection_params(result, params)
 
             if openings_empty?(mapped) && contour_fallback?(detection_method)
-              Logger.info('YOLO/auto found no usable openings — retrying with contour_v1')
+              Logger.info('Auto/YOLO found no usable openings — retrying with facade_row_v1')
+              result = Perception::DetectClient.detect(image_path, method: 'facade_row_v1')
+              params = apply_detection_scale!(params, result)
+              mapped = map_detection_params(result, params)
+            end
+
+            if openings_empty?(mapped) && contour_fallback?(detection_method)
+              Logger.info('facade_row_v1 found no usable openings — retrying with contour_v1')
               result = Perception::DetectClient.detect(image_path, method: 'contour_v1')
+              params = apply_detection_scale!(params, result)
               mapped = map_detection_params(result, params)
             end
 
@@ -235,6 +293,7 @@ module Geomora
               )
             else
               payload = mapped.merge('detection' => result.to_dict)
+              payload['scale_hint'] = params['scale_hint'] if params['scale_hint']
               dialog.execute_script(
                 "window.geomora.applyDetection(#{payload.to_json}, #{overlay_url.to_json})"
               )
@@ -625,6 +684,28 @@ module Geomora
         def path_to_file_url(path)
           normalized = path.gsub('\\', '/')
           "file:///#{normalized}"
+        end
+
+        def apply_detection_scale!(params, result)
+          return params unless auto_scale_enabled?(params)
+
+          hint = result.scale_hint
+          if hint.nil? || hint.empty?
+            hint = Core::ScaleEstimator.from_detection(
+              result.elements,
+              image_width: result.image_width,
+              image_height: result.image_height
+            )
+          end
+          Core::ScaleEstimator.apply_hint!(params, hint) if hint
+          params
+        end
+
+        def auto_scale_enabled?(params)
+          value = params['auto_scale']
+          return true if value.nil?
+
+          !%w[false 0 off no].include?(value.to_s.strip.downcase)
         end
 
         def map_detection_params(result, params)

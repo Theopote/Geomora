@@ -9,7 +9,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Geomora Workspace</div>
-    <div class="subtitle">v0.32.0 — Compact H.264 + Multi-select</div>
+    <div class="subtitle">v0.33.0 — Photo/Video Reconstruction</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -17,6 +17,8 @@
     <aside class="panel sources">
       <h2>Sources</h2>
       <button id="btn-pick-image" class="btn">Load Primary Image</button>
+      <button id="btn-pick-video" class="btn secondary">Load Video</button>
+      <div id="video-frame-picker" class="video-frame-picker" hidden></div>
       <button id="btn-pick-secondary" class="btn secondary">Load Secondary Image</button>
       <button id="btn-register-views" class="btn secondary">Register Views</button>
       <button id="btn-fuse-views" class="btn secondary">Fuse Openings</button>
@@ -25,7 +27,8 @@
       <button id="btn-detect" class="btn">Detect Elements</button>
       <label class="detect-method-label" for="detect-method">Detection</label>
       <select id="detect-method" class="detect-method">
-        <option value="auto" selected>Auto (YOLO if available)</option>
+        <option value="auto" selected>Auto (YOLO → Facade row → Contour)</option>
+        <option value="facade_row_v1">Facade row (rectified photos)</option>
         <option value="yolo_v1">YOLO</option>
         <option value="contour_v1">Contour (fallback)</option>
       </select>
@@ -97,6 +100,7 @@
         <label>Project name<input name="project_name" type="text"></label>
         <label>Wall length (mm)<input name="wall_length" type="number" step="1"></label>
         <label>Wall height (mm)<input name="wall_height" type="number" step="1"></label>
+        <label class="checkbox-label"><input name="auto_scale" type="checkbox" checked> Auto-estimate wall size from detection</label>
         <label>Wall thickness (mm)<input name="wall_thickness" type="number" step="1"></label>
 
         <div class="section-title">Building Elements (Phase 7)</div>

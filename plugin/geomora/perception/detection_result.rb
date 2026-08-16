@@ -4,7 +4,7 @@ module Geomora
   module Perception
     class DetectionResult
       attr_reader :method, :confidence, :image_width, :image_height,
-                    :elements, :overlay_base64, :debug
+                  :elements, :overlay_base64, :debug, :scale_hint
 
       def self.from_hash(data)
         new(
@@ -14,7 +14,8 @@ module Geomora
           image_height: data['image_height'].to_i,
           elements: data['elements'] || [],
           overlay_base64: data['overlay_base64'],
-          debug: data['debug'] || {}
+          debug: data['debug'] || {},
+          scale_hint: data['scale_hint']
         )
       end
 
@@ -26,10 +27,11 @@ module Geomora
         @elements = attrs[:elements]
         @overlay_base64 = attrs[:overlay_base64]
         @debug = attrs[:debug]
+        @scale_hint = attrs[:scale_hint]
       end
 
       def to_dict
-        {
+        payload = {
           'method' => method,
           'confidence' => confidence,
           'image_width' => image_width,
@@ -38,6 +40,8 @@ module Geomora
           'windows' => elements.count { |e| e['type'] == 'window' },
           'doors' => elements.count { |e| e['type'] == 'door' }
         }
+        payload['scale_hint'] = scale_hint if scale_hint
+        payload
       end
 
       def to_source_metadata

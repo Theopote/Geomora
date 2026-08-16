@@ -107,6 +107,67 @@ body {
   font-size: 13px;
 }
 
+.video-frame-picker {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.video-frame-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.video-frame-thumb {
+  border: 1px solid #3c4043;
+  background: #1f2124;
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  min-height: 56px;
+}
+
+.video-frame-thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.video-frame-thumb:hover {
+  border-color: #8ab4f8;
+}
+
+.video-frame-picker {
+  margin-top: 10px;
+}
+
+.video-frame-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.video-frame-thumb {
+  padding: 0;
+  border: 1px solid #3c4043;
+  border-radius: 4px;
+  background: #1f2124;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.video-frame-thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.video-frame-thumb:hover {
+  border-color: #8ab4f8;
+}
+
 .viewer-frame {
   position: relative;
   min-height: 420px;

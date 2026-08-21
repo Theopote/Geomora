@@ -27,6 +27,8 @@ module Geomora
         def add_menu_items(menu)
           menu.add_item('Open Workspace') { open_workspace }
           menu.add_separator
+          add_a1_menu_items(menu)
+          menu.add_separator
           menu.add_item('Generate Phase 0 Fixture') { run_generate }
           menu.add_item('Validate Phase 0 Fixture') { run_validate }
           menu.add_item('Repair Geometry') { run_repair_geometry }
@@ -34,6 +36,14 @@ module Geomora
           add_lod_menu_items(menu)
           menu.add_separator
           menu.add_item('About Geomora') { show_about }
+        end
+
+        def add_a1_menu_items(menu)
+          a1_menu = menu.add_submenu('A1 Real Photo Benchmark')
+          a1_menu.add_item('Review Next Photo') { A1BenchmarkRunner.review_next }
+          a1_menu.add_item('Record A1 Score...') { A1BenchmarkRunner.record_score }
+          a1_menu.add_item('Show Progress') { A1BenchmarkRunner.show_progress }
+          a1_menu.add_item('Open Checklist (HTML)') { A1BenchmarkRunner.open_checklist }
         end
 
         def add_lod_menu_items(menu)

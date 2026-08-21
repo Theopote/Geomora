@@ -93,9 +93,11 @@ module Geomora
     core/lod_scenes
     core/lod_scene_pages
     core/geometry_doctor
+    core/a1_benchmark
     core/ir_builder
     core/project
     ui/workspace_dialog
+    ui/a1_benchmark_runner
     ui/commands
   ].freeze
 

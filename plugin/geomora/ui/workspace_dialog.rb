@@ -20,6 +20,31 @@ module Geomora
           @dialog.bring_to_front if @dialog&.visible?
         end
 
+        def load_source_image(path)
+          raise GeomoraError, "Image not found: #{path}" unless File.exist?(path)
+
+          show
+          @source_path = path
+          @rectified_image_path = nil
+          @rectification = nil
+          @detection = nil
+          file_url = path_to_file_url(path)
+          @dialog.execute_script("window.geomora.setImage(#{file_url.to_json}, #{path.to_json})")
+        end
+
+        def load_a1_photo(path, photo_id, action)
+          load_source_image(path)
+          @dialog.execute_script(<<~JS)
+            (function () {
+              var name = document.querySelector('[name="project_name"]');
+              if (name) name.value = #{photo_id.to_json};
+              if (window.geomora && window.geomora.setStatus) {
+                window.geomora.setStatus('', 'A1 ' + #{photo_id.to_json} + ' — ' + #{action.to_json});
+              }
+            })();
+          JS
+        end
+
         private
 
         def build_dialog

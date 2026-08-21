@@ -38,8 +38,11 @@ module Geomora
             (function () {
               var name = document.querySelector('[name="project_name"]');
               if (name) name.value = #{photo_id.to_json};
-              if (window.geomora && window.geomora.setStatus) {
-                window.geomora.setStatus('', 'A1 ' + #{photo_id.to_json} + ' — ' + #{action.to_json});
+              if (window.geomora) {
+                if (window.geomora.resetCorners) window.geomora.resetCorners();
+                if (window.geomora.setStatus) {
+                  window.geomora.setStatus('', 'A1 ' + #{photo_id.to_json} + ' — ' + #{action.to_json});
+                }
               }
             })();
           JS
@@ -253,11 +256,12 @@ module Geomora
 
             Logger.info("Rectifying image: #{source_path}")
             corners = params['corners']
-            if corners.is_a?(Array) && corners.length == 4
-              result = Perception::RectifyClient.rectify(source_path, corners: corners)
-            else
-              result = Perception::RectifyClient.rectify(source_path)
+            unless corners.is_a?(Array) && corners.length == 4
+              raise GeomoraError,
+                    'Frame the facade on Original view first: drag the four blue corner handles (TL/TR/BR/BL), then Rectify.'
             end
+
+            result = Perception::RectifyClient.rectify(source_path, corners: corners)
             @rectification = result.to_source_metadata(source_path)
             @rectified_image_path = result.rectified_image_path
             rectified_url = path_to_file_url(result.rectified_image_path)

@@ -41,6 +41,7 @@
     image: document.getElementById('reference-image'),
     overlaySvg: document.getElementById('detection-overlay'),
     cornerSvg: document.getElementById('corner-overlay'),
+    cornerGuide: document.getElementById('corner-guide'),
     viewerToolbar: document.getElementById('viewer-toolbar'),
     btnDrawWindow: document.getElementById('btn-draw-window'),
     btnDeleteSelected: document.getElementById('btn-delete-selected'),
@@ -332,6 +333,17 @@
     return { width: 1, height: 1 };
   }
 
+  function ensureDefaultCorners() {
+    if (!state.originalImageUrl || state.activeView !== 'original') {
+      return false;
+    }
+    if (state.corners && state.corners.length === 4) {
+      return true;
+    }
+    initDefaultCorners();
+    return !!(state.corners && state.corners.length === 4);
+  }
+
   function initDefaultCorners() {
     const dims = originalImageDimensions();
     if (!dims.width || !dims.height) return;
@@ -366,7 +378,19 @@
 
   function renderCornerOverlay() {
     const svg = els.cornerSvg;
-    if (!cornersEditable() || !state.corners || state.corners.length !== 4) {
+    if (!cornersEditable()) {
+      svg.innerHTML = '';
+      if (els.cornerGuide) {
+        els.cornerGuide.hidden = true;
+      }
+      return;
+    }
+
+    if (els.cornerGuide) {
+      els.cornerGuide.hidden = false;
+    }
+
+    if (!ensureDefaultCorners()) {
       svg.innerHTML = '';
       return;
     }
@@ -390,13 +414,14 @@
     }).join(' ');
 
     let markup =
+      '<polygon class="corner-fill" points="' + points + '" />' +
       '<polygon class="corner-line" points="' + points + '" />';
 
     state.corners.forEach(function (corner, index) {
       markup +=
         '<circle class="corner-handle" data-corner="' + index + '" cx="' + corner[0] +
-        '" cy="' + corner[1] + '" r="9" />' +
-        '<text class="corner-label" x="' + (corner[0] + 12) + '" y="' + (corner[1] - 8) +
+        '" cy="' + corner[1] + '" r="12" />' +
+        '<text class="corner-label" x="' + (corner[0] + 14) + '" y="' + (corner[1] - 10) +
         '">' + CORNER_LABELS[index] + '</text>';
     });
 
@@ -943,6 +968,9 @@
     els.viewerToolbar.hidden = !cornerMode && !overlayMode;
     els.btnDrawWindow.hidden = !overlayMode;
     els.btnDeleteSelected.hidden = !overlayMode;
+    if (els.cornerGuide) {
+      els.cornerGuide.hidden = !cornerMode;
+    }
     if (cornerMode || overlayMode) {
       updateViewerHint();
     }
@@ -1229,6 +1257,9 @@
       els.imageStack.hidden = true;
       els.viewerToolbar.hidden = true;
       els.placeholder.hidden = false;
+      if (els.cornerGuide) {
+        els.cornerGuide.hidden = true;
+      }
       els.overlaySvg.innerHTML = '';
       els.cornerSvg.innerHTML = '';
       if (state.activeView === 'overlay') {
@@ -1250,9 +1281,13 @@
     updateOverlayLayers();
     if (els.image.complete) {
       if (state.activeView === 'original') {
+        ensureDefaultCorners();
         renderCornerOverlay();
         els.overlaySvg.innerHTML = '';
       } else {
+        if (els.cornerGuide) {
+          els.cornerGuide.hidden = true;
+        }
         els.cornerSvg.innerHTML = '';
         renderDetectionOverlay();
       }
@@ -1389,6 +1424,12 @@
     setStatus('', sourceKind === 'video_frame'
       ? 'Video frame loaded — drag corners to frame facade, then Rectify'
       : 'Photo loaded — drag corners to frame facade, then Rectify');
+    window.requestAnimationFrame(function () {
+      if (ensureDefaultCorners()) {
+        renderCornerOverlay();
+        updateViewerToolbar();
+      }
+    });
   }
 
   function setSecondaryImage(fileUrl, sourcePath) {
@@ -1631,6 +1672,8 @@
   window.geomora = {
     loadPayload: loadPayload,
     setImage: setImage,
+    resetCorners: resetCorners,
+    ensureDefaultCorners: ensureDefaultCorners,
     setVideoFrames: setVideoFrames,
     setSecondaryImage: setSecondaryImage,
     setMultiviewRegistration: setMultiviewRegistration,
@@ -1811,6 +1854,18 @@
   });
 
   document.getElementById('btn-rectify').addEventListener('click', function () {
+    if (state.activeView !== 'original') {
+      setActiveView('original');
+      setStatus(
+        'warning',
+        'Switched to Original — drag the four blue corner handles to frame the facade, then Rectify again.'
+      );
+      return;
+    }
+    if (!ensureDefaultCorners()) {
+      setStatus('error', 'Image still loading — wait a moment, then drag corner handles before Rectify.');
+      return;
+    }
     sketchupCall('rectify', JSON.stringify(collectParams()));
   });
 
@@ -1938,14 +1993,12 @@
   document.addEventListener('mouseup', onOverlayMouseUp);
 
   els.image.addEventListener('load', function () {
-    if (state.activeView === 'original' && state.originalImageUrl && els.image.src === state.originalImageUrl) {
+    if (state.activeView === 'original' && state.originalImageUrl) {
       state.originalImageSize = {
         width: els.image.naturalWidth,
         height: els.image.naturalHeight
       };
-      if (!state.corners) {
-        initDefaultCorners();
-      }
+      ensureDefaultCorners();
       renderCornerOverlay();
       updateViewerToolbar();
     } else {

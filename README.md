@@ -2,6 +2,12 @@
 
 Architectural geometry reconstruction system for SketchUp.
 
+> **North star:** Photo/video → architectural understanding → editable SketchUp geometry — not pixel-perfect bbox drawing.
+>
+> **Priority rule:** If a proposed feature does not improve Reality → Observation → Architectural Understanding → Rationalization → Editable Geometry, it is not current priority.
+>
+> **Honest status (2026-08):** The SketchUp kernel and Workspace are usable; **AI auto-reconstruction is not**. Real photos still require manual rectification and overlay correction; hold-out benchmark gate is not passed. See [ROADMAP.md](docs/ROADMAP.md).
+
 Phase 0 implements the **Architectural IR** and **SketchUp Native Geometry Kernel**.
 
 **Phase 1** adds the **Reconstruction Workspace** (HtmlDialog + manual facade definition). See [PHASE_1.md](docs/PHASE_1.md) — **complete**.

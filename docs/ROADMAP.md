@@ -48,7 +48,7 @@ Phase design docs (`docs/PHASE_*.md`) explain *what* each layer does. They do **
 | Phase 1 — Workspace | v0.2 | HtmlDialog + manual facade |
 | Phase 2 — Rectification | v0.5 | 4-corner UI + OpenCV backend |
 | Phase 3 — Detection bootstrap | v0.34 | YOLO train/export, `accept_real_photos.py` |
-| Phase 4 — Rationalization | v0.2 | Snap, equal spacing, symmetry |
+| Phase 4 — Rationalization bootstrap | v0.2 | Snap + equal-spacing heuristic (not full Constraint Graph) |
 | Phase 5 — Pattern reuse | v0.2 | Bay detection, shared components |
 | Phase 6 — Multi-view | v0.3 | Registration, fusion, depth hooks |
 | Phase 7+ — Parametric building | v0.32 | Floor/roof/stair from params (not vision) |

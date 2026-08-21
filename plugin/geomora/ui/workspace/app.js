@@ -1894,10 +1894,46 @@
     sketchupCall('load_template');
   });
 
+  function shouldWarnBeforeRationalize() {
+    if (state.windows.length < 2) {
+      return null;
+    }
+    const sills = state.windows.map(function (win) {
+      return Math.round((Number(win.sill_height) || 0) / 50);
+    });
+    const uniqueSills = {};
+    sills.forEach(function (sill) {
+      uniqueSills[sill] = true;
+    });
+    if (Object.keys(uniqueSills).length > 1) {
+      return (
+        'Multiple window rows detected (different sill heights).\n' +
+        'Rationalize forces equal width/height and ONE horizontal row — it will destroy overlay positions.\n' +
+        'For complex facades use Validate → Generate instead.'
+      );
+    }
+    if (state.windows.length > 8) {
+      return (
+        'Many windows (' + state.windows.length + ').\n' +
+        'Rationalize assumes a simple row of identical windows.\n' +
+        'Continue only if this is a single-row facade.'
+      );
+    }
+    return null;
+  }
+
   document.getElementById('btn-rationalize').addEventListener('click', function () {
     if (!state.windows.length) {
       setStatus('error', 'Add at least one window before rationalizing.');
       return;
+    }
+    const warn = shouldWarnBeforeRationalize();
+    if (warn) {
+      const proceed = window.confirm(warn + '\n\nOK = rationalize anyway\nCancel = keep overlay positions');
+      if (!proceed) {
+        setStatus('', 'Rationalize cancelled — overlay positions kept.');
+        return;
+      }
     }
     sketchupCall('rationalize', JSON.stringify(collectParams()));
   });

@@ -7,6 +7,7 @@ from geomora_detect.vlm_prelabel import (
     clamp_bbox_norm,
     extract_json_payload,
     parse_elements,
+    sanitize_error_message,
 )
 
 
@@ -35,3 +36,8 @@ def test_bbox_norm_to_yolo_line():
 
 def test_clamp_bbox_norm_rejects_tiny_box():
     assert clamp_bbox_norm([0.1, 0.2, 0.105, 0.5]) is None
+
+
+def test_sanitize_error_message_redacts_key():
+    message = "404 for url https://example.com?key=SECRET123"
+    assert "SECRET123" not in sanitize_error_message(message, "SECRET123")

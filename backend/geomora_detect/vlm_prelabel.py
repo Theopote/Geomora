@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 import re
+import ssl
+import time
+import urllib.error
+import urllib.request
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
@@ -16,6 +21,13 @@ from .overlays import draw_overlay
 from .models import DetectedElement
 
 CLASS_IDS = {"window": 0, "door": 1}
+
+GEMINI_MODEL_CANDIDATES = (
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-flash-latest",
+    "gemini-2.0-flash-lite",
+)
 
 SYSTEM_PROMPT = """You are a facade opening detector for rectified building elevation photos.
 Identify visible window and door openings only.
@@ -67,6 +79,93 @@ class VlmClient(Protocol):
     def detect_openings(self, image_path: Path, *, model: str) -> VlmPrelabelResult: ...
 
 
+def ssl_verify_enabled() -> bool:
+    value = os.environ.get("GEOMORA_SSL_VERIFY", "1").strip().lower()
+    return value not in {"0", "false", "no", "off"}
+
+
+def _is_retryable_request_error(exc: Exception) -> bool:
+    message = str(exc).lower()
+    retry_tokens = (
+        "ssl",
+        "eof occurred",
+        "connection reset",
+        "timed out",
+        "timeout",
+        "temporary failure",
+        "connection aborted",
+        "502",
+        "503",
+        "504",
+        "429",
+    )
+    return any(token in message for token in retry_tokens)
+
+
+def _post_json_urllib(
+    url: str,
+    payload: dict[str, Any],
+    *,
+    headers: dict[str, str] | None = None,
+    timeout: float,
+) -> dict[str, Any]:
+    body = json.dumps(payload).encode("utf-8")
+    request_headers = {"Content-Type": "application/json"}
+    if headers:
+        request_headers.update(headers)
+    request = urllib.request.Request(
+        url,
+        data=body,
+        headers=request_headers,
+        method="POST",
+    )
+    if ssl_verify_enabled():
+        context = ssl.create_default_context()
+    else:
+        context = ssl._create_unverified_context()  # noqa: SLF001
+    with urllib.request.urlopen(request, timeout=timeout, context=context) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+def post_json_with_retries(
+    url: str,
+    payload: dict[str, Any],
+    *,
+    headers: dict[str, str] | None = None,
+    timeout: float = 120.0,
+    attempts: int = 4,
+) -> dict[str, Any]:
+    last_error: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            with httpx.Client(
+                timeout=timeout,
+                http2=False,
+                verify=ssl_verify_enabled(),
+                trust_env=True,
+                follow_redirects=True,
+            ) as client:
+                response = client.post(url, json=payload, headers=headers)
+                response.raise_for_status()
+                return response.json()
+        except Exception as exc:  # noqa: BLE001
+            last_error = exc
+            if attempt < attempts and _is_retryable_request_error(exc):
+                time.sleep(min(2.0 * attempt, 8.0))
+                continue
+            break
+
+    if last_error is not None and _is_retryable_request_error(last_error):
+        try:
+            return _post_json_urllib(url, payload, headers=headers, timeout=timeout)
+        except Exception as urllib_exc:  # noqa: BLE001
+            raise RuntimeError(f"{last_error}; urllib fallback failed: {urllib_exc}") from urllib_exc
+
+    if last_error is not None:
+        raise last_error
+    raise RuntimeError("Request failed without an error message")
+
+
 def encode_image_base64(image_path: Path, *, max_dim: int = 1600, jpeg_quality: int = 88) -> tuple[str, str]:
     bgr = imread_bgr(image_path)
     height, width = bgr.shape[:2]
@@ -84,6 +183,62 @@ def encode_image_base64(image_path: Path, *, max_dim: int = 1600, jpeg_quality: 
     mime = "image/jpeg"
     data = base64.b64encode(encoded.tobytes()).decode("ascii")
     return mime, data
+
+
+def sanitize_error_message(message: str, api_key: str | None = None) -> str:
+    redacted = message
+    if api_key:
+        redacted = redacted.replace(api_key, "***REDACTED***")
+    return re.sub(r"key=[^&\s'\"]+", "key=***REDACTED***", redacted)
+
+
+def gemini_generate_url(model: str) -> str:
+    return f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+
+
+def gemini_headers(api_key: str) -> dict[str, str]:
+    return {
+        "Content-Type": "application/json",
+        "x-goog-api-key": api_key,
+    }
+
+
+def list_gemini_models(api_key: str, *, timeout: float = 30.0) -> list[str]:
+    url = "https://generativelanguage.googleapis.com/v1beta/models"
+    with httpx.Client(
+        timeout=timeout,
+        http2=False,
+        verify=ssl_verify_enabled(),
+        trust_env=True,
+        follow_redirects=True,
+    ) as client:
+        response = client.get(url, headers=gemini_headers(api_key))
+        response.raise_for_status()
+        body = response.json()
+    models: list[str] = []
+    for item in body.get("models", []):
+        name = str(item.get("name", ""))
+        methods = item.get("supportedGenerationMethods", []) or item.get("supported_generation_methods", [])
+        if not name or "generateContent" not in methods:
+            continue
+        models.append(name.removeprefix("models/"))
+    return models
+
+
+def resolve_gemini_models(requested: str, api_key: str) -> list[str]:
+    ordered = [requested, *GEMINI_MODEL_CANDIDATES]
+    unique: list[str] = []
+    for model in ordered:
+        if model and model not in unique:
+            unique.append(model)
+    try:
+        available = set(list_gemini_models(api_key))
+    except Exception:
+        return unique
+    if not available:
+        return unique
+    preferred = [model for model in unique if model in available]
+    return preferred or sorted(available)
 
 
 def extract_json_payload(text: str) -> dict[str, Any]:
@@ -202,11 +357,9 @@ class OpenAIVlmClient:
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
         }
+        url = f"{self.base_url}/chat/completions"
         try:
-            with httpx.Client(timeout=self.timeout) as client:
-                response = client.post(f"{self.base_url}/chat/completions", headers=headers, json=payload)
-                response.raise_for_status()
-                body = response.json()
+            body = post_json_with_retries(url, payload, headers=headers, timeout=self.timeout)
             content = body["choices"][0]["message"]["content"]
             parsed = extract_json_payload(content)
             elements = parse_elements(parsed)
@@ -223,7 +376,7 @@ class OpenAIVlmClient:
                 image_path=str(image_path),
                 provider="openai",
                 model=model,
-                error=str(exc),
+                error=sanitize_error_message(str(exc), self.api_key),
             )
 
 
@@ -238,7 +391,7 @@ class GeminiVlmClient:
         self.timeout = timeout
 
     def detect_openings(self, image_path: Path, *, model: str) -> VlmPrelabelResult:
-        mime, data = encode_image_base64(image_path)
+        mime, data = encode_image_base64(image_path, max_dim=1024, jpeg_quality=82)
         payload = {
             "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
             "contents": [
@@ -260,33 +413,43 @@ class GeminiVlmClient:
                 "responseMimeType": "application/json",
             },
         }
-        url = (
-            f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-            f"?key={self.api_key}"
+        models_to_try = resolve_gemini_models(model, self.api_key)
+        last_error: Exception | None = None
+        for active_model in models_to_try:
+            url = gemini_generate_url(active_model)
+            try:
+                body = post_json_with_retries(
+                    url,
+                    payload,
+                    headers=gemini_headers(self.api_key),
+                    timeout=self.timeout,
+                )
+                content = body["candidates"][0]["content"]["parts"][0]["text"]
+                parsed = extract_json_payload(content)
+                elements = parse_elements(parsed)
+                notes = str(parsed.get("notes", ""))
+                if active_model != model:
+                    notes = f"fallback_model={active_model}; {notes}".strip("; ")
+                return VlmPrelabelResult(
+                    image_path=str(image_path),
+                    provider="gemini",
+                    model=active_model,
+                    elements=elements,
+                    notes=notes,
+                    raw_response=content,
+                )
+            except Exception as exc:  # noqa: BLE001
+                last_error = exc
+                if "404" in str(exc) and active_model != models_to_try[-1]:
+                    continue
+                break
+
+        return VlmPrelabelResult(
+            image_path=str(image_path),
+            provider="gemini",
+            model=model,
+            error=sanitize_error_message(str(last_error or "Gemini request failed"), self.api_key),
         )
-        try:
-            with httpx.Client(timeout=self.timeout) as client:
-                response = client.post(url, json=payload)
-                response.raise_for_status()
-                body = response.json()
-            content = body["candidates"][0]["content"]["parts"][0]["text"]
-            parsed = extract_json_payload(content)
-            elements = parse_elements(parsed)
-            return VlmPrelabelResult(
-                image_path=str(image_path),
-                provider="gemini",
-                model=model,
-                elements=elements,
-                notes=str(parsed.get("notes", "")),
-                raw_response=content,
-            )
-        except Exception as exc:  # noqa: BLE001
-            return VlmPrelabelResult(
-                image_path=str(image_path),
-                provider="gemini",
-                model=model,
-                error=str(exc),
-            )
 
 
 def build_client(provider: str, api_key: str | None = None, *, base_url: str | None = None) -> VlmClient:
@@ -308,5 +471,5 @@ def build_client(provider: str, api_key: str | None = None, *, base_url: str | N
 
 def default_model(provider: str) -> str:
     if provider == "gemini":
-        return "gemini-2.0-flash"
+        return "gemini-2.5-flash"
     return "gpt-4o-mini"

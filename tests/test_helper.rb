@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-ROOT = File.expand_path('../..', __dir__)
+ROOT = File.expand_path('..', __dir__)
 PLUGIN = File.join(ROOT, 'plugin', 'geomora')
 
 $LOAD_PATH.unshift(PLUGIN) unless $LOAD_PATH.include?(PLUGIN)

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative '../core/errors'
 require_relative '../geometry/units'
 require_relative '../geometry/vectors'
 
@@ -18,13 +19,13 @@ module Geomora
 
         openings.each do |opening|
           Logger.debug("Cutting opening #{opening.id} in #{wall.id}")
-          cut_opening(wall_group, opening, basis, half_t, storey_elevation, wall.thickness)
+          cut_opening(wall_group, wall, opening, basis, half_t, storey_elevation, wall.thickness)
         end
       end
 
       private
 
-      def cut_opening(wall_group, opening, basis, half_t, storey_elevation, wall_thickness)
+      def cut_opening(wall_group, wall, opening, basis, half_t, storey_elevation, wall_thickness)
         offset = opening.offset.to_f
         width = opening.width.to_f
         sill = opening.sill_height.to_f
@@ -54,7 +55,10 @@ module Geomora
 
         ents = wall_group.entities
         opening_face = ents.add_face(pts)
-        return unless opening_face&.valid?
+        unless opening_face&.valid?
+          raise GeometryGenerationError,
+                "Failed to create opening #{opening.id} in wall #{wall.id}"
+        end
 
         opening_face.pushpull(-to_len(wall_thickness))
       end

@@ -44,6 +44,9 @@ module Geomora
           a1_menu.add_item('Record A1 Score...') { A1BenchmarkRunner.record_score }
           a1_menu.add_item('Show Progress') { A1BenchmarkRunner.show_progress }
           a1_menu.add_item('Open Checklist (HTML)') { A1BenchmarkRunner.open_checklist }
+          a1_menu.add_item('Open Scores CSV') { A1BenchmarkRunner.open_scores_csv }
+          a1_menu.add_separator
+          a1_menu.add_item('Import A1 Scores to JSON') { A1BenchmarkRunner.import_scores }
         end
 
         def add_lod_menu_items(menu)

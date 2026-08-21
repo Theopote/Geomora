@@ -95,7 +95,7 @@ module Geomora
             "Progress: #{summary[:reviewed]}/#{summary[:total]} reviewed\n" \
             "Generate OK: #{summary[:generate_ok]}\n" \
             "Hold-out: #{summary[:holdout_generate_ok]}\n\n" \
-            "Next: #{summary[:next_id] || 'done — run import_a1_e2e_scores.py'}"
+            "Next: #{summary[:next_id] || 'done — use Import A1 Scores to JSON'}"
           )
         rescue GeomoraError => e
           ::UI.messagebox("A1 score save failed:\n\n#{e.message}")
@@ -130,6 +130,38 @@ module Geomora
           ::UI.openURL("file:///#{path.gsub('\\', '/')}")
         rescue GeomoraError => e
           ::UI.messagebox("Open checklist failed:\n\n#{e.message}")
+        end
+
+        def open_scores_csv
+          path = Core::A1Benchmark.csv_path
+          raise GeomoraError, "Checklist CSV not found: #{path}" unless File.exist?(path)
+
+          if RUBY_PLATFORM =~ /mswin|mingw|cygwin/
+            system('explorer', "/select,#{path.tr('/', '\\')}")
+          else
+            ::UI.openURL("file:///#{path.gsub('\\', '/')}")
+          end
+        rescue GeomoraError => e
+          ::UI.messagebox("Open CSV failed:\n\n#{e.message}")
+        end
+
+        def import_scores
+          result = Core::A1Benchmark.import_scores_to_e2e
+          summary = result[:summary]
+          message = [
+            "Merged #{result[:merged]}/#{result[:total]} rows",
+            "Reviewed: #{summary['reviewed']}/#{summary['total']}",
+            "Generate OK: #{summary['generate_ok']}",
+            "Hold-out Generate OK: #{summary['holdout_generate_ok']} (gate ≥4/5)",
+            summary['rqs_avg'] ? "RQS average: #{summary['rqs_avg']}/100" : nil,
+            '',
+            result[:out_path]
+          ].compact.join("\n")
+
+          ::UI.messagebox("A1 scores imported.\n\n#{message}")
+          Logger.info("A1 scores imported: #{message.gsub("\n", ' | ')}")
+        rescue GeomoraError => e
+          ::UI.messagebox("A1 import failed:\n\n#{e.message}")
         end
       end
     end

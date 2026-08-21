@@ -212,7 +212,126 @@ module Geomora
           )
         end
 
+        def import_scores_to_e2e(csv: csv_path, e2e: e2e_path, out: nil)
+          raise GeomoraError, "Checklist CSV not found: #{csv}" unless File.exist?(csv)
+          raise GeomoraError, "A1 E2E JSON not found: #{e2e}" unless File.exist?(e2e)
+
+          payload = JSON.parse(File.read(e2e, encoding: 'UTF-8'))
+          csv_rows = load_csv_rows_from(csv)
+          rqs_keys = payload.fetch('rqs_rubric', {}).keys
+          rqs_keys = RQS_KEYS if rqs_keys.empty?
+
+          merged = 0
+          payload['results'].each do |result|
+            csv_row = csv_rows[result['id']]
+            next unless csv_row
+
+            apply_csv_row_to_e2e!(result, csv_row, rqs_keys)
+            merged += 1
+          end
+
+          payload['e2e_summary'] = summarize_e2e(payload['results'])
+          out_path = out || e2e
+          File.write(out_path, JSON.pretty_generate(payload) + "\n", encoding: 'UTF-8')
+
+          {
+            merged: merged,
+            total: payload['results'].length,
+            out_path: out_path,
+            summary: payload['e2e_summary']
+          }
+        end
+
+        def load_csv_rows_from(path)
+          rows = {}
+          CSV.foreach(path, headers: true, encoding: 'bom|utf-8') do |row|
+            rows[row['id']] = row.to_h
+          end
+          rows
+        end
+
+        def apply_csv_row_to_e2e!(result, csv_row, rqs_keys)
+          e2e = result['e2e'] ||= {}
+          e2e['sketchup_reviewed'] = truthy?(csv_row['sketchup_reviewed'])
+
+          rectify_ok = csv_row['rectify_ok'].to_s.strip
+          if !rectify_ok.empty?
+            e2e['rectify_ok'] = boolish?(rectify_ok) ? truthy?(rectify_ok) : rectify_ok
+          end
+
+          %w[windows_true doors_true overlay_correction notes].each do |field|
+            val = csv_row[field].to_s.strip
+            e2e[field] = val unless val.empty?
+          end
+
+          generate_ok = csv_row['generate_ok'].to_s.strip
+          if !generate_ok.empty?
+            lowered = generate_ok.downcase
+            e2e['generate_ok'] = if %w[true false 1 0 yes no].include?(lowered)
+                                   truthy?(generate_ok)
+                                 else
+                                   generate_ok
+                                 end
+          end
+
+          correction_time = csv_row['correction_time_sec'].to_s.strip
+          e2e['correction_time_sec'] = parse_optional_float(correction_time) unless correction_time.empty?
+
+          failure = csv_row['failure_classes'].to_s.strip
+          unless failure.empty?
+            e2e['failure_classes'] = failure.split(/[;,]/).map(&:strip).reject(&:empty?)
+          end
+
+          rqs = e2e['rqs'] ||= {}
+          rqs_keys.each do |key|
+            col = "rqs_#{key}"
+            val = csv_row[col].to_s.strip
+            rqs[key] = parse_optional_int(val) unless val.empty?
+          end
+
+          rqs_total = csv_row['rqs_total'].to_s.strip
+          if !rqs_total.empty?
+            e2e['rqs_total'] = parse_optional_int(rqs_total)
+          elsif rqs_keys.any? { |key| rqs[key].is_a?(Integer) }
+            e2e['rqs_total'] = rqs.values.select { |v| v.is_a?(Integer) }.sum
+          end
+        end
+
+        def summarize_e2e(results)
+          reviewed = results.select { |row| row.dig('e2e', 'sketchup_reviewed') }
+          generate_ok = reviewed.select { |row| row.dig('e2e', 'generate_ok') == true }
+          holdout = results.select { |row| row['split'] == 'holdout' }
+          holdout_ok = holdout.select { |row| row.dig('e2e', 'generate_ok') == true }
+          rqs_scores = reviewed.filter_map { |row| row.dig('e2e', 'rqs_total') }.select { |v| v.is_a?(Integer) }
+
+          {
+            'reviewed' => reviewed.length,
+            'total' => results.length,
+            'generate_ok' => generate_ok.length,
+            'holdout_generate_ok' => "#{holdout_ok.length}/#{holdout.length}",
+            'rqs_avg' => rqs_scores.empty? ? nil : (rqs_scores.sum.to_f / rqs_scores.length).round(1)
+          }
+        end
+
         private
+
+        def boolish?(value)
+          %w[true false 1 0 yes no].include?(value.to_s.strip.downcase)
+        end
+
+        def parse_optional_int(value)
+          text = value.to_s.strip
+          return nil if text.empty?
+
+          text.include?('.') ? text.to_f.to_i : text.to_i
+        end
+
+        def parse_optional_float(value)
+          text = value.to_s.strip
+          return nil if text.empty?
+
+          text.to_f
+        end
 
         def truthy?(value)
           %w[true 1 yes y].include?(value.to_s.strip.downcase)

@@ -38,6 +38,6 @@ Write-Host "SketchUp workflow:" -ForegroundColor Yellow
 Write-Host "  Extensions -> Geomora -> A1 Real Photo Benchmark -> Review Next Photo"
 Write-Host "  After each image: Record A1 Score..."
 Write-Host ""
-Write-Host "When done:" -ForegroundColor Yellow
-Write-Host "  cd backend"
-Write-Host "  .\.venv\Scripts\python scripts\import_a1_e2e_scores.py"
+Write-Host "When done (or after each batch):" -ForegroundColor Yellow
+Write-Host "  SketchUp -> Geomora -> A1 Real Photo Benchmark -> Import A1 Scores to JSON"
+Write-Host "  or: .\.venv\Scripts\python scripts\import_a1_e2e_scores.py"

@@ -23,6 +23,10 @@ from .observations.depth_discontinuities import (
     depth_discontinuity_observations,
     depth_observations_to_storey_cues,
 )
+from .observations.balconies import (
+    infer_balcony_slab_observations,
+    balcony_observations_to_storey_cues,
+)
 from .prediction_enrichment import enrich_prediction
 from .vlm_evidence import provider_api_key, request_architectural_evidence
 from geomora_detect.vlm_prelabel import default_model, sanitize_error_message
@@ -58,19 +62,21 @@ def reconstruct_facade(
     )
     facade_bbox = facade_observation.geometry.get("bbox") if facade_observation else None
     storey_cues: list[dict[str, Any]] = []
+    line_observations = []
+    detected_openings = [
+        {"id": f"pred_{index:03d}", "type": element.type, "bbox": list(element.bbox_norm), "confidence": element.confidence}
+        for index, element in enumerate(detection.elements, start=1)
+    ]
     try:
         line_graph = detect_horizontal_structure_observations(
             image_path, photo_id=photo_id, facade_bbox=facade_bbox,
         )
-        detected_openings = [
-            {"type": element.type, "bbox": list(element.bbox_norm), "confidence": element.confidence}
-            for element in detection.elements
-        ]
         role_counts = classify_horizontal_structure_roles(
             line_graph.observations, openings=detected_openings, facade_bbox=facade_bbox,
         )
         line_graph.debug["role_counts"] = role_counts
         line_graph.debug["semantic_classifier"] = "opening_context_v0.1"
+        line_observations = line_graph.observations
         observation_graph.observations.extend(line_graph.observations)
         observation_graph.debug["horizontal_structure"] = line_graph.debug
         storey_cues = horizontal_observations_to_storey_cues(line_graph.observations)
@@ -88,6 +94,16 @@ def reconstruct_facade(
             observation_graph.observations.extend(depth_graph.observations)
             observation_graph.debug["depth_discontinuity"] = depth_graph.debug
             storey_cues.extend(depth_observations_to_storey_cues(depth_graph.observations))
+            balcony_observations = infer_balcony_slab_observations(
+                line_observations, depth_graph.observations,
+                openings=detected_openings, facade_bbox=facade_bbox,
+            )
+            observation_graph.observations.extend(balcony_observations)
+            storey_cues.extend(balcony_observations_to_storey_cues(balcony_observations))
+            observation_graph.debug["balcony_hypotheses"] = {
+                "adapter": "cross_modal_balcony_v0.1", "candidate_count": len(balcony_observations),
+                "requires": ["horizontal_structure", "reliable_depth_discontinuity", "opening_above"],
+            }
             depth_evidence.update({"used": True, "method": resolved_depth_method,
                                    "candidate_count": len(depth_graph.observations),
                                    "metric_depth_evidence": depth_graph.debug["metric_depth_evidence"]})

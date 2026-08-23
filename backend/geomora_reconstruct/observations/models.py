@@ -11,6 +11,7 @@ class ObservationKind(str, Enum):
     OPENING_CANDIDATE = "opening_candidate"
     HORIZONTAL_LINE = "horizontal_line"
     DEPTH_DISCONTINUITY = "depth_discontinuity"
+    BALCONY_CANDIDATE = "balcony_candidate"
     VERTICAL_LINE = "vertical_line"
     REPETITION_EVIDENCE = "repetition_evidence"
     OCCLUSION_REGION = "occlusion_region"

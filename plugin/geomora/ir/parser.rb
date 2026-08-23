@@ -26,7 +26,8 @@ module Geomora
           sources: (@data['sources'] || []).map { |s| parse_source(s) },
           openings: collect_openings,
           rooms: (@data['rooms'] || []).map { |r| parse_room(r) },
-          furniture: (@data['furniture'] || []).map { |f| parse_furniture(f) }
+          furniture: (@data['furniture'] || []).map { |f| parse_furniture(f) },
+          reconstruction: @data['reconstruction'] || {}
         )
       end
 

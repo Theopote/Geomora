@@ -44,6 +44,19 @@ module Geomora
         }
         ir['rooms'] = rooms unless rooms.empty?
         ir['furniture'] = furniture unless furniture.empty?
+        if @params['constraint_solution'].is_a?(Hash)
+          solution = @params['constraint_solution']
+          status = solution['safety_status'] || 'accepted'
+          ir['reconstruction'] = {
+            'constraint_solver' => {
+              'safety_status' => status,
+              'soft_weight_scale' => solution.fetch('soft_weight_scale', 1.0),
+              'attempt_count' => solution.fetch('attempt_count', (solution['safety_attempts'] || []).length),
+              'fallback_reasons' => solution['fallback_reasons'] || [],
+              'human_review_required' => status == 'fallback_observed_geometry'
+            }
+          }
+        end
         ir
       end
 

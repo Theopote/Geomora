@@ -39,9 +39,28 @@
     "sources": {
       "type": "array",
       "items": { "$ref": "#/definitions/source" }
+    },
+    "reconstruction": {
+      "$ref": "#/definitions/reconstruction"
     }
   },
   "definitions": {
+    "reconstruction": {
+      "type": "object",
+      "properties": {
+        "constraint_solver": {
+          "type": "object",
+          "required": ["safety_status", "human_review_required"],
+          "properties": {
+            "safety_status": { "type": "string", "enum": ["accepted", "accepted_after_soft_weight_retry", "fallback_observed_geometry"] },
+            "soft_weight_scale": { "type": "number", "minimum": 0, "maximum": 1 },
+            "attempt_count": { "type": "integer", "minimum": 0 },
+            "fallback_reasons": { "type": "array", "items": { "type": "string" } },
+            "human_review_required": { "type": "boolean" }
+          }
+        }
+      }
+    },
     "building": {
       "type": "object",
       "required": ["id", "name", "storeys"],

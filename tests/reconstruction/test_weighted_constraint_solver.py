@@ -120,3 +120,21 @@ def test_excessive_soft_adjustment_is_retried_at_lower_weight():
     assert solution["soft_weight_scale"] == 0.25
     assert solution["safety_attempts"][0]["reasons"] == ["excessive_geometry_drift"]
     assert solution["safety_attempts"][1]["safe"] is True
+
+
+def test_solver_safety_status_is_exported_to_ir():
+    prediction = {
+        "photo_id": "safe_ir",
+        "facade": {"width": 1.0, "height": 1.0},
+        "topology": {"storey_count": 1, "facade_bbox": [0, 0, 1, 1]},
+        "openings": deepcopy(OPENINGS),
+        "constraint_suggestions": [constraint("equal_width")],
+        "pipeline": {"scale_hint": {"wall_length_mm": 10000, "wall_height_mm": 3000}},
+    }
+
+    enrich_prediction(prediction, export_ir=True)
+
+    solver = prediction["architectural_ir"]["reconstruction"]["constraint_solver"]
+    assert solver["safety_status"] == prediction["constraint_solution"]["safety_status"]
+    assert solver["attempt_count"] >= 1
+    assert solver["human_review_required"] is False

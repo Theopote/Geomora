@@ -99,6 +99,7 @@ module Geomora
       Document = Struct.new(
         :schema_version, :project, :buildings, :components,
         :constraints, :sources, :openings, :rooms, :furniture,
+        :reconstruction,
         keyword_init: true
       )
     end

@@ -1322,6 +1322,7 @@
 
     state.detection = null;
     state.rationalization = null;
+    state.constraintSolution = payload.constraint_solution || null;
     state.pattern = null;
     state.overlayImageUrl = null;
     state.doorBbox = null;
@@ -1337,15 +1338,14 @@
       setImage('file:///' + payload.source_path.replace(/\\/g, '/'), payload.source_path);
     }
 
-    if (payload.ir_preview) {
-      setIrPreview(payload.ir_preview);
-    }
-
     renderTree();
     if (mode === 'template') {
       setStatus('', 'Phase 0 template loaded — for testing only');
     } else {
       setStatus('', 'Ready — load a photo to begin');
+    }
+    if (payload.ir_preview) {
+      setIrPreview(payload.ir_preview);
     }
   }
 
@@ -1660,6 +1660,15 @@
   function setIrPreview(ir) {
     if (!ir || !ir.openings) return;
     renderTree();
+    const solver = ir.reconstruction && ir.reconstruction.constraint_solver;
+    if (!solver) return;
+    if (solver.safety_status === 'fallback_observed_geometry') {
+      setStatus('warning', 'Unsafe AI optimization was rejected. Original detected geometry is preserved; review is recommended.');
+    } else if (solver.safety_status === 'accepted_after_soft_weight_retry') {
+      setStatus('warning', 'AI geometry was optimized with reduced constraint strength; review is recommended.');
+    } else {
+      setStatus('success', 'AI geometry was optimized and passed safety checks.');
+    }
   }
 
   function applyRoomLayoutSuggestion(layout) {

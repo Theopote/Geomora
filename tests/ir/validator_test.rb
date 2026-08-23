@@ -90,6 +90,22 @@ class ValidatorTest < Minitest::Test
     assert_match(/Zero-length wall/, error.message)
   end
 
+  def test_reconstruction_solver_status_survives_ir_parsing
+    data = JSON.parse(File.read(File.join(ROOT, 'examples', 'facade_phase0.json')))
+    data['reconstruction'] = {
+      'constraint_solver' => {
+        'safety_status' => 'fallback_observed_geometry',
+        'human_review_required' => true,
+        'fallback_reasons' => ['introduced_overlap']
+      }
+    }
+
+    doc = Geomora::IR::Parser.parse(data)
+
+    assert_equal 'fallback_observed_geometry', doc.reconstruction.dig('constraint_solver', 'safety_status')
+    assert_equal true, doc.reconstruction.dig('constraint_solver', 'human_review_required')
+  end
+
   def test_unsupported_unit
     data = JSON.parse(File.read(File.join(ROOT, 'examples', 'facade_phase0.json')))
     data['project']['unit'] = 'ft'

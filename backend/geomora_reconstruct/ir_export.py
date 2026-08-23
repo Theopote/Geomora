@@ -190,7 +190,7 @@ def prediction_to_ir(prediction: dict[str, Any]) -> dict[str, Any] | None:
             }
         )
 
-    return {
+    ir = {
         "schema_version": "0.1",
         "project": {
             "id": f"project_{prediction.get('photo_id', 'unknown')}",
@@ -211,6 +211,19 @@ def prediction_to_ir(prediction: dict[str, Any]) -> dict[str, Any] | None:
         "metric": metric,
         "metric_source": metric_source,
     }
+    solution = prediction.get("constraint_solution")
+    if isinstance(solution, dict):
+        status = solution.get("safety_status", "accepted")
+        ir["reconstruction"] = {
+            "constraint_solver": {
+                "safety_status": status,
+                "soft_weight_scale": solution.get("soft_weight_scale", 1.0),
+                "attempt_count": len(solution.get("safety_attempts") or []),
+                "fallback_reasons": solution.get("fallback_reasons") or [],
+                "human_review_required": status == "fallback_observed_geometry",
+            }
+        }
+    return ir
 
 
 def attach_metric_block(prediction: dict[str, Any]) -> dict[str, float] | None:

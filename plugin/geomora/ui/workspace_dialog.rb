@@ -742,6 +742,7 @@ module Geomora
             'door' => door_payload,
             'source_path' => nil,
             'source_id' => nil,
+            'constraint_solution' => data.dig('reconstruction', 'constraint_solver'),
             'ir_preview' => data
           }
         end

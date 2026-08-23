@@ -287,4 +287,28 @@ class IRBuilderTest < Minitest::Test
     assert custom
     assert_equal [600.0, 600.0, 0], custom.dig('geometry', 'position')
   end
+
+  def test_preserves_constraint_solver_safety_status
+    params = {
+      'wall_length' => 10_000,
+      'wall_height' => 3300,
+      'wall_thickness' => 240,
+      'windows' => [],
+      'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 },
+      'constraint_solution' => {
+        'safety_status' => 'accepted_after_soft_weight_retry',
+        'soft_weight_scale' => 0.25,
+        'attempt_count' => 2,
+        'fallback_reasons' => []
+      }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    solver = ir.dig('reconstruction', 'constraint_solver')
+
+    assert_equal 'accepted_after_soft_weight_retry', solver['safety_status']
+    assert_in_delta 0.25, solver['soft_weight_scale']
+    assert_equal 2, solver['attempt_count']
+    assert_equal false, solver['human_review_required']
+  end
 end

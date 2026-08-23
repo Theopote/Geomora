@@ -26,6 +26,11 @@ def test_workspace_has_unique_ids_and_primary_workflow_controls():
     assert 'class="workflow-steps"' in html
     assert 'class="footer-tools"' in html
     assert html.count('class="icon"') >= 6
+    assert 'id="inspector-filter"' in html
+
+    script = (WORKSPACE / "app.js").read_text(encoding="utf-8")
+    assert "function enhanceInspector()" in script
+    assert "group.open = rawName === 'Windows' || rawName === 'Door'" in script
 
 
 def test_reconstruction_review_remains_accessible():

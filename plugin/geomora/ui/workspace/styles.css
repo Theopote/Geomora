@@ -113,6 +113,59 @@ body {
   color: #b0b3b8;
 }
 
+.inspector-search {
+  display: block;
+  margin: 0 0 12px;
+  color: #9da3ad;
+  font-size: 11px;
+}
+
+.inspector-search input {
+  width: 100%;
+  margin-top: 5px;
+  padding: 8px 10px;
+  border: 1px solid #41454e;
+  border-radius: 6px;
+  background: #1d1f23;
+  color: #f0f1f2;
+}
+
+.inspector-search input:focus {
+  border-color: #8ab4f8;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(138, 180, 248, .18);
+}
+
+.inspector-group {
+  margin: 8px 0;
+  border: 1px solid #383b42;
+  border-radius: 7px;
+  background: #232529;
+}
+
+.inspector-group > summary {
+  padding: 10px;
+  color: #cbd0d8;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+}
+
+.inspector-group[open] > summary {
+  border-bottom: 1px solid #383b42;
+  color: #e8eaed;
+}
+
+.inspector-group > :not(summary) {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.inspector-group > :last-child {
+  margin-bottom: 10px;
+}
+
 .btn {
   display: block;
   width: 100%;

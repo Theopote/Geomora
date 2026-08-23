@@ -251,6 +251,61 @@
     });
   }
 
+  function enhanceInspector() {
+    const form = els.form;
+    const filter = document.getElementById('inspector-filter');
+    if (!form || !filter || form.dataset.grouped === 'true') return;
+    const friendlyNames = {
+      'Building Elements (Phase 7)': 'Building shell',
+      'Multi-Storey (Phase 9)': 'Floors and structure',
+      'LOD (Phase 10)': 'Model detail (LOD)',
+      'Interior Layout (Phase 11)': 'Interior layout',
+      'Interior Rooms (Phase 12)': 'Rooms',
+      'Layout Refinement (Phase 13)': 'Layout refinement',
+      'Fixtures + Overrides (Phase 14)': 'Fixtures and overrides',
+      'Catalog + Layouts (Phase 15)': 'Catalog and layouts',
+      'Presentation + Layout (Phase 16)': 'Presentation',
+      'Layout Editor (Phase 17–3)': 'Layout editor',
+      'Geometry Doctor (Phase 8)': 'Geometry repair',
+      'Windows': 'Windows',
+      'Door': 'Door'
+    };
+    const titles = Array.from(form.children).filter(function (child) {
+      return child.classList && child.classList.contains('section-title');
+    });
+    titles.forEach(function (title) {
+      const rawName = title.textContent.trim();
+      const group = document.createElement('details');
+      group.className = 'inspector-group';
+      group.open = rawName === 'Windows' || rawName === 'Door';
+      const summary = document.createElement('summary');
+      summary.textContent = friendlyNames[rawName] || rawName.replace(/\s*\(Phase[^)]*\)/, '');
+      group.appendChild(summary);
+      form.insertBefore(group, title);
+      let next = title.nextSibling;
+      title.remove();
+      while (next && !(next.classList && next.classList.contains('section-title'))) {
+        const current = next;
+        next = next.nextSibling;
+        group.appendChild(current);
+      }
+      group.dataset.searchText = group.textContent.toLowerCase();
+    });
+    form.dataset.grouped = 'true';
+    filter.addEventListener('input', function () {
+      const query = filter.value.trim().toLowerCase();
+      form.querySelectorAll('.inspector-group').forEach(function (group) {
+        const matches = !query || group.dataset.searchText.indexOf(query) >= 0;
+        group.hidden = !matches;
+        if (query && matches) group.open = true;
+      });
+      Array.from(form.children).forEach(function (child) {
+        if (child.tagName !== 'LABEL') return;
+        child.hidden = !!query && child.textContent.toLowerCase().indexOf(query) < 0;
+      });
+    });
+  }
+
   function clearSelection() {
     state.selectedWindowIndex = null;
     state.selectedDoor = false;
@@ -1878,6 +1933,8 @@
   window.addEventListener('focus', function () {
     resumeViewportStreamIfWanted();
   });
+
+  enhanceInspector();
 
   document.getElementById('btn-pick-image').addEventListener('click', function () {
     sketchupCall('pick_image');

@@ -80,3 +80,8 @@ def test_analyze_building_uses_reconstruction_pipeline():
     assert "architecture-storey" in script
     assert "architecture-bay" in script
     assert 'id="show-ai-guides"' in (WORKSPACE / "index.html").read_text(encoding="utf-8")
+    assert 'id="uncertainty-review"' in (WORKSPACE / "index.html").read_text(encoding="utf-8")
+    assert "function selectUncertainty(index)" in script
+    assert "function decideUncertainty(decision)" in script
+    assert "data-tree-uncertainty" in script
+    assert "uncertainty_decisions: state.uncertaintyDecisions" in script

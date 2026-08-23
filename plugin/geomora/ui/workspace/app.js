@@ -30,6 +30,8 @@
     constraintSolution: null,
     reconstructionReview: null,
     understanding: null,
+    selectedUncertaintyIndex: null,
+    uncertaintyDecisions: {},
     activeStoreyIndex: 0,
     storeyWindows: [[]]
   };
@@ -48,6 +50,8 @@
     overlaySvg: document.getElementById('detection-overlay'),
     cornerSvg: document.getElementById('corner-overlay'),
     showAiGuides: document.getElementById('show-ai-guides'),
+    uncertaintyReview: document.getElementById('uncertainty-review'),
+    uncertaintyReviewLabel: document.getElementById('uncertainty-review-label'),
     cornerGuide: document.getElementById('corner-guide'),
     viewerToolbar: document.getElementById('viewer-toolbar'),
     btnDrawWindow: document.getElementById('btn-draw-window'),
@@ -821,10 +825,13 @@
         (facadeBox.y + facadeBox.h - 5) + '">B' + bay.id + '</text>';
     });
 
-    (understanding.uncertain_openings || []).forEach(function (item) {
+    (understanding.uncertain_openings || []).forEach(function (item, index) {
       if (!item.bbox || item.bbox.length !== 4) return;
       const box = bboxPixelsFromNorm(item.bbox);
-      markup += '<rect class="architecture-uncertain" x="' + box.x + '" y="' + box.y +
+      const selected = state.selectedUncertaintyIndex === index;
+      const decided = state.uncertaintyDecisions[index];
+      markup += '<rect class="architecture-uncertain' + (selected ? ' selected' : '') +
+        (decided ? ' decided' : '') + '" x="' + box.x + '" y="' + box.y +
         '" width="' + box.w + '" height="' + box.h + '" />';
     });
     return markup + '</g>';
@@ -1251,6 +1258,15 @@
         detail: state.understanding.storey_count + ' storeys · ' + state.understanding.bay_count + ' bays',
         needsReview: uncertaintyCount > 0
       });
+      (state.understanding.uncertain_openings || []).forEach(function (_uncertainty, index) {
+        items.push({
+          type: 'review',
+          title: 'Uncertain opening ' + (index + 1),
+          detail: state.uncertaintyDecisions[index] || 'Click to inspect',
+          needsReview: !state.uncertaintyDecisions[index],
+          uncertaintyIndex: index
+        });
+      });
     }
     if (state.detection) items.push({ type: 'ai', title: 'AI detection', detail: state.detection.method, confidence: confidenceNumber(state.detection.confidence) });
     if (state.rectification) items.push({ type: 'rectify', title: 'Perspective corrected', detail: state.rectification.method, confidence: confidenceNumber(state.rectification.confidence) });
@@ -1268,7 +1284,7 @@
     });
     els.tree.innerHTML = visible.map(function (item) {
       const confidence = item.confidence == null ? '' : '<span class="confidence ' + (item.confidence < 0.65 ? 'low' : item.confidence < 0.82 ? 'medium' : 'high') + '">' + Math.round(item.confidence * 100) + '%</span>';
-      const action = item.index != null ? ' data-tree-window="' + item.index + '"' : item.door ? ' data-tree-door="true"' : '';
+      const action = item.index != null ? ' data-tree-window="' + item.index + '"' : item.door ? ' data-tree-door="true"' : item.uncertaintyIndex != null ? ' data-tree-uncertainty="' + item.uncertaintyIndex + '"' : '';
       return '<li class="tree-item' + (action ? ' actionable' : '') + '"' + action + '><span class="tree-icon ' + item.type + '" aria-hidden="true"></span><span class="tree-copy"><strong>' + escapeHtml(item.title) + '</strong><small>' + escapeHtml(item.detail || '') + '</small></span>' + confidence + '</li>';
     }).join('');
     els.treeSummary.textContent = params.windows.length + ' windows' + (params.door.width > 0 ? ' · 1 door' : '') + (reviewOnly ? ' · review filter' : '');
@@ -1278,6 +1294,51 @@
     els.tree.querySelectorAll('[data-tree-door]').forEach(function (item) {
       item.addEventListener('click', function () { selectDoor(); setActiveView('overlay'); });
     });
+    els.tree.querySelectorAll('[data-tree-uncertainty]').forEach(function (item) {
+      item.addEventListener('click', function () { selectUncertainty(Number(item.dataset.treeUncertainty)); });
+    });
+  }
+
+  function selectUncertainty(index) {
+    state.selectedUncertaintyIndex = index;
+    setActiveView('overlay');
+    renderUncertaintyReview();
+    scheduleOverlayRender();
+  }
+
+  function renderUncertaintyReview() {
+    if (!els.uncertaintyReview) return;
+    const items = (state.understanding && state.understanding.uncertain_openings) || [];
+    const item = state.selectedUncertaintyIndex == null ? null : items[state.selectedUncertaintyIndex];
+    els.uncertaintyReview.hidden = !item;
+    if (!item) return;
+    els.uncertaintyReviewLabel.textContent = 'Uncertain opening ' + (state.selectedUncertaintyIndex + 1);
+  }
+
+  function decideUncertainty(decision) {
+    if (state.selectedUncertaintyIndex == null) return;
+    state.uncertaintyDecisions[state.selectedUncertaintyIndex] = decision;
+    setStatus('success', 'Uncertainty recorded: ' + decision.replace(/_/g, ' ') + '.');
+    renderTree();
+    scheduleOverlayRender();
+  }
+
+  function editSelectedUncertainty() {
+    const items = (state.understanding && state.understanding.uncertain_openings) || [];
+    const item = items[state.selectedUncertaintyIndex];
+    if (!item || !item.bbox) return;
+    let bestIndex = null;
+    let bestDistance = Infinity;
+    state.windows.forEach(function (win, index) {
+      const bbox = resolveWindowBbox(win);
+      if (!bbox) return;
+      const distance = Math.abs(bbox[0] - item.bbox[0]) + Math.abs(bbox[1] - item.bbox[1]) +
+        Math.abs(bbox[2] - item.bbox[2]) + Math.abs(bbox[3] - item.bbox[3]);
+      if (distance < bestDistance) { bestDistance = distance; bestIndex = index; }
+    });
+    if (bestIndex != null) selectWindow(bestIndex);
+    decideUncertainty('manual_edit');
+    setStatus('warning', 'Opening selected · drag its box or handles to correct the geometry.');
   }
 
   function parsePartitionDoorOffsets(raw) {
@@ -1412,7 +1473,8 @@
       multiview: state.multiview,
       fusion: state.fusion,
       constraint_solution: state.constraintSolution,
-      reconstruction_review: state.reconstructionReview
+      reconstruction_review: state.reconstructionReview,
+      uncertainty_decisions: state.uncertaintyDecisions
     };
   }
 
@@ -1684,6 +1746,8 @@
   function applyReconstruction(payload, overlayUrl) {
     applyDetection(payload, overlayUrl);
     state.understanding = payload.understanding || null;
+    state.selectedUncertaintyIndex = null;
+    state.uncertaintyDecisions = {};
     state.constraintSolution = payload.constraint_solution || null;
     state.reconstructionReview = payload.reconstruction_review || null;
     if (state.understanding && state.understanding.storey_count) {
@@ -2297,6 +2361,13 @@
   if (els.showAiGuides) {
     els.showAiGuides.addEventListener('change', scheduleOverlayRender);
   }
+  document.getElementById('btn-uncertainty-accept').addEventListener('click', function () {
+    decideUncertainty('accepted_ai');
+  });
+  document.getElementById('btn-uncertainty-edit').addEventListener('click', editSelectedUncertainty);
+  document.getElementById('btn-uncertainty-ignore').addEventListener('click', function () {
+    decideUncertainty('ignored');
+  });
 
   els.cornerSvg.addEventListener('mousedown', onCornerMouseDown);
   document.addEventListener('mousemove', onCornerMouseMove);

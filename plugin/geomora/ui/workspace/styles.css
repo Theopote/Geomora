@@ -518,6 +518,15 @@ summary:focus-visible {
   stroke-dasharray: 3 3;
 }
 
+.architecture-uncertain.selected {
+  fill: rgba(251, 188, 5, .2);
+  stroke-width: 4;
+}
+
+.architecture-uncertain.decided {
+  opacity: .32;
+}
+
 .detection-overlay .det-box.door {
   fill: rgba(52, 168, 83, 0.12);
   stroke: #34a853;
@@ -581,6 +590,7 @@ summary:focus-visible {
   align-items: center;
   gap: 12px;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .viewer-toolbar .btn {
@@ -592,6 +602,28 @@ summary:focus-visible {
 .viewer-guide-toggle {
   flex: 0 0 auto;
   white-space: nowrap;
+}
+
+.uncertainty-review {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #6b5620;
+  border-radius: 6px;
+  background: #302817;
+  color: #ffe3a3;
+  font-size: 11px;
+}
+
+.uncertainty-review span {
+  margin-right: auto;
+}
+
+.uncertainty-review .btn {
+  min-height: 28px;
+  padding: 4px 8px;
 }
 
 .viewer-hint {

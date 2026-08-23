@@ -114,6 +114,12 @@
           <button id="btn-delete-selected" class="btn secondary" type="button" disabled>Delete selected</button>
           <label class="checkbox-label compact viewer-guide-toggle"><input id="show-ai-guides" type="checkbox" checked> AI structure</label>
           <span id="viewer-hint" class="viewer-hint">Click a box to select · Del to remove</span>
+          <div id="uncertainty-review" class="uncertainty-review" hidden>
+            <span id="uncertainty-review-label"></span>
+            <button id="btn-uncertainty-accept" class="btn secondary" type="button">Accept AI</button>
+            <button id="btn-uncertainty-edit" class="btn secondary" type="button">Edit geometry</button>
+            <button id="btn-uncertainty-ignore" class="btn secondary" type="button">Ignore</button>
+          </div>
         </div>
         <div id="viewer-placeholder" class="placeholder empty-viewer">
           <svg class="icon" aria-hidden="true"><use href="#i-image"/></svg>

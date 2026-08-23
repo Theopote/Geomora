@@ -1,0 +1,156 @@
+{
+  "schema_version": "reconstruction-metrics-v1",
+  "photo_id": "photo_11",
+  "annotation_status": "reviewed_v1",
+  "review_rounds": 2,
+  "facade_bbox": [
+    0.051,
+    0.0315,
+    0.9054,
+    0.8535
+  ],
+  "facade": {
+    "width": 1,
+    "height": 1
+  },
+  "topology": {
+    "storey_count": 2,
+    "bay_count": 8
+  },
+  "openings": [
+    {
+      "id": "w21",
+      "type": "window",
+      "bbox": [
+        0.1166,
+        0.2188,
+        0.1968,
+        0.4408
+      ],
+      "storey": 2,
+      "bay": 1
+    },
+    {
+      "id": "w22",
+      "type": "window",
+      "bbox": [
+        0.2739,
+        0.216,
+        0.3568,
+        0.4366
+      ],
+      "storey": 2,
+      "bay": 2
+    },
+    {
+      "id": "w23",
+      "type": "window",
+      "bbox": [
+        0.4339,
+        0.2202,
+        0.5177,
+        0.4367
+      ],
+      "storey": 2,
+      "bay": 3
+    },
+    {
+      "id": "w24",
+      "type": "window",
+      "bbox": [
+        0.5992,
+        0.216,
+        0.6812,
+        0.4408
+      ],
+      "storey": 2,
+      "bay": 4
+    },
+    {
+      "id": "w25",
+      "type": "window",
+      "bbox": [
+        0.7565,
+        0.2202,
+        0.8394,
+        0.4325
+      ],
+      "storey": 2,
+      "bay": 5
+    },
+    {
+      "id": "d11",
+      "type": "door",
+      "bbox": [
+        0.4455,
+        0.5648,
+        0.5146,
+        0.8482
+      ],
+      "storey": 1,
+      "bay": 3
+    },
+    {
+      "id": "d12",
+      "type": "door",
+      "bbox": [
+        0.8079,
+        0.5606,
+        0.8752,
+        0.8481
+      ],
+      "storey": 1,
+      "bay": 5
+    },
+    {
+      "id": "w261",
+      "type": "window",
+      "bbox": [
+        0.5273,
+        0.5693,
+        0.7686,
+        0.7673
+      ],
+      "storey": 1,
+      "bay": 1
+    }
+  ],
+  "pattern_groups": [
+    {
+      "id": "upper_window_row",
+      "members": [
+        "w21",
+        "w22",
+        "w23",
+        "w24",
+        "w25"
+      ],
+      "constraints": [
+        "equal_width",
+        "equal_height",
+        "equal_sill",
+        "equal_spacing",
+        "horizontal_alignment"
+      ]
+    }
+  ],
+  "metric_anchors": [
+    {
+      "id": "anchor_facade_width",
+      "type": "user_distance",
+      "status": "surveyed",
+      "start": [
+        0.05,
+        0.9
+      ],
+      "end": [
+        0.95,
+        0.9
+      ],
+      "distance_mm": 12400,
+      "notes": "Requires on-site tape or survey measurement. Do not infer from door height."
+    }
+  ],
+  "annotation_notes": "The facade of a two-story commercial building features five identical windows on the second floor. The ground floor consists of a combined door-and-window unit—with doors at both ends and windows in the middle—positioned on the right half of the ground-floor frontage.\n",
+  "reviewed_at": "2026-08-23T08:35:28.552Z"
+}

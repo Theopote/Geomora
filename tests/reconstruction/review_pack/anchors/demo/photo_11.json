@@ -1,0 +1,7 @@
+{
+  "version": "metric-anchors-v1",
+  "photo_id": "photo_11",
+  "anchor_id": "anchor_facade_width",
+  "distance_mm": 12400,
+  "notes": "DRY-RUN DEMO: example tape measure across full brick facade"
+}

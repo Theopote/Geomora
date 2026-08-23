@@ -87,3 +87,5 @@ def test_analyze_building_uses_reconstruction_pipeline():
     assert "uncertainty_decisions: state.uncertaintyDecisions" in script
     assert 'id="opening-evidence"' in (WORKSPACE / "index.html").read_text(encoding="utf-8")
     assert "function renderOpeningEvidence()" in script
+    assert "setModelSelection: setModelSelection" in script
+    assert "sketchupCall('select_model_entity'" in script

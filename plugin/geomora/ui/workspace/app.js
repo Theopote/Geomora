@@ -32,6 +32,7 @@
     understanding: null,
     selectedUncertaintyIndex: null,
     uncertaintyDecisions: {},
+    modelSelectionEvidence: null,
     activeStoreyIndex: 0,
     storeyWindows: [[]]
   };
@@ -330,12 +331,17 @@
     if (row) {
       row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
+    const storey = state.activeStoreyIndex + 1;
+    sketchupCall('select_model_entity', JSON.stringify({
+      entity_id: 'window_' + String(storey).padStart(2, '0') + '_' + String(index + 1).padStart(2, '0')
+    }));
   }
 
   function selectDoor() {
     state.selectedDoor = true;
     state.selectedWindowIndex = null;
     updateSelectionUi();
+    sketchupCall('select_model_entity', JSON.stringify({ entity_id: 'door_001' }));
   }
 
   function updateSelectionUi() {
@@ -361,13 +367,41 @@
     }).find(function (item) {
       return item && !state.selectedDoor && item.model_opening_index === index;
     });
-    const source = state.detection ? state.detection.method : 'manual';
-    const confidence = confidenceNumber(selected.confidence);
+    const modelEvidence = state.modelSelectionEvidence;
+    const source = (modelEvidence && modelEvidence.ai_source) || (state.detection ? state.detection.method : 'manual');
+    const confidence = confidenceNumber((modelEvidence && modelEvidence.ai_confidence) || selected.confidence);
+    const reviewLabel = (modelEvidence && modelEvidence.review_decision) || (decision && decision.decision) || 'not reviewed';
     els.openingEvidence.innerHTML =
       '<strong>' + (state.selectedDoor ? 'Door evidence' : 'Window ' + (index + 1) + ' evidence') + '</strong>' +
       '<span>Source: ' + escapeHtml(source) + '</span>' +
       '<span>AI confidence: ' + (confidence == null ? 'unknown' : Math.round(confidence * 100) + '%') + '</span>' +
-      '<span>Review: ' + escapeHtml(decision ? decision.decision.replace(/_/g, ' ') : 'not reviewed') + '</span>';
+      '<span>Review: ' + escapeHtml(reviewLabel.replace(/_/g, ' ')) + '</span>' +
+      (modelEvidence && modelEvidence.reviewed_by ? '<span>Reviewed by: ' + escapeHtml(modelEvidence.reviewed_by) + '</span>' : '');
+  }
+
+  function setModelSelection(payload) {
+    state.modelSelectionEvidence = payload || null;
+    if (!payload || !payload.entity_id) {
+      renderOpeningEvidence();
+      return;
+    }
+    const windowMatch = /^window_(\d+)_(\d+)$/.exec(payload.entity_id);
+    if (windowMatch) {
+      const targetStorey = Math.max(Number(windowMatch[1]) - 1, 0);
+      if (!isRepeatOpenings() && targetStorey !== state.activeStoreyIndex) {
+        setActiveStorey(targetStorey);
+      }
+      state.selectedWindowIndex = Math.max(Number(windowMatch[2]) - 1, 0);
+      state.selectedDoor = false;
+      renderStoreySelector();
+      updateSelectionUi();
+    } else if (payload.entity_type === 'door') {
+      state.selectedDoor = true;
+      state.selectedWindowIndex = null;
+      updateSelectionUi();
+    } else {
+      renderOpeningEvidence();
+    }
   }
 
   function removeWindowAt(index) {
@@ -2032,6 +2066,7 @@
     setRectifiedImage: setRectifiedImage,
     applyDetection: applyDetection,
     applyReconstruction: applyReconstruction,
+    setModelSelection: setModelSelection,
     applyFusion: applyFusion,
     applyRationalization: applyRationalization,
     applyConstraintSolution: applyConstraintSolution,

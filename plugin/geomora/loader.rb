@@ -89,6 +89,7 @@ module Geomora
     core/layout_report_exporter
     core/layout_snap
     core/viewport_snapshot
+    core/workspace_selection_sync
     core/lod_video_exporter
     core/constraint_solver
     core/lod_scenes

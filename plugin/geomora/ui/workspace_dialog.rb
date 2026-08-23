@@ -62,7 +62,12 @@ module Geomora
           )
 
           register_callbacks(dialog)
-          dialog.set_on_closed { Core::ViewportStream.stop } if dialog.respond_to?(:set_on_closed)
+          if dialog.respond_to?(:set_on_closed)
+            dialog.set_on_closed do
+              Core::ViewportStream.stop
+              Core::WorkspaceSelectionSync.stop
+            end
+          end
           dialog.set_file(HTML_PATH)
           dialog
         end
@@ -71,6 +76,13 @@ module Geomora
           dialog.add_action_callback('ready') do |_ctx, _|
             payload = default_payload
             dialog.execute_script("window.geomora.loadPayload(#{payload.to_json})")
+            Core::WorkspaceSelectionSync.start(dialog)
+          end
+
+          dialog.add_action_callback('select_model_entity') do |_ctx, json|
+            payload = JSON.parse(json)
+            selected = Core::WorkspaceSelectionSync.select_entity(payload['entity_id'])
+            post_message(dialog, 'warning', 'Entity is inside a closed group; open its context to select it.') unless selected
           end
 
           dialog.add_action_callback('pick_secondary_image') do |_ctx, _|

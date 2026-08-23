@@ -22,13 +22,13 @@ RQS is normalized over available groups for diagnostic use, while `coverage`
 reports how much of the 100-point contract was actually evaluated. A release
 gate requires full required coverage; missing annotations cannot count as a
 pass. Metric scale may be unavailable when no measured anchor exists, but an
-anchored A3 sample requires it.
+anchored RC-G1 sample requires it (legacy reports call this A3).
 
 ## Gate policy
 
 - train/val establish regressions and thresholds;
 - hold-out is evaluation-only and never used for parameter tuning;
-- a smoke result such as `window_count > 0` is diagnostic, never an A2/A3 gate;
+- a smoke result such as `window_count > 0` is diagnostic, never RC-G1 gate evidence;
 - image-specific heuristics are rejected without an architectural rationale;
 - aggregate scores must retain per-photo results and annotation coverage.
 

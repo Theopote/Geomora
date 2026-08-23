@@ -1,182 +1,149 @@
 # Geomora Roadmap
 
-**This file is the single source of truth for project milestones and priorities.**
+**This file is the single source of truth for current priorities, subsystem
+maturity, and release gates.** Phase documents describe design history; they do
+not declare current progress.
 
-Phase design docs (`docs/PHASE_*.md`) explain *what* each layer does. They do **not** declare global progress — only this file does.
-
-**Updated:** v0.36.0 · 2026-08-16
-
----
-
-## Current milestone
-
-### R0 — Reconstruction Metrics (in progress, P0)
-
-**Goal:** Measure whether Photo → SketchUp reconstruction improves, rather than
-whether a detector returns at least one window.
-
-Reconstruction Metrics v1 evaluates six evidence groups: detection, topology,
-relative geometry, metric scale (only with measured ground truth),
-rationalization, and SketchUp E2E quality. Results must report annotation
-`coverage`; a partial RQS cannot pass a gate.
-
-Implementation: `backend/geomora_reconstruct/metrics/`
-Minimal 5-photo GT: `tests/reconstruction/minimal_set.json`
-Baseline exporter: `backend/scripts/run_reconstruction_baseline.py`
-
-**R0 exit (phased):** 5-photo minimal set reviewed twice + baseline recorded;
-then expand to 20 A1 photos. Metric scores only where a real scale anchor exists.
-
-### R1 — Observation Graph + VLM Evidence v0.1 (in progress)
-
-**Goal:** Perception outputs become evidence, not architectural facts.
-
-Implementation: `backend/geomora_reconstruct/observations/` and
-`backend/geomora_reconstruct/vlm_evidence.py`. YOLO, facade-row, and cached VLM
-architectural evidence now share the Observation Graph. Architectural
-Understanding v0.2 now reconciles CV counts with VLM evidence conservatively:
-agreement increases confidence, high-confidence VLM may supplement weak/sparse
-geometry, and unresolved conflicts remain explicit instead of becoming IR.
-
-The production vertical slice is now available through `POST /reconstruct`.
-Workspace **Analyze building** consumes the shared reconstruction service and
-returns detection evidence, Observation Graph, architectural understanding,
-constraint safety status, and editable IR in one request. Live VLM provider
-selection and richer review overlays remain pending.
-
-### R4 — Pattern/Constraint Evidence v0.1 (in progress)
-
-Measured row/column repetition now produces IR-compatible soft constraint
-proposals with targets, confidence, weight, source, and evidence. VLM can raise
-confidence for a geometrically identified group but cannot create target
-entities. Python weighted projection now applies soft architectural constraints
-to Prediction geometry while preserving observations and residuals. Surveyed
-user dimensions are exported as hard `fixed_dimension` constraints. Next,
-validate solver gains on the five-photo baseline before expanding constraint
-types.
-
-### A2 — Failure-driven Improvement (completed)
-
-Detection smoke hold-out **5/5** via `auto_fusion_v1`. No further threshold
-tuning until R0 baseline analysis identifies layer-specific failures.
-
-| Priority | Failure class | A2 fix |
-|----------|---------------|--------|
-| P0 | `missed_window` (20/20) | YOLO + facade_row fusion (`auto_fusion_v1`) |
-| P1 | `wrong_scale` (14/20) | Span extrapolation from facade bounds + window count |
-| P2 | `false_door` / `missed_door` (15/20) | Door geometry + confidence filter |
-
-### A1 — Real Photo Benchmark (completed)
-
-**Goal:** Establish an honest baseline before any further feature work.
-
-| Item | Target | Status |
-|------|--------|--------|
-| 20 real building photos curated | 5 res / 3 office / 3 old / 3 commercial / 2 occluded / 2 perspective / 2 low-light | ✅ manifest 20 |
-| Split: train / val / hold-out | 10 / 5 / 5 (hold-out never in training) | ✅ |
-| Run full Photo → SketchUp workflow | All 20 | ✅ 20/20 reviewed |
-| Export checklist pack | `cache/benchmark_a1/index.html` | ✅ |
-| Record failures (no code fixes yet) | `cache/benchmark_a1_e2e.json` | ✅ RQS avg 69.3 |
-| Detection CLI baseline | 18/20 smoke pass (hold-out 3/5) | ✅ see `docs/A1_BASELINE_REPORT.md` |
-
-**Exit:** ✅ Failure taxonomy populated; RQS scores recorded; hold-out untouched for training.
+**Updated:** 2026-08-24
 
 ---
 
-## Milestone queue
+## How progress is represented
 
-| ID | Name | Gate | Status |
-|----|------|------|--------|
-| **A1** | Real Photo Benchmark | 20 photos, baseline recorded | **Completed** |
-| **A2** | Failure-driven Improvement | Detection smoke hold-out 5/5 | **Completed** |
-| **R0** | Reconstruction Metrics + Minimal GT | 5-photo objective ruler + baseline | **In progress** |
-| **R1** | Observation Graph → Understanding | Evidence layer before IR | **In progress** |
-| **A3** | Reconstruction Baseline Gate | E2E Photo → SketchUp topology, relative geometry, anchored scale, and editable valid geometry | Frozen until R0+R1 |
-| **B0** | Constraint Graph Solver | Equal-width / equal-sill / equal-spacing after A3 | P0 after Stage A |
-| B1 | Multi-view production path | Fuse + depth on real photos | P1 |
-| B2 | Evidence-driven model selection | SAM / depth only if RQS gain proven | P1 |
+Reconstruction Core is being developed as parallel subsystems. Subsystem IDs do
+not prescribe implementation order.
 
----
+| Maturity | Meaning |
+|----------|---------|
+| **Experimental** | Vertical slice exists, but interfaces may change and benchmark gain is unproven. |
+| **Prototype** | In the production path with tests and safe fallback, but real-photo validation is incomplete. |
+| **Validated** | Reviewed GT and benchmark evidence meet the subsystem exit criteria without material regression. |
+| **Stable** | Interface is versioned/frozen, expanded real-photo validation passes, and compatibility is maintained. |
 
-## Completed
-
-| Area | Version | Notes |
-|------|---------|-------|
-| Phase 0 — IR + SketchUp kernel | v0.1 | Deterministic geometry foundation |
-| Phase 1 — Workspace | v0.2 | HtmlDialog + manual facade |
-| Phase 2 — Rectification | v0.5 | 4-corner UI + OpenCV backend |
-| Phase 3 — Detection bootstrap | v0.34 | YOLO train/export, `accept_real_photos.py` |
-| Phase 4 — Rationalization bootstrap | v0.2 | Snap + equal-spacing heuristic (not full Constraint Graph) |
-| Phase 5 — Pattern reuse | v0.2 | Bay detection, shared components |
-| Phase 6 — Multi-view | v0.3 | Registration, fusion, depth hooks |
-| Phase 7+ — Parametric building | v0.32 | Floor/roof/stair from params (not vision) |
-| Phase 3.6 — SAM refine | v0.35 | Optional mask refinement |
+Writing code does not advance a subsystem to Validated. Gates are policies over
+multiple subsystems, not development phases.
 
 ---
 
-## In validation
+## Reconstruction Core v0.1 snapshot
 
-| Item | Blocker |
-|------|---------|
-| Real Photo Stage A sign-off | A1 → A2 → A3 not complete |
-| YOLO on real rectified facades | Needs ≥10 train labels from benchmark |
-| End-to-end RQS ≥ 70 avg on hold-out | Not measured yet |
+| ID | Subsystem | Maturity | Current evidence | Next exit work |
+|----|-----------|----------|------------------|----------------|
+| **RC-M** | Metrics & Ground Truth | **Prototype** | Metrics v1, five-photo GT, GT validator, RC-G1 evaluator | Complete two-person GT review and record reproducible baseline |
+| **RC-O** | Observation Graph | **Prototype** | CV, structural, depth and VLM adapters feed a shared graph | Validate provenance/fusion on reviewed real photos |
+| **RC-U** | Architectural Understanding | **Prototype** | Storey, bay, opening and pattern hypotheses run in production | Measure topology accuracy beyond regular window arrays |
+| **RC-S** | Metric Scale & Anchors | **Experimental** | Typed anchors and scale derivation exist | Validate multi-anchor consistency and anchored scale error |
+| **RC-C** | Constraint Solver | **Prototype** | Weighted hard/soft solver, fixed dimensions, residuals and safety fallback run in production | Prove non-negative geometry gain through ablation |
+| **RC-A** | AI/VLM Evidence | **Experimental** | OpenAI, Gemini and OpenAI-compatible evidence can enter the graph | Record CV-only vs VLM paired benchmark; do not add providers first |
+| **RC-I** | Architectural IR Integration | **Prototype** | Understanding, metric and solver audit export to editable IR | Freeze v0.1 reconstruction schema after gate evidence |
+| **RC-E** | SketchUp E2E Generation | **Prototype** | `POST /reconstruct` feeds Workspace and editable generation | Pass reviewed real-photo topology, scale and editability checks |
+
+Current status is intentionally parallel: RC-C may be Prototype while RC-G1 is
+not passed. This is not a sequencing contradiction.
 
 ---
 
-## Frozen (do not extend without explicit request)
+## Current validation gate
 
-- Phase 16–23: LOD tours, layout PDF, MP4 export, interior layout polish
-- New AI models without evidence of RQS improvement
-- New export formats, UI chrome, or parametric elements
+### RC-G1 — Reconstruction Core v0.1 Validation Gate (not passed, P0)
+
+RC-G1 was historically called **A3 Reconstruction Baseline Gate**. The legacy
+name remains accepted in scripts and archived reports, but new planning text
+must use RC-G1.
+
+| Dependency | Exit evidence |
+|------------|---------------|
+| RC-M | Five-photo GT reviewed twice, validator clean or warnings adjudicated, baseline archived |
+| RC-O | Observation source/provenance present for every evaluated prediction |
+| RC-U | Topology thresholds reported for storeys, bays and openings |
+| RC-S | Metric scores reported only for genuinely anchored samples |
+| RC-C | Solver ablation recorded; hard constraints satisfied or the run fails visibly |
+| RC-A | CV-only/VLM paired result recorded using frozen evidence, not live benchmark calls |
+| RC-I | IR validator and reconstruction audit pass |
+| RC-E | Hold-out ≥4/5 produces editable SketchUp geometry after bounded review |
+
+A subsystem may continue prototype work before RC-G1. It may not be described
+as Validated merely because it is connected to the production pipeline.
 
 ---
 
-## Reconstruction Core sequence
+## P0 work queue
 
-| Order | Milestone | Priority |
-|-------|-----------|----------|
-| 1 | R0 — Reconstruction Metrics | P0 |
-| 2 | A2-final — documented failure fixes, no image-specific heuristics | P0 |
-| 3 | A3 — E2E Reconstruction Baseline Gate | P0 |
-| 4 | R1 — Observation Graph | P0 |
-| 5 | R2 — Architectural Understanding (storeys, bays, grouping, patterns) | P0 core |
-| 6 | R3 — Metric Anchors + Scale Solver | P0 core |
-| 7 | R4 — Constraint Graph | P0 core |
-| 8 | R5 — VLM semantic evidence | P1 |
-| 9 | R6 — Multi-view / Video | P1 |
-| 10 | R7 — richer architecture | P2 |
+This is a dependency-aware queue, not a phase sequence.
 
-No heuristic may be added solely to make an individual benchmark photo pass.
-Every heuristic requires an architectural rationale and train/val regression
+1. **RC-M:** finish GT audit and freeze the minimal baseline inputs.
+2. **RC-M/RC-E:** record the current full Reconstruction Metrics baseline.
+3. **RC-S:** verify typed Metric Anchor mathematics and multi-anchor residuals.
+4. **RC-C:** run solver on/off ablation; fix hard-constraint failures before adding constraint types.
+5. **RC-A/RC-U:** run frozen CV-only vs CV+VLM topology ablation.
+6. **RC-G1:** evaluate the gate and publish failed criteria without threshold tuning to individual photos.
+
+No heuristic may be added solely to make one benchmark photo pass. Every
+heuristic needs an architectural rationale and train/validation regression
 evidence. Hold-out photos must not influence thresholds or parameters.
 
 ---
 
-## Maturity snapshot (2026-08-16)
+## Historical benchmark work
 
-| Layer | Score | Evidence |
-|-------|-------|----------|
-| Architecture | 9/10 | IR boundary, generator isolation |
-| SketchUp kernel | 9/10 | Phase 0 acceptance |
-| IR | 8/10 | Schema + validator |
-| Workspace | 8/10 | Full manual path |
-| Rectification | 7/10 | 28-photo log; 11/28 auto_full_frame |
-| Detection | 6/10 | 26/28 smoke pass; 2 hard fails |
-| Rationalization | 7/10 | Synthetic + manual tests |
-| Multi-view | 5/10 | Code complete, no real-photo proof |
-| Real-world validation | 3/10 | A1 in progress |
-| Product focus | 6/10 | Pivoting to benchmark-first |
+| Legacy ID | Result | Status |
+|-----------|--------|--------|
+| **A1** | 20-photo real-photo baseline and failure taxonomy | **Completed** |
+| **A2** | Failure-driven detector/rectification improvement; smoke hold-out 5/5 | **Completed (diagnostic, not RC-G1 evidence)** |
+
+Detection smoke success such as `window_count > 0` must not be used to pass
+RC-G1. The objective Reconstruction Metrics contract remains authoritative.
 
 ---
 
-## Related docs
+## Legacy ID mapping
 
-| Doc | Role |
-|-----|------|
-| `docs/REAL_PHOTO_ACCEPTANCE.md` | Stage A workflow + RQS rubric |
-| `docs/A1_BASELINE_REPORT.md` | A1 detection baseline snapshot |
-| `docs/MODEL_ARTIFACT_POLICY.md` | What stays in git vs releases |
-| `docs/OBSERVATION_LAYER.md` | Perception → Understanding boundary |
-| `docs/ARCHITECTURE.md` | Layer design (no progress claims) |
-| `docs/RECONSTRUCTION_STATUS.md` | Technical deliverable log (defers to this file for priority) |
+These aliases exist only to interpret old commits, scripts, and reports.
+
+| Legacy ID | Canonical owner now |
+|-----------|---------------------|
+| R0 — Reconstruction Metrics | RC-M |
+| R1 — Observation Graph | RC-O |
+| R2 — Architectural Understanding | RC-U |
+| R3 — Metric Anchors / Scale | RC-S |
+| R4 / B0 — Constraint Graph Solver | RC-C |
+| R5 — VLM semantic evidence | RC-A |
+| A3 — Reconstruction Baseline Gate | RC-G1 |
+| B1 — Multi-view production path | RC-O + RC-S future validation |
+| B2 — Evidence-driven model selection | RC-A benchmark policy |
+
+Do not assign new work to R0–R7, A3, or B0. Checklist row numbers must use a
+document-specific prefix such as `RP-1`, never an `R` milestone ID.
+
+---
+
+## Secondary backlog
+
+| Priority | Work |
+|----------|------|
+| P1 | Multi-view/depth real-photo validation under RC-O and RC-S |
+| P1 | Evidence-driven local model inclusion only when an ablation shows gain |
+| P2 | Richer architecture: balconies, slabs, cornices, split levels and occlusion reasoning |
+| P2 | Video source metadata and key-frame evidence provenance |
+
+---
+
+## Frozen without explicit request
+
+- Phase 16–23 presentation expansion: LOD tours, layout PDF and MP4 export
+- New AI providers or models without evidence of Reconstruction Metrics gain
+- New constraint types before RC-C fixed dimensions and solver ablation pass
+- New export formats, UI chrome, or parametric elements unrelated to RC-G1
+
+---
+
+## Related documents
+
+| Document | Role |
+|----------|------|
+| `docs/RECONSTRUCTION_METRICS.md` | Objective measurement contract |
+| `docs/REAL_PHOTO_ACCEPTANCE.md` | Real-photo workflow and RC-G1 E2E checklist |
+| `docs/OBSERVATION_LAYER.md` | RC-O evidence boundary design |
+| `docs/RECONSTRUCTION_STATUS.md` | Technical delivery log; defers here for priorities/maturity |
+| `docs/ARCHITECTURE.md` | Layer architecture, not progress claims |
+| `docs/MODEL_ARTIFACT_POLICY.md` | Model inclusion and distribution policy |

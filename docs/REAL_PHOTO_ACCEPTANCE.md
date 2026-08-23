@@ -6,7 +6,7 @@
 
 | 文档 | 用途 |
 |------|------|
-| `docs/ROADMAP.md` | **唯一里程碑进度源**（A1/A2/A3） |
+| `docs/ROADMAP.md` | **唯一子系统成熟度与 Gate 进度源**（RC-* / RC-G1） |
 | `docs/ACCEPTANCE.md` | 合成数据 + 功能清单 |
 | `docs/YOLO_LABELING.md` | 标注与 Workspace 导出 |
 | `docs/YOLO_TRAINING.md` | 重训 YOLO |
@@ -104,19 +104,19 @@ Load Image（或 Load Video → 选帧）
 
 | # | 检查项 | 通过 |
 |---|--------|------|
-| R1 | Rectify 后面砖/窗线大致水平 | ☐ |
-| R2 | 检测到的窗数量与肉眼一致（±1 可 Overlay 修正） | ☐ |
-| R3 | 门：有则检出或手画；无则 door width=0 | ☐ |
-| R4 | Overlay 修正后 **Export YOLO Labels (train)** | ☐ |
-| R5 | Generate 后立面比例可接受（不要求毫米级精度） | ☐ |
+| RP-1 | Rectify 后面砖/窗线大致水平 | ☐ |
+| RP-2 | 检测到的窗数量与肉眼一致（±1 可 Overlay 修正） | ☐ |
+| RP-3 | 门：有则检出或手画；无则 door width=0 | ☐ |
+| RP-4 | Overlay 修正后 **Export YOLO Labels (train)** | ☐ |
+| RP-5 | Generate 后立面比例可接受（不要求毫米级精度） | ☐ |
 
-### 批次通过标准（Stage A · A3 Gate）
+### 批次通过标准（RC-G1 E2E evidence；旧称 A3 Gate）
 
 | 指标 | 最低要求 |
 |------|----------|
 | 样本数 | **20** 张（manifest 定义） |
 | hold-out 成功率 | ≥ **4/5** 在 Overlay 轻微修正（~1 分钟）后可 Generate |
-| val window recall | ≥ **0.80**（A3 目标；A1 基线 0.70） |
+| val window recall | ≥ **0.80**（RC-G1 detection evidence；A1 基线 0.70） |
 | train 标注 | ≥ **10** 张 Export 并重训 YOLO 一次 |
 | 阻塞缺陷 | 无「Rectify 完全失败」且无法手调四角 |
 
@@ -218,7 +218,7 @@ SketchUp 复测同一批照片
 
 ---
 
-## 7. Stage A 签字标准（A3 Reconstruction Gate）
+## 7. RC-G1 E2E 签字标准（旧称 A3 Reconstruction Gate）
 
 满足以下全部条件，可认为 **真实照片 Stage A 验收通过**（见 `docs/ROADMAP.md`）：
 
@@ -230,8 +230,9 @@ SketchUp 复测同一批照片
 6. `accept_real_photos.py --split val` window recall ≥ **0.80**  
 7. `cache/benchmark_a1_e2e.json` 与 `cache/real_photo_acceptance.json` 已存档  
 
-**A3 之后**才进入 Constraint Graph Solver（`docs/ROADMAP.md` B0）。  
-Stage B：多视角 Fuse、证据驱动的 SAM — 不在本清单范围。
+Constraint Solver 已属于 **RC-C Prototype**，可在 RC-G1 前并行开发，但必须
+通过 solver on/off ablation，不能因“已接入生产链”而视为 Validated。多视角
+Fuse 与证据驱动模型选择分别归入 RC-O/RC-S 和 RC-A 的后续验证范围。
 
 ---
 

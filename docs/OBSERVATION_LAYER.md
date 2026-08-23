@@ -95,8 +95,8 @@ Replacing YOLO → GroundingDINO → future foundation model only changes the Ob
 | Design doc | ✅ This file |
 | Observation Graph data structure | ✅ `geomora_reconstruct/observations/` v0.1 |
 | YOLO / facade-row adapters + fusion | ✅ |
-| Understanding layer | ☐ Detections still map directly to overlay elements in UI |
-| Constraint Graph solver | ☐ P0 after Understanding v0.1 (see `ROADMAP.md` B0) |
+| Understanding layer | ⚠️ Prototype — production reconstruction uses hypotheses; legacy overlay path remains |
+| Constraint Solver | ⚠️ RC-C Prototype — weighted solve and safety fallback run in production; ablation pending |
 
 Production update: `POST /reconstruct` now runs detection evidence through the
 Observation Graph, Understanding, constraint safety checks, and IR export.
@@ -104,7 +104,8 @@ Workspace **Analyze building** uses this endpoint; the legacy detection callback
 is retained for diagnostics and compatibility.
 
 **Rule:** Observation Graph is now the required boundary for new perception work.
-Legacy detection → overlay path remains via adapters until Understanding v0.1 lands.
+Legacy detection → overlay remains a diagnostic/compatibility path and must not
+bypass the Observation Graph in new reconstruction work.
 
 ---
 

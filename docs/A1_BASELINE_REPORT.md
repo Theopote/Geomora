@@ -21,7 +21,7 @@
 | val detect pass | 5/5 |
 | hold-out detect pass | **3/5** |
 
-**A3 Gate target:** hold-out ≥4/5 Generate after ~1 min overlay · val window recall ≥0.80
+**RC-G1 target (legacy A3):** hold-out ≥4/5 Generate after ~1 min overlay · val window recall ≥0.80
 
 ---
 

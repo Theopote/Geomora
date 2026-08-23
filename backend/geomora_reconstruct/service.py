@@ -7,6 +7,8 @@ from typing import Any
 import cv2
 
 from geomora_detect.pipeline import detect_facade
+from geomora_detect.image_io import imread_bgr
+from geomora_multiview.depth import compute_depth_map
 
 from .export import detection_to_prediction
 from .observations.adapters import detection_result_to_observations
@@ -16,6 +18,10 @@ from .observations.structural_lines import (
     detect_horizontal_structure_observations,
     horizontal_observations_to_storey_cues,
     classify_horizontal_structure_roles,
+)
+from .observations.depth_discontinuities import (
+    depth_discontinuity_observations,
+    depth_observations_to_storey_cues,
 )
 from .prediction_enrichment import enrich_prediction
 from .vlm_evidence import provider_api_key, request_architectural_evidence
@@ -34,6 +40,7 @@ def reconstruct_facade(
     vlm_provider: str = "openai",
     vlm_model: str = "auto",
     cloud_upload_authorized: bool = False,
+    depth_method: str = "off",
 ) -> dict[str, Any]:
     """Turn one facade image into evidence, understanding and editable IR.
 
@@ -71,6 +78,22 @@ def reconstruct_facade(
         observation_graph.debug["horizontal_structure"] = {
             "adapter": "horizontal_structure_v0.1", "status": "failed", "error": str(error),
         }
+    depth_evidence = {"requested": depth_method not in {"", "off", "none"}, "used": False}
+    if depth_evidence["requested"]:
+        try:
+            depth_map, resolved_depth_method = compute_depth_map(imread_bgr(image_path), method=depth_method)
+            depth_graph = depth_discontinuity_observations(
+                depth_map, photo_id=photo_id, method=resolved_depth_method, facade_bbox=facade_bbox,
+            )
+            observation_graph.observations.extend(depth_graph.observations)
+            observation_graph.debug["depth_discontinuity"] = depth_graph.debug
+            storey_cues.extend(depth_observations_to_storey_cues(depth_graph.observations))
+            depth_evidence.update({"used": True, "method": resolved_depth_method,
+                                   "candidate_count": len(depth_graph.observations),
+                                   "metric_depth_evidence": depth_graph.debug["metric_depth_evidence"]})
+        except (ValueError, RuntimeError, cv2.error) as error:
+            depth_evidence.update({"status": "failed", "error": str(error)})
+            observation_graph.debug["depth_discontinuity"] = depth_evidence
     cloud = {"requested": routing_mode == "cloud_enhanced", "used": False, "provider": vlm_provider}
     architectural_evidence = None
     if routing_mode == "cloud_enhanced":
@@ -137,4 +160,5 @@ def reconstruct_facade(
         "architectural_ir": prediction.get("architectural_ir"),
         "review_required": review_required,
         "cloud_evidence": cloud,
+        "depth_evidence": depth_evidence,
     }

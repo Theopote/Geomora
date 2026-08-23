@@ -20,6 +20,7 @@ from .structural_lines import (
     horizontal_observations_to_storey_cues,
     classify_horizontal_structure_roles,
 )
+from .depth_discontinuities import depth_discontinuity_observations, depth_observations_to_storey_cues
 
 __all__ = [
     "Observation",
@@ -36,4 +37,6 @@ __all__ = [
     "detect_horizontal_structure_observations",
     "horizontal_observations_to_storey_cues",
     "classify_horizontal_structure_roles",
+    "depth_discontinuity_observations",
+    "depth_observations_to_storey_cues",
 ]

@@ -54,6 +54,7 @@ def test_reconstruct_endpoint_returns_evidence_understanding_and_ir(client: Test
                 "photo_id": "workspace_test",
                 "wall_length_mm": "12000",
                 "wall_height_mm": "7200",
+                "depth_method": "gradient_laplacian_v1",
             },
         )
 
@@ -68,6 +69,10 @@ def test_reconstruct_endpoint_returns_evidence_understanding_and_ir(client: Test
     assert payload["understanding"]["facade_bbox"]
     assert payload["architectural_ir"]["metric"]["facade_width_mm"] == 12000
     assert payload["status"] == "ready"
+    assert payload["depth_evidence"]["used"] is True
+    assert payload["depth_evidence"]["method"] == "gradient_laplacian_v1"
+    assert payload["depth_evidence"]["metric_depth_evidence"] is False
+    assert payload["observation_graph"]["debug"]["depth_discontinuity"]["adapter"] == "depth_discontinuity_v0.1"
 
 
 def test_cloud_reconstruction_requires_per_upload_authorization(client: TestClient, tmp_path):

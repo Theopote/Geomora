@@ -132,6 +132,7 @@ async def reconstruct(
     vlm_provider: str = Form(default="openai"),
     vlm_model: str = Form(default="auto"),
     cloud_upload_authorized: bool = Form(default=False),
+    depth_method: str = Form(default="off"),
 ) -> JSONResponse:
     if not is_image_upload(image):
         raise HTTPException(status_code=400, detail="Upload must be an image file")
@@ -157,6 +158,7 @@ async def reconstruct(
                 vlm_provider=vlm_provider,
                 vlm_model=vlm_model,
                 cloud_upload_authorized=cloud_upload_authorized,
+                depth_method=depth_method,
             )
         except ValueError as error:
             raise HTTPException(status_code=400, detail=str(error)) from error

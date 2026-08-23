@@ -1,0 +1,65 @@
+{
+  "schema_version": "reconstruction-metrics-v1",
+  "photo_id": "photo_16",
+  "facade": {
+    "width": 1.0,
+    "height": 1.0
+  },
+  "openings": [
+    {
+      "id": "pred_001",
+      "type": "window",
+      "bbox": [
+        0.0108,
+        0.4143,
+        0.0431,
+        0.4661
+      ],
+      "confidence": 0.7779
+    },
+    {
+      "id": "pred_002",
+      "type": "window",
+      "bbox": [
+        0.1521,
+        0.3429,
+        0.424,
+        0.5282
+      ],
+      "confidence": 0.7814
+    },
+    {
+      "id": "pred_003",
+      "type": "window",
+      "bbox": [
+        0.4832,
+        0.3314,
+        0.6541,
+        0.5696
+      ],
+      "confidence": 0.6752
+    },
+    {
+      "id": "pred_004",
+      "type": "window",
+      "bbox": [
+        0.7187,
+        0.0,
+        0.9838,
+        0.7054
+      ],
+      "confidence": 0.6536
+    }
+  ],
+  "pipeline": {
+    "detection_method": "auto_fusion_v1",
+    "detection_confidence": 0.722,
+    "scale_hint": {
+      "wall_length_mm": 4000,
+      "wall_height_mm": 2400,
+      "method": "window_sill",
+      "confidence": 0.75,
+      "opening_span_norm": 0.9731
+    }
+  }
+}

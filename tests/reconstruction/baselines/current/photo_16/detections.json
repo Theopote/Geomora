@@ -1,0 +1,79 @@
+{
+  "method": "auto_fusion_v1",
+  "confidence": 0.722,
+  "image_width": 743,
+  "image_height": 869,
+  "elements": [
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.010767160161507403,
+        0.4142692750287687,
+        0.04306864064602961,
+        0.4660529344073648
+      ],
+      "confidence": 0.7779
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.15208613728129206,
+        0.3429228998849252,
+        0.423956931359354,
+        0.5281933256616801
+      ],
+      "confidence": 0.7814
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.4831763122476447,
+        0.33141542002301494,
+        0.6541049798115747,
+        0.569620253164557
+      ],
+      "confidence": 0.6752
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.7187079407806191,
+        0.0,
+        0.9838492597577388,
+        0.7054085155350979
+      ],
+      "confidence": 0.6536
+    }
+  ],
+  "overlay_base64": null,
+  "debug": {
+    "fusion": "yolo_facade_row_v1",
+    "yolo_element_count": 0,
+    "row_element_count": 4,
+    "fused_element_count": 4,
+    "yolo_window_count": 0,
+    "row_window_count": 4,
+    "fused_window_count": 4,
+    "facade_bounds": [
+      0,
+      0,
+      743,
+      869
+    ],
+    "yolo_model_path": "F:\\development\\Geomora\\backend\\models\\facade_yolo_v1.onnx",
+    "scale_hint": {
+      "wall_length_mm": 4000,
+      "wall_height_mm": 2400,
+      "method": "window_sill",
+      "confidence": 0.75,
+      "opening_span_norm": 0.9731
+    }
+  },
+  "scale_hint": {
+    "wall_length_mm": 4000,
+    "wall_height_mm": 2400,
+    "method": "window_sill",
+    "confidence": 0.75,
+    "opening_span_norm": 0.9731
+  }
+}

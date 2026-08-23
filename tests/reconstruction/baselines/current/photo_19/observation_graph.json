@@ -1,0 +1,569 @@
+{
+  "schema_version": "observation-graph-v0.1",
+  "photo_id": "photo_19",
+  "image_width": 1148,
+  "image_height": 633,
+  "observations": [
+    {
+      "id": "obs_fused_001",
+      "kind": "facade_candidate",
+      "geometry": {
+        "bbox": [
+          0.010452961672473868,
+          0.009478672985781991,
+          0.9703832752613241,
+          1.0
+        ]
+      },
+      "semantic_candidates": {
+        "facade": 0.6
+      },
+      "confidence": 0.6,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.6,
+          "metadata": {
+            "role": "facade_bounds"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_002",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.7290940766550522,
+          0.6050552922590837,
+          0.8275261324041812,
+          0.8230647709320695
+        ]
+      },
+      "semantic_candidates": {
+        "door": 0.8307,
+        "window": 0.0254,
+        "unknown_opening": 0.0254
+      },
+      "confidence": 0.8307,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.8307,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_003",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.07578397212543554,
+          0.660347551342812,
+          0.16114982578397213,
+          0.7045813586097947
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.6457,
+        "door": 0.0709,
+        "unknown_opening": 0.0531
+      },
+      "confidence": 0.6457,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.6457,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_004",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.09581881533101046,
+          0.25118483412322273,
+          0.14982578397212543,
+          0.43285939968404424
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.695,
+        "door": 0.061,
+        "unknown_opening": 0.0457
+      },
+      "confidence": 0.695,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.695,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_005",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.18554006968641115,
+          0.8957345971563981,
+          0.2465156794425087,
+          0.9383886255924171
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.6639,
+        "door": 0.0672,
+        "unknown_opening": 0.0504
+      },
+      "confidence": 0.6639,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.6639,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_006",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.3876306620209059,
+          0.6793048973143759,
+          0.44947735191637633,
+          0.7488151658767772
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.7402,
+        "door": 0.052,
+        "unknown_opening": 0.039
+      },
+      "confidence": 0.7402,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.7402,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_007",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.46777003484320556,
+          0.5576619273301737,
+          0.5914634146341463,
+          0.6303317535545023
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.6697,
+        "door": 0.0661,
+        "unknown_opening": 0.0495
+      },
+      "confidence": 0.6697,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.6697,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_008",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.49825783972125437,
+          0.07109004739336493,
+          0.563588850174216,
+          0.10900473933649289
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.6681,
+        "door": 0.0664,
+        "unknown_opening": 0.0498
+      },
+      "confidence": 0.6681,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.6681,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_009",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.5296167247386759,
+          0.25118483412322273,
+          0.5836236933797909,
+          0.4107424960505529
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.7779,
+        "unknown_opening": 0.0462,
+        "door": 0.0616
+      },
+      "confidence": 0.7779,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.692,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        },
+        {
+          "type": "yolo",
+          "confidence": 0.7779,
+          "metadata": {
+            "method": "yolo_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_010",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.730836236933798,
+          0.24960505529225907,
+          0.7839721254355401,
+          0.4107424960505529
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.8328,
+        "unknown_opening": 0.0284,
+        "door": 0.0379
+      },
+      "confidence": 0.8328,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.8104,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        },
+        {
+          "type": "yolo",
+          "confidence": 0.8328,
+          "metadata": {
+            "method": "yolo_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_011",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.8066202090592335,
+          0.2480252764612954,
+          0.8588850174216028,
+          0.40916271721958924
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.7431,
+        "unknown_opening": 0.0423,
+        "door": 0.0564
+      },
+      "confidence": 0.7431,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.7431,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        },
+        {
+          "type": "yolo",
+          "confidence": 0.718,
+          "metadata": {
+            "method": "yolo_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_012",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.9128919860627178,
+          0.9652448657187994,
+          0.9703832752613241,
+          1.0
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.7308,
+        "door": 0.0538,
+        "unknown_opening": 0.0404
+      },
+      "confidence": 0.7308,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.7308,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_013",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          6.30646931065915e-05,
+          0.0016687760044236508,
+          0.029455779736881058,
+          0.6083864329550503
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.6631,
+        "door": 0.0674,
+        "unknown_opening": 0.0505
+      },
+      "confidence": 0.6631,
+      "sources": [
+        {
+          "type": "yolo",
+          "confidence": 0.6631,
+          "metadata": {
+            "method": "yolo_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_014",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.17713739481537183,
+          0.2590980469521376,
+          0.22461950322061466,
+          0.40948852731906593
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.693,
+        "door": 0.0614,
+        "unknown_opening": 0.0461
+      },
+      "confidence": 0.693,
+      "sources": [
+        {
+          "type": "yolo",
+          "confidence": 0.693,
+          "metadata": {
+            "method": "yolo_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_015",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.2629835547470465,
+          0.26091360179545564,
+          0.31096194596240745,
+          0.4125745149585308
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.623,
+        "door": 0.0754,
+        "unknown_opening": 0.0566
+      },
+      "confidence": 0.623,
+      "sources": [
+        {
+          "type": "yolo",
+          "confidence": 0.623,
+          "metadata": {
+            "method": "yolo_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_016",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.37532032823728767,
+          0.26056761538247925,
+          0.41916909035074584,
+          0.41555506508873913
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.552,
+        "door": 0.0896,
+        "unknown_opening": 0.0672
+      },
+      "confidence": 0.552,
+      "sources": [
+        {
+          "type": "yolo",
+          "confidence": 0.552,
+          "metadata": {
+            "method": "yolo_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_017",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.4545522018592117,
+          0.2619272385728303,
+          0.5000490726909571,
+          0.4074227813672492
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.8841,
+        "door": 0.0232,
+        "unknown_opening": 0.0174
+      },
+      "confidence": 0.8841,
+      "sources": [
+        {
+          "type": "yolo",
+          "confidence": 0.8841,
+          "metadata": {
+            "method": "yolo_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_018",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.6486787696333297,
+          0.26065656472156395,
+          0.6926683166716572,
+          0.4089371378387885
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.7633,
+        "door": 0.0473,
+        "unknown_opening": 0.0355
+      },
+      "confidence": 0.7633,
+      "sources": [
+        {
+          "type": "yolo",
+          "confidence": 0.7633,
+          "metadata": {
+            "method": "yolo_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_019",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.9251489938343859,
+          0.0028849235643142773,
+          0.9998476247754247,
+          0.3094817247435945
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.9491,
+        "door": 0.0102,
+        "unknown_opening": 0.0076
+      },
+      "confidence": 0.9491,
+      "sources": [
+        {
+          "type": "yolo",
+          "confidence": 0.9491,
+          "metadata": {
+            "method": "yolo_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    }
+  ],
+  "debug": {
+    "fusion": "observation_graph_v0.1",
+    "source_graphs": 2,
+    "source_counts": {
+      "facade_row": 12,
+      "yolo": 10
+    },
+    "fused_count": 19,
+    "iou_threshold": 0.35
+  }
+}

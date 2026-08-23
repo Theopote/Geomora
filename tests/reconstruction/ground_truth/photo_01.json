@@ -1,0 +1,23 @@
+{
+  "schema_version": "reconstruction-metrics-v1",
+  "photo_id": "photo_01",
+  "annotation_status": "draft_v1",
+  "review_rounds": 1,
+  "facade_bbox": [0.10, 0.04, 0.90, 0.98],
+  "facade": {"width": 1.0, "height": 1.0},
+  "topology": {"storey_count": 2, "bay_count": 2},
+  "openings": [
+    {"id": "w21", "type": "window", "bbox": [0.36, 0.14, 0.64, 0.30], "storey": 2, "bay": 1},
+    {"id": "d11", "type": "door", "bbox": [0.14, 0.56, 0.44, 0.96], "storey": 1, "bay": 1},
+    {"id": "w11", "type": "window", "bbox": [0.56, 0.58, 0.82, 0.88], "storey": 1, "bay": 2}
+  ],
+  "pattern_groups": [
+    {
+      "id": "upper_single_window",
+      "members": ["w21"],
+      "constraints": ["inside_facade"]
+    }
+  ],
+  "metric_anchors": [],
+  "annotation_notes": "Draft from rectified image review. Second human pass required before gate use."
+}

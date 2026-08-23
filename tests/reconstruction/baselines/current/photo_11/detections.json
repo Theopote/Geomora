@@ -1,0 +1,169 @@
+{
+  "method": "auto_fusion_v1",
+  "confidence": 0.6632,
+  "image_width": 1132,
+  "image_height": 722,
+  "elements": [
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.0,
+        0.5443213296398892,
+        0.037102473498233215,
+        0.7700831024930748
+      ],
+      "confidence": 0.7309
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.0,
+        0.26038781163434904,
+        1.0,
+        0.9127423822714681
+      ],
+      "confidence": 0.658
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.0,
+        0.853185595567867,
+        0.045053003533568906,
+        0.9265927977839336
+      ],
+      "confidence": 0.6411
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.0,
+        0.0025987176023361757,
+        0.052520940666063935,
+        0.281417931215915
+      ],
+      "confidence": 0.4657
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.045936395759717315,
+        0.7451523545706371,
+        0.24558303886925795,
+        0.9141274238227147
+      ],
+      "confidence": 0.6739
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.11527087747418838,
+        0.21703395685000432,
+        0.1946874827462456,
+        0.4259778812651489
+      ],
+      "confidence": 0.3524
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.22084805653710246,
+        0.6800554016620498,
+        0.26060070671378094,
+        0.7562326869806094
+      ],
+      "confidence": 0.6396
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.25530035335689044,
+        0.21606648199445982,
+        0.36837455830388693,
+        0.45290858725761773
+      ],
+      "confidence": 0.8225
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.2747349823321555,
+        0.5609418282548476,
+        0.35247349823321555,
+        0.5997229916897507
+      ],
+      "confidence": 0.7043
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.41872791519434627,
+        0.21745152354570638,
+        0.5282685512367491,
+        0.45429362880886426
+      ],
+      "confidence": 0.8301
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.5821554770318021,
+        0.21745152354570638,
+        0.691696113074205,
+        0.46121883656509693
+      ],
+      "confidence": 0.8135
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.7570671378091873,
+        0.21745152354570638,
+        0.8418727915194346,
+        0.24930747922437674
+      ],
+      "confidence": 0.6954
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.7577214325274679,
+        0.220140303931408,
+        0.8416344201185678,
+        0.43397991148718834
+      ],
+      "confidence": 0.5939
+    }
+  ],
+  "overlay_base64": null,
+  "debug": {
+    "fusion": "yolo_facade_row_v1",
+    "yolo_element_count": 3,
+    "row_element_count": 12,
+    "fused_element_count": 13,
+    "yolo_window_count": 3,
+    "row_window_count": 12,
+    "fused_window_count": 13,
+    "facade_bounds": [
+      0,
+      7,
+      1132,
+      716
+    ],
+    "yolo_model_path": "F:\\development\\Geomora\\backend\\models\\facade_yolo_v1.onnx",
+    "scale_hint": {
+      "wall_length_mm": 4200,
+      "wall_height_mm": 2400,
+      "method": "window_sill",
+      "confidence": 0.75,
+      "opening_span_norm": 0.98
+    }
+  },
+  "scale_hint": {
+    "wall_length_mm": 4200,
+    "wall_height_mm": 2400,
+    "method": "window_sill",
+    "confidence": 0.75,
+    "opening_span_norm": 0.98
+  }
+}

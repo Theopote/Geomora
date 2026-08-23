@@ -93,11 +93,13 @@ Replacing YOLO → GroundingDINO → future foundation model only changes the Ob
 | Item | Status |
 |------|--------|
 | Design doc | ✅ This file |
-| Observation Graph data structure | ☐ Not implemented |
-| Understanding layer | ☐ Detections still map directly to overlay elements |
-| Constraint Graph solver | ☐ P0 after Stage A (see `ROADMAP.md` B0) |
+| Observation Graph data structure | ✅ `geomora_reconstruct/observations/` v0.1 |
+| YOLO / facade-row adapters + fusion | ✅ |
+| Understanding layer | ☐ Detections still map directly to overlay elements in UI |
+| Constraint Graph solver | ☐ P0 after Understanding v0.1 (see `ROADMAP.md` B0) |
 
-**Rule for Stage A:** No Observation Graph code until A3 Reconstruction Gate passes. Document and preserve the boundary; do not expand IR with detector-specific fields.
+**Rule:** Observation Graph is now the required boundary for new perception work.
+Legacy detection → overlay path remains via adapters until Understanding v0.1 lands.
 
 ---
 

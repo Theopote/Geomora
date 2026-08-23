@@ -1,0 +1,98 @@
+{
+  "schema_version": "reconstruction-metrics-v1",
+  "photo_id": "photo_18",
+  "facade": {
+    "width": 1.0,
+    "height": 1.0
+  },
+  "openings": [
+    {
+      "id": "pred_001",
+      "type": "door",
+      "bbox": [
+        0.0,
+        0.2341,
+        0.8943,
+        0.9165
+      ],
+      "confidence": 0.6957
+    },
+    {
+      "id": "pred_002",
+      "type": "window",
+      "bbox": [
+        0.2051,
+        0.7187,
+        0.3129,
+        0.7641
+      ],
+      "confidence": 0.7398
+    },
+    {
+      "id": "pred_003",
+      "type": "window",
+      "bbox": [
+        0.4271,
+        0.6969,
+        0.4947,
+        0.7477
+      ],
+      "confidence": 0.6996
+    },
+    {
+      "id": "pred_004",
+      "type": "window",
+      "bbox": [
+        0.5201,
+        0.7042,
+        0.5518,
+        0.8022
+      ],
+      "confidence": 0.6428
+    },
+    {
+      "id": "pred_005",
+      "type": "window",
+      "bbox": [
+        0.5879,
+        0.5493,
+        0.7456,
+        0.6286
+      ],
+      "confidence": 0.3426
+    },
+    {
+      "id": "pred_006",
+      "type": "window",
+      "bbox": [
+        0.6385,
+        0.7659,
+        0.6998,
+        0.8185
+      ],
+      "confidence": 0.6603
+    },
+    {
+      "id": "pred_007",
+      "type": "window",
+      "bbox": [
+        0.7852,
+        0.5546,
+        0.859,
+        0.6306
+      ],
+      "confidence": 0.3542
+    }
+  ],
+  "pipeline": {
+    "detection_method": "auto_fusion_v1",
+    "detection_confidence": 0.5907,
+    "scale_hint": {
+      "wall_length_mm": 4000,
+      "wall_height_mm": 3100,
+      "method": "door_height",
+      "confidence": 0.696,
+      "opening_span_norm": 0.8943
+    }
+  }
+}

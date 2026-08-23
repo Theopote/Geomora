@@ -1,0 +1,31 @@
+{
+  "schema_version": "reconstruction-metrics-v1",
+  "photo_id": "photo_16",
+  "annotation_status": "draft_v1",
+  "review_rounds": 1,
+  "facade_bbox": [0.08, 0.02, 0.92, 0.96],
+  "facade": {"width": 1.0, "height": 1.0},
+  "topology": {"storey_count": 3, "bay_count": 2},
+  "openings": [
+    {"id": "w31", "type": "window", "bbox": [0.12, 0.10, 0.38, 0.28], "storey": 3, "bay": 1},
+    {"id": "w32", "type": "window", "bbox": [0.62, 0.12, 0.82, 0.28], "storey": 3, "bay": 2},
+    {"id": "w21", "type": "window", "bbox": [0.12, 0.32, 0.38, 0.50], "storey": 2, "bay": 1},
+    {"id": "w22", "type": "window", "bbox": [0.62, 0.34, 0.82, 0.52], "storey": 2, "bay": 2},
+    {"id": "w11", "type": "window", "bbox": [0.12, 0.54, 0.38, 0.72], "storey": 1, "bay": 1},
+    {"id": "d11", "type": "door", "bbox": [0.62, 0.68, 0.82, 0.94], "storey": 1, "bay": 2}
+  ],
+  "pattern_groups": [
+    {
+      "id": "left_column_stack",
+      "members": ["w31", "w21", "w11"],
+      "constraints": ["equal_width", "vertical_alignment"]
+    },
+    {
+      "id": "right_column_stack",
+      "members": ["w32", "w22"],
+      "constraints": ["equal_width", "vertical_alignment"]
+    }
+  ],
+  "metric_anchors": [],
+  "annotation_notes": "Perspective + slope case. Side-facade openings excluded from v0.1 single-facade GT."
+}

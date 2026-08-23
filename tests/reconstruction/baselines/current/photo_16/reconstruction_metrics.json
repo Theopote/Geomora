@@ -1,0 +1,36 @@
+{
+  "photo_id": "photo_16",
+  "detection": {
+    "iou_threshold": 0.5,
+    "window": {
+      "true_positives": 1,
+      "false_positives": 3,
+      "false_negatives": 4,
+      "precision": 0.25,
+      "recall": 0.2,
+      "f1": 0.2222
+    },
+    "door": {
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 1.0,
+      "recall": 0.0,
+      "f1": 0.0
+    }
+  },
+  "topology": null,
+  "geometry": null,
+  "scale": null,
+  "rationalization": null,
+  "sketchup": null,
+  "rqs": 11.1,
+  "coverage": 0.25,
+  "not_evaluated": [
+    "topology",
+    "geometry",
+    "scale",
+    "rationalization",
+    "sketchup"
+  ]
+}

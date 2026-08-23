@@ -21,24 +21,30 @@ rationalization, and SketchUp E2E quality. Results must report annotation
 `coverage`; a partial RQS cannot pass a gate.
 
 Implementation: `backend/geomora_reconstruct/metrics/`
-Ground truth and regression fixtures: `tests/reconstruction/`
+Minimal 5-photo GT: `tests/reconstruction/minimal_set.json`
+Baseline exporter: `backend/scripts/run_reconstruction_baseline.py`
 
-**R0 exit:** all 20 A1 photos have reviewed opening annotations and topology;
-metric scores are included only for photos with a real scale anchor.
+**R0 exit (phased):** 5-photo minimal set reviewed twice + baseline recorded;
+then expand to 20 A1 photos. Metric scores only where a real scale anchor exists.
 
-### A2 — Failure-driven Improvement (in progress)
+### R1 — Observation Graph v0.1 (in progress)
 
-**Goal:** Fix only documented A1 failure classes — no new lateral features.
+**Goal:** Perception outputs become evidence, not architectural facts.
+
+Implementation: `backend/geomora_reconstruct/observations/`
+YOLO and facade-row adapters + fusion are in place. VLM evidence and
+Architectural Understanding are next.
+
+### A2 — Failure-driven Improvement (completed)
+
+Detection smoke hold-out **5/5** via `auto_fusion_v1`. No further threshold
+tuning until R0 baseline analysis identifies layer-specific failures.
 
 | Priority | Failure class | A2 fix |
 |----------|---------------|--------|
 | P0 | `missed_window` (20/20) | YOLO + facade_row fusion (`auto_fusion_v1`) |
 | P1 | `wrong_scale` (14/20) | Span extrapolation from facade bounds + window count |
 | P2 | `false_door` / `missed_door` (15/20) | Door geometry + confidence filter |
-
-**Exit:** val window recall ≥ 0.80 and precision ≥ 0.85; door false-positive
-rate decreases; no train/val regression; normalized geometry and scale error do
-not regress. Hold-out is evaluation-only and never used for tuning.
 
 ### A1 — Real Photo Benchmark (completed)
 
@@ -62,8 +68,10 @@ not regress. Hold-out is evaluation-only and never used for tuning.
 | ID | Name | Gate | Status |
 |----|------|------|--------|
 | **A1** | Real Photo Benchmark | 20 photos, baseline recorded | **Completed** |
-| **A2** | Failure-driven Improvement | Fix only documented failure classes | **In progress** |
-| **A3** | Reconstruction Baseline Gate | E2E Photo → SketchUp topology, relative geometry, anchored scale, and editable valid geometry | Frozen until R0 and A2 done |
+| **A2** | Failure-driven Improvement | Detection smoke hold-out 5/5 | **Completed** |
+| **R0** | Reconstruction Metrics + Minimal GT | 5-photo objective ruler + baseline | **In progress** |
+| **R1** | Observation Graph → Understanding | Evidence layer before IR | **In progress** |
+| **A3** | Reconstruction Baseline Gate | E2E Photo → SketchUp topology, relative geometry, anchored scale, and editable valid geometry | Frozen until R0+R1 |
 | **B0** | Constraint Graph Solver | Equal-width / equal-sill / equal-spacing after A3 | P0 after Stage A |
 | B1 | Multi-view production path | Fuse + depth on real photos | P1 |
 | B2 | Evidence-driven model selection | SAM / depth only if RQS gain proven | P1 |

@@ -1,0 +1,6 @@
+{
+  "photo_id": "photo_11",
+  "image_path": "F:\\development\\Geomora\\backend\\cache\\real_photo_desktop_rectified\\025123d59801215ad27eafd1693f7cf8.jpg",
+  "method": "existing_rectified_cache",
+  "notes": "Rectification artifact not re-run in baseline exporter v0.1"
+}

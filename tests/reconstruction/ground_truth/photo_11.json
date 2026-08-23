@@ -1,0 +1,37 @@
+{
+  "schema_version": "reconstruction-metrics-v1",
+  "photo_id": "photo_11",
+  "annotation_status": "draft_v1",
+  "review_rounds": 1,
+  "facade_bbox": [0.02, 0.08, 0.98, 0.92],
+  "facade": {"width": 1.0, "height": 1.0},
+  "topology": {"storey_count": 2, "bay_count": 5},
+  "openings": [
+    {"id": "w21", "type": "window", "bbox": [0.06, 0.18, 0.18, 0.42], "storey": 2, "bay": 1},
+    {"id": "w22", "type": "window", "bbox": [0.22, 0.18, 0.34, 0.42], "storey": 2, "bay": 2},
+    {"id": "w23", "type": "window", "bbox": [0.38, 0.18, 0.50, 0.42], "storey": 2, "bay": 3},
+    {"id": "w24", "type": "window", "bbox": [0.54, 0.18, 0.66, 0.42], "storey": 2, "bay": 4},
+    {"id": "w25", "type": "window", "bbox": [0.70, 0.18, 0.82, 0.42], "storey": 2, "bay": 5},
+    {"id": "d11", "type": "door", "bbox": [0.48, 0.58, 0.58, 0.88], "storey": 1, "bay": 3},
+    {"id": "d12", "type": "door", "bbox": [0.86, 0.58, 0.96, 0.88], "storey": 1, "bay": 5}
+  ],
+  "pattern_groups": [
+    {
+      "id": "upper_window_row",
+      "members": ["w21", "w22", "w23", "w24", "w25"],
+      "constraints": ["equal_width", "equal_height", "equal_sill", "equal_spacing", "horizontal_alignment"]
+    }
+  ],
+  "metric_anchors": [
+    {
+      "id": "anchor_facade_width",
+      "type": "user_distance",
+      "status": "pending_survey",
+      "start": [0.05, 0.90],
+      "end": [0.95, 0.90],
+      "distance_mm": null,
+      "notes": "Requires on-site tape or survey measurement. Do not infer from door height."
+    }
+  ],
+  "annotation_notes": "Upper row is primary detection target. Ground-floor glazing simplified to doors for v0.1."
+}

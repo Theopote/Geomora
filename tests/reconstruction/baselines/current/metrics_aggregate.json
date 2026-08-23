@@ -1,0 +1,220 @@
+{
+  "minimal_set": "F:\\development\\Geomora\\tests\\reconstruction\\minimal_set.json",
+  "aggregate": {
+    "photos": 5,
+    "evaluated": 5,
+    "full_coverage_count": 0,
+    "mean_coverage": 0.25,
+    "mean_rqs": 2.2,
+    "mean_window_recall": 0.04,
+    "mean_window_precision": 0.05,
+    "gate_ready": false
+  },
+  "results": [
+    {
+      "photo_id": "photo_01",
+      "ground_truth": "F:\\development\\Geomora\\tests\\reconstruction\\ground_truth\\photo_01.json",
+      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_01\\prediction.json",
+      "metrics": {
+        "photo_id": "photo_01",
+        "detection": {
+          "iou_threshold": 0.5,
+          "window": {
+            "true_positives": 0,
+            "false_positives": 5,
+            "false_negatives": 2,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "door": {
+            "true_positives": 0,
+            "false_positives": 0,
+            "false_negatives": 1,
+            "precision": 1.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "topology": null,
+        "geometry": null,
+        "scale": null,
+        "rationalization": null,
+        "sketchup": null,
+        "rqs": 0.0,
+        "coverage": 0.25,
+        "not_evaluated": [
+          "topology",
+          "geometry",
+          "scale",
+          "rationalization",
+          "sketchup"
+        ]
+      }
+    },
+    {
+      "photo_id": "photo_11",
+      "ground_truth": "F:\\development\\Geomora\\tests\\reconstruction\\ground_truth\\photo_11.json",
+      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_11\\prediction.json",
+      "metrics": {
+        "photo_id": "photo_11",
+        "detection": {
+          "iou_threshold": 0.5,
+          "window": {
+            "true_positives": 0,
+            "false_positives": 13,
+            "false_negatives": 5,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "door": {
+            "true_positives": 0,
+            "false_positives": 0,
+            "false_negatives": 2,
+            "precision": 1.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "topology": null,
+        "geometry": null,
+        "scale": null,
+        "rationalization": null,
+        "sketchup": null,
+        "rqs": 0.0,
+        "coverage": 0.25,
+        "not_evaluated": [
+          "topology",
+          "geometry",
+          "scale",
+          "rationalization",
+          "sketchup"
+        ]
+      }
+    },
+    {
+      "photo_id": "photo_16",
+      "ground_truth": "F:\\development\\Geomora\\tests\\reconstruction\\ground_truth\\photo_16.json",
+      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_16\\prediction.json",
+      "metrics": {
+        "photo_id": "photo_16",
+        "detection": {
+          "iou_threshold": 0.5,
+          "window": {
+            "true_positives": 1,
+            "false_positives": 3,
+            "false_negatives": 4,
+            "precision": 0.25,
+            "recall": 0.2,
+            "f1": 0.2222
+          },
+          "door": {
+            "true_positives": 0,
+            "false_positives": 0,
+            "false_negatives": 1,
+            "precision": 1.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "topology": null,
+        "geometry": null,
+        "scale": null,
+        "rationalization": null,
+        "sketchup": null,
+        "rqs": 11.1,
+        "coverage": 0.25,
+        "not_evaluated": [
+          "topology",
+          "geometry",
+          "scale",
+          "rationalization",
+          "sketchup"
+        ]
+      }
+    },
+    {
+      "photo_id": "photo_18",
+      "ground_truth": "F:\\development\\Geomora\\tests\\reconstruction\\ground_truth\\photo_18.json",
+      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_18\\prediction.json",
+      "metrics": {
+        "photo_id": "photo_18",
+        "detection": {
+          "iou_threshold": 0.5,
+          "window": {
+            "true_positives": 0,
+            "false_positives": 6,
+            "false_negatives": 6,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "door": {
+            "true_positives": 0,
+            "false_positives": 1,
+            "false_negatives": 2,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "topology": null,
+        "geometry": null,
+        "scale": null,
+        "rationalization": null,
+        "sketchup": null,
+        "rqs": 0.0,
+        "coverage": 0.25,
+        "not_evaluated": [
+          "topology",
+          "geometry",
+          "scale",
+          "rationalization",
+          "sketchup"
+        ]
+      }
+    },
+    {
+      "photo_id": "photo_19",
+      "ground_truth": "F:\\development\\Geomora\\tests\\reconstruction\\ground_truth\\photo_19.json",
+      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_19\\prediction.json",
+      "metrics": {
+        "photo_id": "photo_19",
+        "detection": {
+          "iou_threshold": 0.5,
+          "window": {
+            "true_positives": 0,
+            "false_positives": 17,
+            "false_negatives": 11,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "door": {
+            "true_positives": 0,
+            "false_positives": 1,
+            "false_negatives": 3,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "topology": null,
+        "geometry": null,
+        "scale": null,
+        "rationalization": null,
+        "sketchup": null,
+        "rqs": 0.0,
+        "coverage": 0.25,
+        "not_evaluated": [
+          "topology",
+          "geometry",
+          "scale",
+          "rationalization",
+          "sketchup"
+        ]
+      }
+    }
+  ]
+}

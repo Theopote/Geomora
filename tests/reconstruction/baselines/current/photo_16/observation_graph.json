@@ -1,0 +1,156 @@
+{
+  "schema_version": "observation-graph-v0.1",
+  "photo_id": "photo_16",
+  "image_width": 743,
+  "image_height": 869,
+  "observations": [
+    {
+      "id": "obs_fused_001",
+      "kind": "facade_candidate",
+      "geometry": {
+        "bbox": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ]
+      },
+      "semantic_candidates": {
+        "facade": 0.6
+      },
+      "confidence": 0.6,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.6,
+          "metadata": {
+            "role": "facade_bounds"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_002",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.010767160161507403,
+          0.4142692750287687,
+          0.04306864064602961,
+          0.4660529344073648
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.7779,
+        "door": 0.0444,
+        "unknown_opening": 0.0333
+      },
+      "confidence": 0.7779,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.7779,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_003",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.15208613728129206,
+          0.3429228998849252,
+          0.423956931359354,
+          0.5281933256616801
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.7814,
+        "door": 0.0437,
+        "unknown_opening": 0.0328
+      },
+      "confidence": 0.7814,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.7814,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_004",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.4831763122476447,
+          0.33141542002301494,
+          0.6541049798115747,
+          0.569620253164557
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.6752,
+        "door": 0.065,
+        "unknown_opening": 0.0487
+      },
+      "confidence": 0.6752,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.6752,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    },
+    {
+      "id": "obs_fused_005",
+      "kind": "opening_candidate",
+      "geometry": {
+        "bbox": [
+          0.7187079407806191,
+          0.0,
+          0.9838492597577388,
+          0.7054085155350979
+        ]
+      },
+      "semantic_candidates": {
+        "window": 0.6536,
+        "door": 0.0693,
+        "unknown_opening": 0.052
+      },
+      "confidence": 0.6536,
+      "sources": [
+        {
+          "type": "facade_row",
+          "confidence": 0.6536,
+          "metadata": {
+            "method": "facade_row_v1"
+          }
+        }
+      ],
+      "uncertainties": []
+    }
+  ],
+  "debug": {
+    "fusion": "observation_graph_v0.1",
+    "source_graphs": 2,
+    "source_counts": {
+      "facade_row": 5,
+      "yolo": 0
+    },
+    "fused_count": 5,
+    "iou_threshold": 0.35
+  }
+}

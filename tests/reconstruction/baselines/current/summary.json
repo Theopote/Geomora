@@ -1,0 +1,232 @@
+{
+  "generated_at": "2026-08-23T07:27:42.490226+00:00",
+  "method": "auto",
+  "photos": 5,
+  "results": [
+    {
+      "photo_id": "photo_01",
+      "split": "train",
+      "category": "residential",
+      "detection_method": "auto_fusion_v1",
+      "window_count": 5,
+      "door_count": 0,
+      "metrics": {
+        "photo_id": "photo_01",
+        "detection": {
+          "iou_threshold": 0.5,
+          "window": {
+            "true_positives": 0,
+            "false_positives": 5,
+            "false_negatives": 2,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "door": {
+            "true_positives": 0,
+            "false_positives": 0,
+            "false_negatives": 1,
+            "precision": 1.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "topology": null,
+        "geometry": null,
+        "scale": null,
+        "rationalization": null,
+        "sketchup": null,
+        "rqs": 0.0,
+        "coverage": 0.25,
+        "not_evaluated": [
+          "topology",
+          "geometry",
+          "scale",
+          "rationalization",
+          "sketchup"
+        ]
+      },
+      "preview": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_01\\preview.png"
+    },
+    {
+      "photo_id": "photo_11",
+      "split": "val",
+      "category": "commercial",
+      "detection_method": "auto_fusion_v1",
+      "window_count": 13,
+      "door_count": 0,
+      "metrics": {
+        "photo_id": "photo_11",
+        "detection": {
+          "iou_threshold": 0.5,
+          "window": {
+            "true_positives": 0,
+            "false_positives": 13,
+            "false_negatives": 5,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "door": {
+            "true_positives": 0,
+            "false_positives": 0,
+            "false_negatives": 2,
+            "precision": 1.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "topology": null,
+        "geometry": null,
+        "scale": null,
+        "rationalization": null,
+        "sketchup": null,
+        "rqs": 0.0,
+        "coverage": 0.25,
+        "not_evaluated": [
+          "topology",
+          "geometry",
+          "scale",
+          "rationalization",
+          "sketchup"
+        ]
+      },
+      "preview": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_11\\preview.png"
+    },
+    {
+      "photo_id": "photo_16",
+      "split": "holdout",
+      "category": "strong_perspective",
+      "detection_method": "auto_fusion_v1",
+      "window_count": 4,
+      "door_count": 0,
+      "metrics": {
+        "photo_id": "photo_16",
+        "detection": {
+          "iou_threshold": 0.5,
+          "window": {
+            "true_positives": 1,
+            "false_positives": 3,
+            "false_negatives": 4,
+            "precision": 0.25,
+            "recall": 0.2,
+            "f1": 0.2222
+          },
+          "door": {
+            "true_positives": 0,
+            "false_positives": 0,
+            "false_negatives": 1,
+            "precision": 1.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "topology": null,
+        "geometry": null,
+        "scale": null,
+        "rationalization": null,
+        "sketchup": null,
+        "rqs": 11.1,
+        "coverage": 0.25,
+        "not_evaluated": [
+          "topology",
+          "geometry",
+          "scale",
+          "rationalization",
+          "sketchup"
+        ]
+      },
+      "preview": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_16\\preview.png"
+    },
+    {
+      "photo_id": "photo_18",
+      "split": "holdout",
+      "category": "tree_occluded",
+      "detection_method": "auto_fusion_v1",
+      "window_count": 6,
+      "door_count": 1,
+      "metrics": {
+        "photo_id": "photo_18",
+        "detection": {
+          "iou_threshold": 0.5,
+          "window": {
+            "true_positives": 0,
+            "false_positives": 6,
+            "false_negatives": 6,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "door": {
+            "true_positives": 0,
+            "false_positives": 1,
+            "false_negatives": 2,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "topology": null,
+        "geometry": null,
+        "scale": null,
+        "rationalization": null,
+        "sketchup": null,
+        "rqs": 0.0,
+        "coverage": 0.25,
+        "not_evaluated": [
+          "topology",
+          "geometry",
+          "scale",
+          "rationalization",
+          "sketchup"
+        ]
+      },
+      "preview": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_18\\preview.png"
+    },
+    {
+      "photo_id": "photo_19",
+      "split": "holdout",
+      "category": "old_building",
+      "detection_method": "auto_fusion_v1",
+      "window_count": 17,
+      "door_count": 1,
+      "metrics": {
+        "photo_id": "photo_19",
+        "detection": {
+          "iou_threshold": 0.5,
+          "window": {
+            "true_positives": 0,
+            "false_positives": 17,
+            "false_negatives": 11,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "door": {
+            "true_positives": 0,
+            "false_positives": 1,
+            "false_negatives": 3,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "topology": null,
+        "geometry": null,
+        "scale": null,
+        "rationalization": null,
+        "sketchup": null,
+        "rqs": 0.0,
+        "coverage": 0.25,
+        "not_evaluated": [
+          "topology",
+          "geometry",
+          "scale",
+          "rationalization",
+          "sketchup"
+        ]
+      },
+      "preview": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_19\\preview.png"
+    }
+  ]
+}

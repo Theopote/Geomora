@@ -1,0 +1,28 @@
+{
+  "schema_version": "reconstruction-metrics-v1",
+  "photo_id": "photo_18",
+  "annotation_status": "draft_v1",
+  "review_rounds": 1,
+  "facade_bbox": [0.13, 0.03, 0.90, 0.88],
+  "facade": {"width": 1.0, "height": 1.0},
+  "topology": {"storey_count": 2, "bay_count": 3},
+  "openings": [
+    {"id": "w21", "type": "window", "bbox": [0.26, 0.22, 0.35, 0.44], "storey": 2, "bay": 1},
+    {"id": "w22", "type": "window", "bbox": [0.48, 0.22, 0.57, 0.44], "storey": 2, "bay": 2},
+    {"id": "w23", "type": "window", "bbox": [0.70, 0.22, 0.79, 0.44], "storey": 2, "bay": 3},
+    {"id": "d12", "type": "door", "bbox": [0.15, 0.58, 0.22, 0.86], "storey": 1, "bay": 1},
+    {"id": "w11", "type": "window", "bbox": [0.24, 0.54, 0.38, 0.86], "storey": 1, "bay": 1},
+    {"id": "d11", "type": "door", "bbox": [0.46, 0.58, 0.54, 0.86], "storey": 1, "bay": 2},
+    {"id": "w12", "type": "window", "bbox": [0.58, 0.54, 0.72, 0.86], "storey": 1, "bay": 2},
+    {"id": "w13", "type": "window", "bbox": [0.76, 0.54, 0.88, 0.86], "storey": 1, "bay": 3}
+  ],
+  "pattern_groups": [
+    {
+      "id": "upper_window_row",
+      "members": ["w21", "w22", "w23"],
+      "constraints": ["equal_width", "equal_height", "equal_sill", "equal_spacing"]
+    }
+  ],
+  "metric_anchors": [],
+  "annotation_notes": "Ground floor partially occluded by lamp/flowers. Lower openings are approximate."
+}

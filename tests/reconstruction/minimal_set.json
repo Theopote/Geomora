@@ -1,0 +1,23 @@
+{
+  "version": "minimal-v1",
+  "description": "Five representative A1 photos for Reconstruction Core v0.1 objective metrics.",
+  "selection_rationale": {
+    "photo_01": "regular residential facade (2F, door + windows)",
+    "photo_11": "commercial/office with repetitive upper window row",
+    "photo_16": "strong perspective on sloped street",
+    "photo_18": "tree/street furniture occlusion on ground floor",
+    "photo_19": "irregular old commercial masonry with multi-unit ground floor"
+  },
+  "manifest": "examples/real_photos/benchmark/manifest.json",
+  "ground_truth_dir": "tests/reconstruction/ground_truth",
+  "baseline_dir": "tests/reconstruction/baselines/current",
+  "photos": [
+  {"id": "photo_01", "category": "residential", "split": "train"},
+  {"id": "photo_11", "category": "commercial", "split": "val"},
+  {"id": "photo_16", "category": "strong_perspective", "split": "holdout"},
+  {"id": "photo_18", "category": "tree_occluded", "split": "holdout"},
+  {"id": "photo_19", "category": "old_building", "split": "holdout"}
+  ],
+  "metric_anchor_required": ["photo_11", "photo_19"],
+  "holdout_evaluation_only": ["photo_16", "photo_18", "photo_19"]
+}

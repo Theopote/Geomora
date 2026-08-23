@@ -1,0 +1,44 @@
+{
+  "schema_version": "reconstruction-metrics-v1",
+  "photo_id": "photo_19",
+  "annotation_status": "draft_v1",
+  "review_rounds": 1,
+  "facade_bbox": [0.04, 0.02, 0.96, 0.96],
+  "facade": {"width": 1.0, "height": 1.0},
+  "topology": {"storey_count": 2, "bay_count": 8},
+  "openings": [
+    {"id": "w21", "type": "window", "bbox": [0.06, 0.14, 0.14, 0.34], "storey": 2, "bay": 1},
+    {"id": "w22", "type": "window", "bbox": [0.16, 0.14, 0.24, 0.34], "storey": 2, "bay": 2},
+    {"id": "w23", "type": "window", "bbox": [0.28, 0.14, 0.36, 0.34], "storey": 2, "bay": 3},
+    {"id": "w24", "type": "window", "bbox": [0.40, 0.14, 0.48, 0.34], "storey": 2, "bay": 4},
+    {"id": "w25", "type": "window", "bbox": [0.52, 0.14, 0.60, 0.34], "storey": 2, "bay": 5},
+    {"id": "w26", "type": "window", "bbox": [0.64, 0.14, 0.72, 0.34], "storey": 2, "bay": 6},
+    {"id": "w27", "type": "window", "bbox": [0.76, 0.14, 0.84, 0.34], "storey": 2, "bay": 7},
+    {"id": "w28", "type": "window", "bbox": [0.86, 0.14, 0.94, 0.34], "storey": 2, "bay": 8},
+    {"id": "w11", "type": "window", "bbox": [0.06, 0.52, 0.28, 0.88], "storey": 1, "bay": 1},
+    {"id": "d11", "type": "door", "bbox": [0.28, 0.62, 0.34, 0.88], "storey": 1, "bay": 1},
+    {"id": "w12", "type": "window", "bbox": [0.36, 0.52, 0.58, 0.88], "storey": 1, "bay": 2},
+    {"id": "d12", "type": "door", "bbox": [0.58, 0.62, 0.64, 0.88], "storey": 1, "bay": 2},
+    {"id": "w13", "type": "window", "bbox": [0.66, 0.52, 0.88, 0.88], "storey": 1, "bay": 3},
+    {"id": "d13", "type": "door", "bbox": [0.88, 0.62, 0.94, 0.88], "storey": 1, "bay": 3}
+  ],
+  "pattern_groups": [
+    {
+      "id": "upper_window_row",
+      "members": ["w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28"],
+      "constraints": ["equal_width", "equal_height", "equal_sill", "equal_spacing"]
+    }
+  ],
+  "metric_anchors": [
+    {
+      "id": "anchor_facade_width",
+      "type": "user_distance",
+      "status": "pending_survey",
+      "start": [0.06, 0.94],
+      "end": [0.94, 0.94],
+      "distance_mm": null,
+      "notes": "Requires on-site measurement across full brick facade."
+    }
+  ],
+  "annotation_notes": "Irregular old commercial facade. Ground floor modeled as 3 shop bays."
+}

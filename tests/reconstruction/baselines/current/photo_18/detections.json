@@ -1,0 +1,109 @@
+{
+  "method": "auto_fusion_v1",
+  "confidence": 0.5907,
+  "image_width": 473,
+  "image_height": 551,
+  "elements": [
+    {
+      "type": "door",
+      "bbox_norm": [
+        0.0,
+        0.23411978221415608,
+        0.8942917547568711,
+        0.9165154264972777
+      ],
+      "confidence": 0.6957
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.20507399577167018,
+        0.7186932849364791,
+        0.3128964059196617,
+        0.764065335753176
+      ],
+      "confidence": 0.7398
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.427061310782241,
+        0.6969147005444646,
+        0.49471458773784355,
+        0.7477313974591652
+      ],
+      "confidence": 0.6996
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.5200845665961945,
+        0.7041742286751361,
+        0.5517970401691332,
+        0.8021778584392014
+      ],
+      "confidence": 0.6428
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.5879470147743789,
+        0.5493028367279662,
+        0.745640825267574,
+        0.6285921017184665
+      ],
+      "confidence": 0.3426
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.638477801268499,
+        0.7658802177858439,
+        0.6997885835095138,
+        0.8185117967332124
+      ],
+      "confidence": 0.6603
+    },
+    {
+      "type": "window",
+      "bbox_norm": [
+        0.7851993488206924,
+        0.5546407543812386,
+        0.8590403389477075,
+        0.6305646671357475
+      ],
+      "confidence": 0.3542
+    }
+  ],
+  "overlay_base64": null,
+  "debug": {
+    "fusion": "yolo_facade_row_v1",
+    "yolo_element_count": 2,
+    "row_element_count": 5,
+    "fused_element_count": 7,
+    "yolo_window_count": 2,
+    "row_window_count": 4,
+    "fused_window_count": 6,
+    "facade_bounds": [
+      0,
+      5,
+      473,
+      540
+    ],
+    "yolo_model_path": "F:\\development\\Geomora\\backend\\models\\facade_yolo_v1.onnx",
+    "scale_hint": {
+      "wall_length_mm": 4000,
+      "wall_height_mm": 3100,
+      "method": "door_height",
+      "confidence": 0.696,
+      "opening_span_norm": 0.8943
+    }
+  },
+  "scale_hint": {
+    "wall_length_mm": 4000,
+    "wall_height_mm": 3100,
+    "method": "door_height",
+    "confidence": 0.696,
+    "opening_span_norm": 0.8943
+  }
+}

@@ -7,8 +7,18 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <svg class="icon-sprite" aria-hidden="true">
+    <symbol id="i-image" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM7 15l3-3 2 2 3-4 3 5M8 9h.01"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5zM18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24"><path d="M5 21V4h10v17M15 9h4v12M8 8h2M8 12h2M8 16h2M3 21h18"/></symbol>
+    <symbol id="i-tools" viewBox="0 0 24 24"><path d="M14 6a4 4 0 0 0 4 4l-8 8-4-4 8-8zM5 13l6 6"/></symbol>
+  </svg>
   <header class="topbar">
-    <div class="brand">Geomora Workspace</div>
+    <div class="brand-block"><div class="brand">Geomora Workspace</div><div class="subtitle">Photo to editable SketchUp model</div></div>
+    <ol class="workflow-steps" aria-label="Reconstruction workflow">
+      <li class="active">1 Source</li><li>2 AI analysis</li><li>3 Review</li><li>4 Generate</li>
+    </ol>
     <div class="subtitle">v0.35.0 — Photo/Video Reconstruction</div>
     <div id="status" class="status">Ready</div>
   </header>
@@ -16,15 +26,18 @@
   <main class="layout">
     <aside class="panel sources">
       <h2>Sources</h2>
-      <button id="btn-pick-image" class="btn">Load Primary Image</button>
+      <div class="workflow-card">
+      <div class="workflow-card-label">Start here</div>
+      <button id="btn-pick-image" class="btn primary"><svg class="icon"><use href="#i-image"/></svg>Load facade photo</button>
       <button id="btn-pick-video" class="btn secondary">Load Video</button>
       <div id="video-frame-picker" class="video-frame-picker" hidden></div>
       <button id="btn-pick-secondary" class="btn secondary">Load Secondary Image</button>
       <button id="btn-register-views" class="btn secondary">Register Views</button>
       <button id="btn-fuse-views" class="btn secondary">Fuse Openings</button>
       <button id="btn-reset-corners" class="btn secondary">Reset Corners</button>
-      <button id="btn-rectify" class="btn">Rectify Facade</button>
-      <button id="btn-detect" class="btn">Detect Elements</button>
+      <button id="btn-rectify" class="btn"><svg class="icon"><use href="#i-tools"/></svg>Rectify perspective</button>
+      <button id="btn-detect" class="btn"><svg class="icon"><use href="#i-spark"/></svg>Analyze building</button>
+      </div>
       <div class="yolo-export-row">
         <button id="btn-export-yolo-labels" class="btn secondary" type="button">Export YOLO Labels</button>
         <select id="yolo-split" class="detect-method" aria-label="YOLO dataset split">
@@ -254,12 +267,17 @@
   </main>
 
   <footer class="actions">
-    <button id="btn-rationalize" class="btn">Rationalize</button>
-    <button id="btn-solve-constraints" class="btn">Solve Constraints</button>
-    <button id="btn-apply-pattern" class="btn">Apply Pattern</button>
-    <button id="btn-validate" class="btn">Validate</button>
-    <button id="btn-generate" class="btn primary">Generate</button>
-    <button id="btn-repair-geometry" class="btn secondary">Repair Geometry</button>
+    <details class="footer-tools">
+      <summary><svg class="icon"><use href="#i-tools"/></svg>Advanced geometry</summary>
+      <div class="footer-tools-menu">
+        <button id="btn-rationalize" class="btn">Rationalize</button>
+        <button id="btn-solve-constraints" class="btn">Solve Constraints</button>
+        <button id="btn-apply-pattern" class="btn">Apply Pattern</button>
+        <button id="btn-repair-geometry" class="btn secondary">Repair Geometry</button>
+      </div>
+    </details>
+    <button id="btn-validate" class="btn action-btn"><svg class="icon"><use href="#i-check"/></svg>Validate</button>
+    <button id="btn-generate" class="btn primary action-btn"><svg class="icon"><use href="#i-building"/></svg>Generate model</button>
   </footer>
 
   <script src="layout_editor.js"></script>

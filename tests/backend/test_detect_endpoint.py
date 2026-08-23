@@ -63,5 +63,8 @@ def test_reconstruct_endpoint_returns_evidence_understanding_and_ir(client: Test
     assert payload["photo_id"] == "workspace_test"
     assert payload["observation_graph"]["observations"]
     assert payload["understanding"]["opening_count"] >= 2
+    assert payload["understanding"]["storeys"]
+    assert payload["understanding"]["bays"]
+    assert payload["understanding"]["facade_bbox"]
     assert payload["architectural_ir"]["metric"]["facade_width_mm"] == 12000
     assert payload["status"] == "ready"

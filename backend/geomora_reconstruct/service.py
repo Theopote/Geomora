@@ -59,6 +59,14 @@ def reconstruct_facade(
             "storey_count": topology.get("storey_count", 0),
             "bay_count": topology.get("bay_count", 0),
             "opening_count": len(openings),
+            "facade_bbox": topology.get("facade_bbox"),
+            "storeys": topology.get("storeys") or [],
+            "bays": topology.get("bays") or [],
+            "uncertain_openings": [
+                {"id": item.get("id"), "bbox": item.get("bbox")}
+                for item in openings
+                if item.get("understanding_status") == "low_confidence"
+            ],
             "uncertainties": uncertainties,
         },
         "constraint_solution": solution or None,

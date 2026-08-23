@@ -47,6 +47,7 @@
     image: document.getElementById('reference-image'),
     overlaySvg: document.getElementById('detection-overlay'),
     cornerSvg: document.getElementById('corner-overlay'),
+    showAiGuides: document.getElementById('show-ai-guides'),
     cornerGuide: document.getElementById('corner-guide'),
     viewerToolbar: document.getElementById('viewer-toolbar'),
     btnDrawWindow: document.getElementById('btn-draw-window'),
@@ -792,6 +793,43 @@
     return markup;
   }
 
+  function renderUnderstandingMarkup() {
+    const understanding = state.understanding;
+    if (!understanding || (els.showAiGuides && !els.showAiGuides.checked)) return '';
+    const facade = understanding.facade_bbox || [0, 0, 1, 1];
+    const facadeBox = bboxPixelsFromNorm(facade);
+    let markup = '<g class="architecture-guide">' +
+      '<rect class="architecture-facade" x="' + facadeBox.x + '" y="' + facadeBox.y +
+      '" width="' + facadeBox.w + '" height="' + facadeBox.h + '" />';
+
+    (understanding.storeys || []).forEach(function (storey) {
+      const range = storey.y_range || [];
+      if (range.length !== 2) return;
+      const y = range[0] * imageDimensions().height;
+      const height = Math.max((range[1] - range[0]) * imageDimensions().height, 1);
+      markup += '<rect class="architecture-storey" x="' + facadeBox.x + '" y="' + y +
+        '" width="' + facadeBox.w + '" height="' + height + '" />' +
+        '<text class="architecture-label" x="' + (facadeBox.x + 5) + '" y="' + (y + 13) +
+        '">S' + storey.id + '</text>';
+    });
+
+    (understanding.bays || []).forEach(function (bay) {
+      const x = Number(bay.x_center) * imageDimensions().width;
+      markup += '<line class="architecture-bay" x1="' + x + '" y1="' + facadeBox.y +
+        '" x2="' + x + '" y2="' + (facadeBox.y + facadeBox.h) + '" />' +
+        '<text class="architecture-label bay-label" x="' + (x + 4) + '" y="' +
+        (facadeBox.y + facadeBox.h - 5) + '">B' + bay.id + '</text>';
+    });
+
+    (understanding.uncertain_openings || []).forEach(function (item) {
+      if (!item.bbox || item.bbox.length !== 4) return;
+      const box = bboxPixelsFromNorm(item.bbox);
+      markup += '<rect class="architecture-uncertain" x="' + box.x + '" y="' + box.y +
+        '" width="' + box.w + '" height="' + box.h + '" />';
+    });
+    return markup + '</g>';
+  }
+
   function renderDetectionOverlay() {
     const svg = els.overlaySvg;
     if (!overlayEditable()) {
@@ -817,6 +855,7 @@
 
     let markup =
       '<rect class="det-hitlayer" x="0" y="0" width="' + nw + '" height="' + nh + '" />';
+    markup += renderUnderstandingMarkup();
 
     state.windows.forEach(function (win, index) {
       const bbox = resolveWindowBbox(win);
@@ -2254,6 +2293,10 @@
   els.btnDrawWindow.addEventListener('click', function () {
     setDrawMode(!state.drawMode);
   });
+
+  if (els.showAiGuides) {
+    els.showAiGuides.addEventListener('change', scheduleOverlayRender);
+  }
 
   els.cornerSvg.addEventListener('mousedown', onCornerMouseDown);
   document.addEventListener('mousemove', onCornerMouseMove);

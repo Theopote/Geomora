@@ -155,6 +155,8 @@ def understanding_to_topology(result: UnderstandingResult) -> dict[str, Any]:
         "window_row_count": int(result.debug.get("window_row_count", 0)),
         "window_column_count": int(result.debug.get("window_column_count", 0)),
         "facade_bbox": result.facade_bbox,
+        "storeys": [storey.to_dict() for storey in result.storeys],
+        "bays": [bay.to_dict() for bay in result.bays],
         "pattern_groups": result.pattern_groups,
         "uncertainties": result.uncertainties,
     }

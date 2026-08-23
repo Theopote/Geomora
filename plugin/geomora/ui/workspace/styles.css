@@ -475,6 +475,49 @@ summary:focus-visible {
   cursor: pointer;
 }
 
+.architecture-guide {
+  pointer-events: none;
+}
+
+.architecture-facade {
+  fill: none;
+  stroke: rgba(138, 180, 248, .72);
+  stroke-width: 2;
+  stroke-dasharray: 9 5;
+}
+
+.architecture-storey {
+  fill: rgba(138, 180, 248, .035);
+  stroke: rgba(138, 180, 248, .48);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+
+.architecture-bay {
+  stroke: rgba(192, 132, 252, .62);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 5;
+}
+
+.architecture-label {
+  fill: #b9d2ff;
+  font: 700 12px "Segoe UI", Arial, sans-serif;
+  paint-order: stroke;
+  stroke: rgba(20, 22, 26, .9);
+  stroke-width: 3px;
+}
+
+.architecture-label.bay-label {
+  fill: #d8b4fe;
+}
+
+.architecture-uncertain {
+  fill: rgba(251, 188, 5, .08);
+  stroke: #fbbc05;
+  stroke-width: 2;
+  stroke-dasharray: 3 3;
+}
+
 .detection-overlay .det-box.door {
   fill: rgba(52, 168, 83, 0.12);
   stroke: #34a853;
@@ -544,6 +587,11 @@ summary:focus-visible {
   width: auto;
   margin: 0;
   padding: 6px 12px;
+}
+
+.viewer-guide-toggle {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .viewer-hint {

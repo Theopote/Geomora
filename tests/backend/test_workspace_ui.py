@@ -76,3 +76,7 @@ def test_analyze_building_uses_reconstruction_pipeline():
     assert "Architectural understanding" in script
     assert "add_action_callback('reconstruct')" in dialog
     assert "Perception::ReconstructionClient.reconstruct" in dialog
+    assert "renderUnderstandingMarkup" in script
+    assert "architecture-storey" in script
+    assert "architecture-bay" in script
+    assert 'id="show-ai-guides"' in (WORKSPACE / "index.html").read_text(encoding="utf-8")

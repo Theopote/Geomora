@@ -41,7 +41,8 @@
         <label>Provider<select name="vlm_provider"><option value="openai">OpenAI</option><option value="gemini">Google Gemini</option><option value="openai_compatible">Local / OpenAI compatible</option></select></label>
         <label>Model<input name="vlm_model" type="text" value="auto" maxlength="100" placeholder="auto"></label>
         <label>API key<input name="vlm_api_key" type="password" maxlength="500" autocomplete="new-password" placeholder="Leave blank to keep the current key"></label>
-        <label>Base URL<input name="vlm_base_url" type="url" maxlength="300" placeholder="e.g. http://127.0.0.1:1234/v1"></label>
+        <label>Endpoint preset<select id="vlm-endpoint-preset" aria-label="Endpoint preset"></select></label>
+        <label>Base URL<input name="vlm_base_url" type="url" maxlength="300" placeholder="Select a preset or enter a custom URL"></label>
         <div class="provider-status-grid"><div><span>OpenAI</span><strong id="openai-status">Checking…</strong></div><div><span>Gemini</span><strong id="gemini-status">Checking…</strong></div><div><span>Local</span><strong id="openai-compatible-status">Checking…</strong></div></div>
         <p class="settings-help">Keys entered here stay in backend memory only and are cleared when the service stops. Environment variables remain supported.</p>
       </section>

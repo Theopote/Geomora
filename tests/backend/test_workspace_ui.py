@@ -108,6 +108,7 @@ def test_workspace_has_safe_ai_settings_center():
     assert 'name="vlm_api_key"' in html
     assert 'value="openai_compatible"' in html
     assert 'name="vlm_base_url"' in html
+    assert 'id="vlm-endpoint-preset"' in html
     assert 'name="api_key"' not in html
     assert "setSettings: setSettings" in script
     assert "ai_settings: Object.assign({}, state.settings)" in script
@@ -115,6 +116,10 @@ def test_workspace_has_safe_ai_settings_center():
     assert "Continue with this one upload?" in script
     assert "cloud_upload_authorized: state.cloudUploadAuthorized" in script
     assert "!state.settings.cloud_upload_confirm" in script
+    assert "VLM_ENDPOINT_PRESETS" in script
+    assert "http://127.0.0.1:11434/v1" in script
+    assert "http://127.0.0.1:1234/v1" in script
+    assert "renderEndpointPresets" in script
     assert 'id="ai-evidence-review"' in html
     assert "function renderEvidenceReview()" in script
     assert "evidence_review: state.evidenceReview" in script

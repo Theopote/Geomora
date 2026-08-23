@@ -138,6 +138,43 @@
     return !!coordination && ['storey_count', 'bay_count'].some(function (key) { return coordination[key] && coordination[key].conflict; });
   }
 
+  const VLM_ENDPOINT_PRESETS = {
+    openai: [
+      { id: 'openai', label: 'OpenAI official', url: 'https://api.openai.com/v1' },
+      { id: 'custom', label: 'Custom endpoint', url: null }
+    ],
+    gemini: [
+      { id: 'gemini', label: 'Google managed endpoint', url: '' }
+    ],
+    openai_compatible: [
+      { id: 'ollama', label: 'Ollama', url: 'http://127.0.0.1:11434/v1' },
+      { id: 'lm_studio', label: 'LM Studio', url: 'http://127.0.0.1:1234/v1' },
+      { id: 'localai', label: 'LocalAI', url: 'http://127.0.0.1:8080/v1' },
+      { id: 'vllm', label: 'vLLM', url: 'http://127.0.0.1:8000/v1' },
+      { id: 'custom', label: 'Custom endpoint', url: null }
+    ]
+  };
+
+  function renderEndpointPresets(provider, currentUrl, preferDefault) {
+    const preset = document.getElementById('vlm-endpoint-preset');
+    const baseUrl = els.settingsForm.elements.namedItem('vlm_base_url');
+    const choices = VLM_ENDPOINT_PRESETS[provider] || VLM_ENDPOINT_PRESETS.openai_compatible;
+    preset.innerHTML = '';
+    choices.forEach(function (choice) {
+      const option = document.createElement('option');
+      option.value = choice.id;
+      option.textContent = choice.label;
+      preset.appendChild(option);
+    });
+    let selected = choices.find(function (choice) { return choice.url === currentUrl; });
+    if (!selected && currentUrl) selected = choices.find(function (choice) { return choice.id === 'custom'; });
+    if (!selected) selected = choices[0];
+    preset.value = selected.id;
+    if (preferDefault || !currentUrl) baseUrl.value = selected.url === null ? currentUrl || '' : selected.url;
+    baseUrl.disabled = provider === 'gemini';
+    baseUrl.readOnly = selected.url !== null && provider !== 'gemini';
+  }
+
   function setSettings(settings, capabilities) {
     state.settings = Object.assign({}, settings || {});
     state.settingsSnapshot = Object.assign({}, state.settings);
@@ -148,6 +185,7 @@
       if (input.type === 'checkbox') input.checked = !!state.settings[key];
       else input.value = state.settings[key];
     });
+    renderEndpointPresets(state.settings.vlm_provider || 'openai', state.settings.vlm_base_url || '', false);
     renderSettingsCapabilities();
     if (els.detectMethod && state.settings.detection_method) els.detectMethod.value = state.settings.detection_method;
     if (els.depthMethod && state.settings.depth_method) els.depthMethod.value = state.settings.depth_method;
@@ -2429,6 +2467,26 @@
   document.getElementById('btn-settings-cancel').addEventListener('click', function () { closeSettings(true); });
   els.settingsBackdrop.addEventListener('click', function () { closeSettings(true); });
   document.getElementById('btn-refresh-settings').addEventListener('click', function () { sketchupCall('refresh_settings_capabilities'); });
+  els.settingsForm.elements.namedItem('vlm_provider').addEventListener('change', function (event) {
+    renderEndpointPresets(event.target.value, '', true);
+  });
+  document.getElementById('vlm-endpoint-preset').addEventListener('change', function (event) {
+    const provider = els.settingsForm.elements.namedItem('vlm_provider').value;
+    const choice = (VLM_ENDPOINT_PRESETS[provider] || []).find(function (item) { return item.id === event.target.value; });
+    const baseUrl = els.settingsForm.elements.namedItem('vlm_base_url');
+    baseUrl.readOnly = !!choice && choice.url !== null;
+    if (choice && choice.url !== null) baseUrl.value = choice.url;
+    if (choice && choice.url === null) {
+      baseUrl.value = '';
+      baseUrl.focus();
+    }
+  });
+  els.settingsForm.elements.namedItem('vlm_base_url').addEventListener('input', function (event) {
+    const provider = els.settingsForm.elements.namedItem('vlm_provider').value;
+    const match = (VLM_ENDPOINT_PRESETS[provider] || []).find(function (item) { return item.url === event.target.value; });
+    const custom = (VLM_ENDPOINT_PRESETS[provider] || []).find(function (item) { return item.id === 'custom'; });
+    document.getElementById('vlm-endpoint-preset').value = match ? match.id : (custom ? custom.id : '');
+  });
   document.getElementById('btn-settings-save').addEventListener('click', function () {
     state.settings = settingsFormValue();
     sketchupCall('save_settings', JSON.stringify(state.settings));

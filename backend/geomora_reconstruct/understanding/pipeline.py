@@ -15,6 +15,7 @@ from .openings import (
     partition_openings,
 )
 from .patterns import infer_pattern_groups
+from .occlusions import infer_hidden_opening_hypotheses
 from .result import UnderstandingResult
 from .storeys import infer_storey_hypotheses
 
@@ -163,6 +164,20 @@ def understand_openings(
             elif item.get("bbox"):
                 item["storey"] = _nearest_storey(bbox_center(item["bbox"])[1], result.storeys)
 
+    if architectural_evidence is not None and architectural_evidence.occlusions:
+        result.hidden_opening_hypotheses = infer_hidden_opening_hypotheses(
+            enriched, architectural_evidence.occlusions,
+        )
+        result.debug["occlusion_awareness"] = {
+            "occlusion_count": len(architectural_evidence.occlusions),
+            "hidden_hypothesis_count": len(result.hidden_opening_hypotheses),
+            "geometry_policy": "review_only_not_exported",
+        }
+        if result.hidden_opening_hypotheses:
+            result.uncertainties.append(
+                f"hidden_opening_hypotheses_require_confirmation:{len(result.hidden_opening_hypotheses)}"
+            )
+
     return result, enriched
 
 
@@ -179,6 +194,8 @@ def understanding_to_topology(result: UnderstandingResult) -> dict[str, Any]:
         "pattern_groups": result.pattern_groups,
         "uncertainties": result.uncertainties,
         "storey_hypothesis": result.debug.get("storey_hypothesis", {}),
+        "hidden_opening_hypotheses": result.hidden_opening_hypotheses,
+        "occlusion_awareness": result.debug.get("occlusion_awareness", {}),
     }
     if "evidence_coordination" in result.debug:
         topology["evidence_coordination"] = result.debug["evidence_coordination"]

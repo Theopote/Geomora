@@ -46,6 +46,7 @@ class UnderstandingResult:
     storeys: list[StoreyBand] = field(default_factory=list)
     bays: list[BayColumn] = field(default_factory=list)
     pattern_groups: list[dict[str, Any]] = field(default_factory=list)
+    hidden_opening_hypotheses: list[dict[str, Any]] = field(default_factory=list)
     uncertainties: list[str] = field(default_factory=list)
     debug: dict[str, Any] = field(default_factory=dict)
 
@@ -56,6 +57,7 @@ class UnderstandingResult:
             "storeys": [storey.to_dict() for storey in self.storeys],
             "bays": [bay.to_dict() for bay in self.bays],
             "pattern_groups": self.pattern_groups,
+            "hidden_opening_hypotheses": self.hidden_opening_hypotheses,
             "uncertainties": self.uncertainties,
             "debug": self.debug,
         }

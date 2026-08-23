@@ -170,6 +170,8 @@ def reconstruct_facade(
             ],
             "uncertainties": uncertainties,
             "evidence_coordination": topology.get("evidence_coordination"),
+            "hidden_opening_hypotheses": topology.get("hidden_opening_hypotheses") or [],
+            "occlusion_awareness": topology.get("occlusion_awareness") or {},
         },
         "constraint_solution": solution or None,
         "prediction": prediction,

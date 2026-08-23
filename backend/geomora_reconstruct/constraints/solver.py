@@ -6,6 +6,7 @@ from statistics import mean
 from typing import Any, Callable
 
 SUPPORTED_TYPES = {"equal_width", "equal_height", "equal_spacing", "align", "vertical", "symmetry", "fixed_dimension"}
+SAFETY_SOFT_WEIGHT_SCALES = (1.0, 0.25, 0.05)
 
 
 def _width(item: dict[str, Any]) -> float:
@@ -125,6 +126,7 @@ def solve_opening_constraints(
     *,
     facade_bbox: list[float] | None = None,
     iterations: int = 8,
+    soft_weight_scale: float = 1.0,
 ) -> dict[str, Any]:
     solved = deepcopy(openings)
     by_id = {str(item["id"]): item for item in solved if item.get("id")}
@@ -141,7 +143,7 @@ def solve_opening_constraints(
         for item in ordered:
             confidence = max(0.0, min(1.0, float(item.get("confidence", 1.0))))
             weight = max(0.0, min(1.0, float(item.get("weight", confidence))))
-            alpha = 1.0 if item.get("priority") == "hard" else max(0.05, min(0.8, confidence * weight * 0.5))
+            alpha = 1.0 if item.get("priority") == "hard" else max(0.0, min(0.8, confidence * weight * 0.5 * soft_weight_scale))
             _project(item, targets_for(item), alpha, facade_center)
         for opening in solved:
             _clamp_bbox(opening, bounds)
@@ -176,6 +178,61 @@ def solve_opening_constraints(
         "mean_residual_before": round(mean(before.values()), 8) if before else 0.0,
         "mean_residual_after": round(mean(item["residual_after"] for item in reports), 8) if reports else 0.0,
         "hard_violations": hard_violations,
+        "soft_weight_scale": soft_weight_scale,
+    }
+
+
+def _overlaps(left: list[float], right: list[float]) -> bool:
+    return min(left[2], right[2]) > max(left[0], right[0]) and min(left[3], right[3]) > max(left[1], right[1])
+
+
+def _geometry_violations(openings: list[dict[str, Any]], bounds: list[float]) -> tuple[int, int]:
+    boxes = [[float(value) for value in item["bbox"]] for item in openings]
+    overlaps = sum(_overlaps(left, right) for index, left in enumerate(boxes) for right in boxes[index + 1 :])
+    fx1, fy1, fx2, fy2 = bounds
+    outside = sum(x1 < fx1 or y1 < fy1 or x2 > fx2 or y2 > fy2 or x2 <= x1 or y2 <= y1 for x1, y1, x2, y2 in boxes)
+    return overlaps, outside
+
+
+def _solution_safety(
+    original: list[dict[str, Any]],
+    solution: dict[str, Any],
+    bounds: list[float],
+    *,
+    mean_drift_max: float = 0.03,
+    coordinate_drift_max: float = 0.10,
+) -> dict[str, Any]:
+    solved = solution["openings"]
+    by_id = {str(item.get("id")): item for item in original}
+    deltas = [
+        abs(float(value) - float(observed))
+        for item in solved
+        if str(item.get("id")) in by_id
+        for value, observed in zip(item["bbox"], by_id[str(item.get("id"))]["bbox"])
+    ]
+    before_overlap, before_outside = _geometry_violations(original, bounds)
+    after_overlap, after_outside = _geometry_violations(solved, bounds)
+    mean_drift = mean(deltas) if deltas else 0.0
+    max_drift = max(deltas, default=0.0)
+    residual_safe = solution["mean_residual_after"] <= solution["mean_residual_before"] + 1e-9
+    reasons = []
+    if solution["hard_violations"]:
+        reasons.append("hard_constraint_violation")
+    if not residual_safe:
+        reasons.append("residual_regression")
+    if mean_drift > mean_drift_max or max_drift > coordinate_drift_max:
+        reasons.append("excessive_geometry_drift")
+    if after_overlap > before_overlap:
+        reasons.append("introduced_overlap")
+    if after_outside > before_outside:
+        reasons.append("introduced_boundary_violation")
+    return {
+        "safe": not reasons,
+        "reasons": reasons,
+        "mean_bbox_drift": round(mean_drift, 6),
+        "max_bbox_drift": round(max_drift, 6),
+        "introduced_overlaps": max(0, after_overlap - before_overlap),
+        "introduced_boundary_violations": max(0, after_outside - before_outside),
     }
 
 
@@ -185,7 +242,33 @@ def solve_prediction_constraints(prediction: dict[str, Any], *, iterations: int 
     if not constraints or not openings:
         return None
     topology = prediction.get("topology") or {}
-    solution = solve_opening_constraints(openings, constraints, facade_bbox=topology.get("facade_bbox"), iterations=iterations)
+    bounds = topology.get("facade_bbox") or [0.0, 0.0, 1.0, 1.0]
+    attempts = []
+    solution = None
+    for scale in SAFETY_SOFT_WEIGHT_SCALES:
+        candidate = solve_opening_constraints(openings, constraints, facade_bbox=bounds, iterations=iterations, soft_weight_scale=scale)
+        safety = _solution_safety(openings, candidate, bounds)
+        attempts.append({"soft_weight_scale": scale, **safety})
+        if safety["safe"]:
+            solution = candidate
+            break
+    if solution is None:
+        solution = solve_opening_constraints(openings, constraints, facade_bbox=bounds, iterations=iterations, soft_weight_scale=0.0)
+        solution["openings"] = deepcopy(openings)
+        for item in solution["openings"]:
+            item.setdefault("observed_bbox", list(item["bbox"]))
+        solution["mean_residual_after"] = solution["mean_residual_before"]
+        solution["hard_violations"] = []
+        for report in solution["constraints"]:
+            report["residual_after"] = report["residual_before"]
+            report["satisfied"] = report["residual_before"] <= (1e-6 if report["priority"] == "hard" else report["residual_before"] + 1e-9)
+            if report["priority"] == "hard" and not report["satisfied"]:
+                solution["hard_violations"].append(report["id"])
+        solution["safety_status"] = "fallback_observed_geometry"
+        solution["fallback_reasons"] = sorted({reason for attempt in attempts for reason in attempt["reasons"]})
+    else:
+        solution["safety_status"] = "accepted" if len(attempts) == 1 else "accepted_after_soft_weight_retry"
+    solution["safety_attempts"] = attempts
     prediction["openings"] = solution.pop("openings")
     prediction["constraint_solution"] = solution
     return solution

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 import pytest
 
 from geomora_reconstruct.constraints import solve_opening_constraints, solve_prediction_constraints
@@ -76,3 +78,45 @@ def test_user_metric_anchor_is_exported_as_hard_fixed_dimension():
     assert all(item["type"] == "fixed_dimension" for item in hard)
     assert hard[0]["source"] == "user_anchor"
     assert prediction["architectural_ir"]["metric"]["facade_width_mm"] == 12000
+
+
+def test_unsafe_hard_constraint_falls_back_to_observed_geometry():
+    openings = [
+        {"id": "w1", "type": "window", "bbox": [0.1, 0.2, 0.3, 0.4]},
+        {"id": "w2", "type": "window", "bbox": [0.7, 0.2, 0.9, 0.4]},
+    ]
+    prediction = {
+        "topology": {"facade_bbox": [0, 0, 1, 1]},
+        "openings": deepcopy(openings),
+        "constraint_suggestions": [
+            {"id": "unsafe", "type": "vertical", "targets": ["w1", "w2"], "priority": "hard", "status": "accepted"}
+        ],
+    }
+
+    solve_prediction_constraints(prediction)
+
+    assert [item["bbox"] for item in prediction["openings"]] == [item["bbox"] for item in openings]
+    assert prediction["constraint_solution"]["safety_status"] == "fallback_observed_geometry"
+    assert "introduced_overlap" in prediction["constraint_solution"]["fallback_reasons"]
+    assert len(prediction["constraint_solution"]["safety_attempts"]) == 3
+
+
+def test_excessive_soft_adjustment_is_retried_at_lower_weight():
+    prediction = {
+        "topology": {"facade_bbox": [0, 0, 1, 1]},
+        "openings": [
+            {"id": "w1", "type": "window", "bbox": [0.10, 0.2, 0.15, 0.4]},
+            {"id": "w2", "type": "window", "bbox": [0.55, 0.2, 0.90, 0.4]},
+        ],
+        "constraint_suggestions": [
+            {"id": "equal", "type": "equal_width", "targets": ["w1", "w2"], "priority": "soft", "confidence": 1.0, "weight": 1.0}
+        ],
+    }
+
+    solve_prediction_constraints(prediction)
+
+    solution = prediction["constraint_solution"]
+    assert solution["safety_status"] == "accepted_after_soft_weight_retry"
+    assert solution["soft_weight_scale"] == 0.25
+    assert solution["safety_attempts"][0]["reasons"] == ["excessive_geometry_drift"]
+    assert solution["safety_attempts"][1]["safe"] is True

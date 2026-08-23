@@ -43,3 +43,15 @@ def test_reconstruction_review_remains_accessible():
     assert 'id="btn-accept-observed"' in html
     assert 'id="btn-accept-adjusted"' in html
     assert 'id="btn-retry-constraints"' in html
+
+
+def test_workspace_empty_and_narrow_panel_states_do_not_overflow():
+    html = (WORKSPACE / "index.html").read_text(encoding="utf-8")
+    styles = (WORKSPACE / "styles.css").read_text(encoding="utf-8")
+
+    assert 'id="viewer-placeholder" class="placeholder empty-viewer"' in html
+    assert "[hidden]" in styles
+    assert "display: none !important;" in styles
+    assert "grid-template-columns: repeat(3, minmax(0, 1fr));" in styles
+    assert '.form .checkbox-label input[type="checkbox"]' in styles
+    assert "max-height: min(260px, calc(100vh - 150px));" in styles

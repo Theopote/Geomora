@@ -2,6 +2,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   font-family: "Segoe UI", Arial, sans-serif;
@@ -103,6 +107,12 @@ body {
   border-radius: 8px;
   padding: 12px;
   overflow: auto;
+}
+
+.sources,
+.elements,
+.inspector {
+  overflow-x: hidden;
 }
 
 .panel h2 {
@@ -553,6 +563,28 @@ summary:focus-visible {
   text-align: center;
 }
 
+.empty-viewer {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  color: #9aa0a6;
+}
+
+.empty-viewer .icon {
+  width: 28px;
+  height: 28px;
+  color: #6f8fc8;
+}
+
+.empty-viewer strong {
+  color: #c9cdd3;
+  font-size: 13px;
+}
+
+.empty-viewer span {
+  font-size: 11px;
+}
+
 .tree {
   list-style: none;
   padding-left: 0;
@@ -730,6 +762,8 @@ summary:focus-visible {
   border-radius: 8px;
   background: #202226;
   box-shadow: 0 8px 28px rgba(0, 0, 0, .38);
+  max-height: min(260px, calc(100vh - 150px));
+  overflow-y: auto;
 }
 
 .footer-tools-menu .btn {
@@ -896,9 +930,18 @@ summary:focus-visible {
 }
 
 .view-toggle {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
   margin: 8px 0;
+}
+
+.view-toggle .btn {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding-inline: 4px;
+  font-size: 12px;
 }
 
 .view-toggle .btn.active {
@@ -921,4 +964,11 @@ summary:focus-visible {
 
 .checkbox-label input {
   accent-color: #3367d6;
+}
+
+.form .checkbox-label input[type="checkbox"] {
+  width: auto;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
 }

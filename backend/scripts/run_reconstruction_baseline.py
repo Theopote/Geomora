@@ -68,7 +68,13 @@ def git_text(*args: str) -> str | None:
 
 def source_changes(out_dir: Path) -> list[str]:
     """Return dirty source inputs while excluding generated benchmark artifacts/caches."""
-    rows = (git_text("status", "--porcelain") or "").splitlines()
+    try:
+        rows = subprocess.run(
+            ["git", "status", "--porcelain"], cwd=REPO_ROOT, check=True,
+            capture_output=True, text=True,
+        ).stdout.splitlines()
+    except (OSError, subprocess.CalledProcessError):
+        rows = []
     try:
         out_prefix = out_dir.resolve().relative_to(REPO_ROOT).as_posix().rstrip("/") + "/"
     except ValueError:

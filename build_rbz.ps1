@@ -34,6 +34,12 @@ New-Item -ItemType Directory -Path $StagingDir | Out-Null
 Copy-Item (Join-Path $PluginDir "geomora.rb") $StagingDir
 Copy-Item (Join-Path $PluginDir "geomora") (Join-Path $StagingDir "geomora") -Recurse
 
+$LicensePath = Join-Path $Root "LICENSE"
+if (Test-Path $LicensePath) {
+    Copy-Item $LicensePath $StagingDir
+    Write-Host "[OK] Included LICENSE in package"
+}
+
 # Create RBZ (ZIP)
 New-Item -ItemType Directory -Path $DistDir -Force | Out-Null
 $ZipPath = Join-Path $DistDir "geomora.zip"

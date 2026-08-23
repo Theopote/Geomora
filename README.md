@@ -115,4 +115,8 @@ ruby tests/run_tests.rb
 
 ## License
 
-TBD
+This project is licensed under the [MIT License](LICENSE).
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, workflow, and pull request guidelines.

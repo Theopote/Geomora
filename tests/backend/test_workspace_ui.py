@@ -55,3 +55,13 @@ def test_workspace_empty_and_narrow_panel_states_do_not_overflow():
     assert "grid-template-columns: repeat(3, minmax(0, 1fr));" in styles
     assert '.form .checkbox-label input[type="checkbox"]' in styles
     assert "max-height: min(260px, calc(100vh - 150px));" in styles
+
+
+def test_workspace_uses_compact_tool_density():
+    styles = (WORKSPACE / "styles.css").read_text(encoding="utf-8")
+
+    assert "gap: 8px;\n  padding: 8px;" in styles
+    assert "min-height: 32px;" in styles
+    assert "padding: 7px 8px;" in styles
+    assert "margin-bottom: 7px;" in styles
+    assert "min-height: 48px;" in styles

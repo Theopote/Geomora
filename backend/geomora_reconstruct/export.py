@@ -38,6 +38,7 @@ def detection_to_prediction(
     metric: dict[str, Any] | None = None,
     metric_anchors: list[dict[str, Any]] | None = None,
     architectural_evidence: ArchitecturalEvidence | None = None,
+    storey_cues: list[dict[str, Any]] | None = None,
     rationalization_before: dict[str, float] | None = None,
     rationalization_after: dict[str, float] | None = None,
     sketchup: dict[str, bool] | None = None,
@@ -68,6 +69,7 @@ def detection_to_prediction(
             openings,
             facade_bounds=facade_bounds,
             architectural_evidence=architectural_evidence,
+            storey_cues=storey_cues,
         )
 
     geometry_payload = None

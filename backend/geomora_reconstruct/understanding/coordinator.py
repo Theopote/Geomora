@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from ..vlm_evidence import ArchitecturalEvidence
-from .result import UnderstandingResult
+from .result import StoreyBand, UnderstandingResult
 
 VLM_OVERRIDE_MIN = 0.85
 CV_WEAK_MAX = 0.55
@@ -103,6 +103,22 @@ def coordinate_architectural_evidence(
     }
     if result.facade_bbox is None and evidence.facade_bbox:
         result.facade_bbox = evidence.facade_bbox
+    if storey_decision.source == "vlm_high_confidence" and storey_decision.value != len(result.storeys):
+        bbox = result.facade_bbox or evidence.facade_bbox or [0.0, 0.0, 1.0, 1.0]
+        top, bottom = float(bbox[1]), float(bbox[3])
+        height = (bottom - top) / max(storey_decision.value, 1)
+        result.storeys = [
+            StoreyBand(
+                id=storey_id,
+                y_min=bottom - storey_id * height,
+                y_max=bottom - (storey_id - 1) * height,
+                confidence=storey_decision.confidence,
+                evidence=[{"type": "vlm_storey_count", "provider": evidence.provider, "model": evidence.model,
+                           "confidence": round(storey_decision.confidence, 4)}],
+                status="provisional",
+            )
+            for storey_id in range(1, storey_decision.value + 1)
+        ]
     for decision in (storey_decision, bay_decision):
         if decision.conflict:
             result.uncertainties.append(

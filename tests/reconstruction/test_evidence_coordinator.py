@@ -60,7 +60,9 @@ def test_sparse_openings_use_high_confidence_vlm_but_keep_uncertainty():
     assert topology["bay_count"] == 4
     assert topology["method"] == "understanding_v0.2_evidence"
     assert any("unobserved_structure" in item for item in topology["uncertainties"])
-    assert enriched[0]["storey"] == 1
+    assert enriched[0]["storey"] == 2
+    assert len(topology["storeys"]) == 3
+    assert all(item["status"] == "provisional" for item in topology["storeys"])
 
 
 def test_strong_cv_conflict_is_reported_without_vlm_override():
@@ -103,3 +105,4 @@ def test_zero_cv_detections_still_produce_uncertain_vlm_topology():
     assert payload["topology"]["bay_count"] == 5
     assert "no_openings" in payload["topology"]["uncertainties"]
     assert payload["openings"] == []
+    assert len(payload["topology"]["storeys"]) == 3

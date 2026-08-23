@@ -19,11 +19,13 @@ def infer_topology_from_openings(
     bay_tolerance: float = DEFAULT_BAY_TOLERANCE,
     facade_bounds: list[float] | None = None,
     architectural_evidence: ArchitecturalEvidence | None = None,
+    storey_cues: list[dict[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     del storey_tolerance, bay_tolerance  # adaptive tolerances in understanding_v0.1
     result, enriched = understand_openings(
         openings,
         facade_bounds=facade_bounds,
         architectural_evidence=architectural_evidence,
+        storey_cues=storey_cues,
     )
     return understanding_to_topology(result), enriched

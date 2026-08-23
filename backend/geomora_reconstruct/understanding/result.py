@@ -10,13 +10,19 @@ class StoreyBand:
     y_min: float
     y_max: float
     confidence: float
+    evidence: list[dict[str, Any]] = field(default_factory=list)
+    status: str = "observed"
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        payload = {
             "id": self.id,
             "y_range": [round(self.y_min, 4), round(self.y_max, 4)],
             "confidence": round(self.confidence, 4),
+            "status": self.status,
         }
+        if self.evidence:
+            payload["evidence"] = self.evidence
+        return payload
 
 
 @dataclass

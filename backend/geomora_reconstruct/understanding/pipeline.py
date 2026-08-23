@@ -16,7 +16,7 @@ from .openings import (
 )
 from .patterns import infer_pattern_groups
 from .result import UnderstandingResult
-from .storeys import infer_storey_bands
+from .storeys import infer_storey_hypotheses
 
 DOOR_FLOOR_Y_MIN = 0.72
 
@@ -38,6 +38,7 @@ def understand_openings(
     *,
     facade_bounds: list[float] | None = None,
     architectural_evidence: ArchitecturalEvidence | None = None,
+    storey_cues: list[dict[str, Any]] | None = None,
 ) -> tuple[UnderstandingResult, list[dict[str, Any]]]:
     result = UnderstandingResult()
     if not openings:
@@ -64,10 +65,21 @@ def understand_openings(
     result.debug["bay_tolerance"] = round(bay_tol, 4)
     result.debug["core_window_count"] = len(core_windows)
 
-    storeys, storey_labels = infer_storey_bands(core_windows, tolerance=storey_tol)
+    automatic_cues = list(storey_cues or [])
+    for index, opening in core_pairs:
+        if opening.get("type") == "door" and opening["bbox"][3] >= DOOR_FLOOR_Y_MIN:
+            automatic_cues.append({
+                "id": f"door_baseline:{opening.get('id', index)}", "type": "door_baseline",
+                "role": "door_baseline", "y": opening["bbox"][3],
+                "confidence": float(opening.get("confidence", 0.65)), "source": "opening_detection",
+            })
+    storeys, storey_labels, storey_audit = infer_storey_hypotheses(
+        core_windows, tolerance=storey_tol, facade_bbox=facade_bbox, cues=automatic_cues,
+    )
     bays, bay_labels = infer_bay_columns(core_windows, tolerance=bay_tol)
     result.storeys = storeys
     result.bays = bays
+    result.debug["storey_hypothesis"] = storey_audit
 
     core_window_index = 0
     core_window_map: dict[int, int] = {}
@@ -144,6 +156,13 @@ def understand_openings(
     if architectural_evidence is not None:
         coordinate_architectural_evidence(result, architectural_evidence)
 
+    if result.storeys:
+        for item in enriched:
+            if item.get("type") == "door" and item.get("bbox", [0, 0, 0, 0])[3] >= DOOR_FLOOR_Y_MIN:
+                item["storey"] = 1
+            elif item.get("bbox"):
+                item["storey"] = _nearest_storey(bbox_center(item["bbox"])[1], result.storeys)
+
     return result, enriched
 
 
@@ -159,6 +178,7 @@ def understanding_to_topology(result: UnderstandingResult) -> dict[str, Any]:
         "bays": [bay.to_dict() for bay in result.bays],
         "pattern_groups": result.pattern_groups,
         "uncertainties": result.uncertainties,
+        "storey_hypothesis": result.debug.get("storey_hypothesis", {}),
     }
     if "evidence_coordination" in result.debug:
         topology["evidence_coordination"] = result.debug["evidence_coordination"]

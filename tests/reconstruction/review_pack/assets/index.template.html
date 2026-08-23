@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Geomora GT Review Pack</title>
+  <link rel="stylesheet" href="assets/gt_review.css" />
+</head>
+<body>
+  <header>
+    <h1>Geomora · Ground Truth Review</h1>
+    <select id="photo-select" aria-label="Photo"></select>
+    <div class="toolbar">
+      <button type="button" data-tool="select" class="active" title="Select (V)">Select</button>
+      <button type="button" data-tool="draw-window" title="Draw window (W)">Draw Window</button>
+      <button type="button" data-tool="draw-door" title="Draw door (D)">Draw Door</button>
+      <button type="button" id="btn-select-facade">Facade</button>
+      <button type="button" id="btn-add-window">+ Window</button>
+      <button type="button" id="btn-add-door">+ Door</button>
+      <button type="button" id="btn-add-anchor">+ Anchor</button>
+      <button type="button" id="btn-delete">Delete</button>
+      <button type="button" id="btn-export" class="primary">Export JSON</button>
+      <button type="button" id="btn-export-all">Export All</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="stage-wrap">
+      <div id="photo-meta" class="hint" style="margin-bottom:8px"></div>
+      <div class="stage" id="stage">
+        <img id="photo-image" alt="facade" />
+        <svg id="overlay-svg"></svg>
+      </div>
+      <p class="hint" style="margin-top:12px">
+        Drag boxes to move · corner handles to resize · Draw Window/Door to click-drag new boxes.
+        Coordinates are facade-normalized [0,1]. Metric anchors need real survey mm values.
+      </p>
+    </section>
+
+    <aside class="panel">
+      <h2>Elements</h2>
+      <ul id="opening-list" class="opening-list"></ul>
+
+      <h2 style="margin-top:16px">Properties</h2>
+      <div class="field">
+        <label for="field-id">ID</label>
+        <input id="field-id" type="text" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="field-type">Type</label>
+          <select id="field-type">
+            <option value="window">window</option>
+            <option value="door">door</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="field-bbox">bbox x1,y1,x2,y2</label>
+          <input id="field-bbox" type="text" class="mono" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="field-storey">storey</label>
+          <input id="field-storey" type="number" min="1" />
+        </div>
+        <div class="field">
+          <label for="field-bay">bay</label>
+          <input id="field-bay" type="number" min="1" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="field-storey-count">storey_count</label>
+          <input id="field-storey-count" type="number" min="1" />
+        </div>
+        <div class="field">
+          <label for="field-bay-count">bay_count</label>
+          <input id="field-bay-count" type="number" min="1" />
+        </div>
+      </div>
+      <div id="anchor-panel" hidden>
+        <h2 style="margin-top:16px">Metric anchor</h2>
+        <div class="field">
+          <label for="field-anchor-distance">distance_mm (survey only)</label>
+          <input id="field-anchor-distance" type="number" min="0" step="1" placeholder="e.g. 12600" />
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="field-anchor-start">start x,y</label>
+            <input id="field-anchor-start" type="text" class="mono" />
+          </div>
+          <div class="field">
+            <label for="field-anchor-end">end x,y</label>
+            <input id="field-anchor-end" type="text" class="mono" />
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="field-notes">annotation_notes</label>
+        <textarea id="field-notes" rows="3"></textarea>
+      </div>
+      <button type="button" id="btn-apply" class="primary" style="width:100%;margin-top:8px">Apply edits</button>
+    </aside>
+  </main>
+
+  <footer>
+    <span id="status">Ready</span>
+    <span class="hint" style="margin-left:12px">
+      After export, save JSON files to <code>tests/reconstruction/review_pack/exports/</code>
+      then run <code>python backend/scripts/import_gt_review_pack.py</code>
+    </span>
+  </footer>
+
+  <script>window.PACK_DATA = __PACK_JSON__;</script>
+  <script src="assets/gt_review.js"></script>
+</body>
+</html>

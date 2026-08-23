@@ -19,6 +19,30 @@ Ground truth files are `draft_v1` and require a second human review before
 gate use. `metric_anchors` with `status: pending_survey` are placeholders —
 never infer millimetre truth from door-height priors.
 
+## GT review pack (editable bbox)
+
+Export the HTML annotator:
+
+```powershell
+cd backend
+.venv\Scripts\python scripts\export_gt_review_pack.py
+start ..\tests\reconstruction\review_pack\index.html
+```
+
+Workflow:
+
+1. Open `tests/reconstruction/review_pack/index.html` in a browser.
+2. Drag boxes / draw new window or door boxes / edit storey & bay in the panel.
+3. For photo_11 and photo_19, enter surveyed `distance_mm` on metric anchors.
+4. Click **Export All** and save JSON files to `review_pack/exports/`.
+5. Import back into ground truth:
+
+```powershell
+.venv\Scripts\python scripts\import_gt_review_pack.py
+```
+
+Imported files get `annotation_status: reviewed_v1` and `review_rounds` incremented.
+
 ## Annotation order
 
 1. opening bounding boxes and stable IDs;

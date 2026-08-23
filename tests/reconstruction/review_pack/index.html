@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Geomora GT Review Pack</title>
+  <link rel="stylesheet" href="assets/gt_review.css" />
+</head>
+<body>
+  <header>
+    <h1>Geomora · Ground Truth Review</h1>
+    <select id="photo-select" aria-label="Photo"></select>
+    <div class="toolbar">
+      <button type="button" data-tool="select" class="active" title="Select (V)">Select</button>
+      <button type="button" data-tool="draw-window" title="Draw window (W)">Draw Window</button>
+      <button type="button" data-tool="draw-door" title="Draw door (D)">Draw Door</button>
+      <button type="button" id="btn-select-facade">Facade</button>
+      <button type="button" id="btn-add-window">+ Window</button>
+      <button type="button" id="btn-add-door">+ Door</button>
+      <button type="button" id="btn-add-anchor">+ Anchor</button>
+      <button type="button" id="btn-delete">Delete</button>
+      <button type="button" id="btn-export" class="primary">Export JSON</button>
+      <button type="button" id="btn-export-all">Export All</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="stage-wrap">
+      <div id="photo-meta" class="hint" style="margin-bottom:8px"></div>
+      <div class="stage" id="stage">
+        <img id="photo-image" alt="facade" />
+        <svg id="overlay-svg"></svg>
+      </div>
+      <p class="hint" style="margin-top:12px">
+        Drag boxes to move · corner handles to resize · Draw Window/Door to click-drag new boxes.
+        Coordinates are facade-normalized [0,1]. Metric anchors need real survey mm values.
+      </p>
+    </section>
+
+    <aside class="panel">
+      <h2>Elements</h2>
+      <ul id="opening-list" class="opening-list"></ul>
+
+      <h2 style="margin-top:16px">Properties</h2>
+      <div class="field">
+        <label for="field-id">ID</label>
+        <input id="field-id" type="text" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="field-type">Type</label>
+          <select id="field-type">
+            <option value="window">window</option>
+            <option value="door">door</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="field-bbox">bbox x1,y1,x2,y2</label>
+          <input id="field-bbox" type="text" class="mono" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="field-storey">storey</label>
+          <input id="field-storey" type="number" min="1" />
+        </div>
+        <div class="field">
+          <label for="field-bay">bay</label>
+          <input id="field-bay" type="number" min="1" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="field-storey-count">storey_count</label>
+          <input id="field-storey-count" type="number" min="1" />
+        </div>
+        <div class="field">
+          <label for="field-bay-count">bay_count</label>
+          <input id="field-bay-count" type="number" min="1" />
+        </div>
+      </div>
+      <div id="anchor-panel" hidden>
+        <h2 style="margin-top:16px">Metric anchor</h2>
+        <div class="field">
+          <label for="field-anchor-distance">distance_mm (survey only)</label>
+          <input id="field-anchor-distance" type="number" min="0" step="1" placeholder="e.g. 12600" />
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="field-anchor-start">start x,y</label>
+            <input id="field-anchor-start" type="text" class="mono" />
+          </div>
+          <div class="field">
+            <label for="field-anchor-end">end x,y</label>
+            <input id="field-anchor-end" type="text" class="mono" />
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="field-notes">annotation_notes</label>
+        <textarea id="field-notes" rows="3"></textarea>
+      </div>
+      <button type="button" id="btn-apply" class="primary" style="width:100%;margin-top:8px">Apply edits</button>
+    </aside>
+  </main>
+
+  <footer>
+    <span id="status">Ready</span>
+    <span class="hint" style="margin-left:12px">
+      After export, save JSON files to <code>tests/reconstruction/review_pack/exports/</code>
+      then run <code>python backend/scripts/import_gt_review_pack.py</code>
+    </span>
+  </footer>
+
+  <script>window.PACK_DATA = {"version": "gt-review-pack-v1", "minimal_set": "minimal-v1", "metric_anchor_required": ["photo_11", "photo_19"], "photos": [{"id": "photo_01", "split": "train", "category": "residential", "image_rel": "images/photo_01.jpg", "ground_truth": {"schema_version": "reconstruction-metrics-v1", "photo_id": "photo_01", "annotation_status": "draft_v1", "review_rounds": 1, "facade_bbox": [0.1, 0.04, 0.9, 0.98], "facade": {"width": 1.0, "height": 1.0}, "topology": {"storey_count": 2, "bay_count": 2}, "openings": [{"id": "w21", "type": "window", "bbox": [0.36, 0.14, 0.64, 0.3], "storey": 2, "bay": 1}, {"id": "d11", "type": "door", "bbox": [0.14, 0.56, 0.44, 0.96], "storey": 1, "bay": 1}, {"id": "w11", "type": "window", "bbox": [0.56, 0.58, 0.82, 0.88], "storey": 1, "bay": 2}], "pattern_groups": [{"id": "upper_single_window", "members": ["w21"], "constraints": ["inside_facade"]}], "metric_anchors": [], "annotation_notes": "Draft from rectified image review. Second human pass required before gate use."}}, {"id": "photo_11", "split": "val", "category": "commercial", "image_rel": "images/photo_11.jpg", "ground_truth": {"schema_version": "reconstruction-metrics-v1", "photo_id": "photo_11", "annotation_status": "draft_v1", "review_rounds": 1, "facade_bbox": [0.02, 0.08, 0.98, 0.92], "facade": {"width": 1.0, "height": 1.0}, "topology": {"storey_count": 2, "bay_count": 5}, "openings": [{"id": "w21", "type": "window", "bbox": [0.06, 0.18, 0.18, 0.42], "storey": 2, "bay": 1}, {"id": "w22", "type": "window", "bbox": [0.22, 0.18, 0.34, 0.42], "storey": 2, "bay": 2}, {"id": "w23", "type": "window", "bbox": [0.38, 0.18, 0.5, 0.42], "storey": 2, "bay": 3}, {"id": "w24", "type": "window", "bbox": [0.54, 0.18, 0.66, 0.42], "storey": 2, "bay": 4}, {"id": "w25", "type": "window", "bbox": [0.7, 0.18, 0.82, 0.42], "storey": 2, "bay": 5}, {"id": "d11", "type": "door", "bbox": [0.48, 0.58, 0.58, 0.88], "storey": 1, "bay": 3}, {"id": "d12", "type": "door", "bbox": [0.86, 0.58, 0.96, 0.88], "storey": 1, "bay": 5}], "pattern_groups": [{"id": "upper_window_row", "members": ["w21", "w22", "w23", "w24", "w25"], "constraints": ["equal_width", "equal_height", "equal_sill", "equal_spacing", "horizontal_alignment"]}], "metric_anchors": [{"id": "anchor_facade_width", "type": "user_distance", "status": "pending_survey", "start": [0.05, 0.9], "end": [0.95, 0.9], "distance_mm": null, "notes": "Requires on-site tape or survey measurement. Do not infer from door height."}], "annotation_notes": "Upper row is primary detection target. Ground-floor glazing simplified to doors for v0.1."}}, {"id": "photo_16", "split": "holdout", "category": "strong_perspective", "image_rel": "images/photo_16.jpg", "ground_truth": {"schema_version": "reconstruction-metrics-v1", "photo_id": "photo_16", "annotation_status": "draft_v1", "review_rounds": 1, "facade_bbox": [0.08, 0.02, 0.92, 0.96], "facade": {"width": 1.0, "height": 1.0}, "topology": {"storey_count": 3, "bay_count": 2}, "openings": [{"id": "w31", "type": "window", "bbox": [0.12, 0.1, 0.38, 0.28], "storey": 3, "bay": 1}, {"id": "w32", "type": "window", "bbox": [0.62, 0.12, 0.82, 0.28], "storey": 3, "bay": 2}, {"id": "w21", "type": "window", "bbox": [0.12, 0.32, 0.38, 0.5], "storey": 2, "bay": 1}, {"id": "w22", "type": "window", "bbox": [0.62, 0.34, 0.82, 0.52], "storey": 2, "bay": 2}, {"id": "w11", "type": "window", "bbox": [0.12, 0.54, 0.38, 0.72], "storey": 1, "bay": 1}, {"id": "d11", "type": "door", "bbox": [0.62, 0.68, 0.82, 0.94], "storey": 1, "bay": 2}], "pattern_groups": [{"id": "left_column_stack", "members": ["w31", "w21", "w11"], "constraints": ["equal_width", "vertical_alignment"]}, {"id": "right_column_stack", "members": ["w32", "w22"], "constraints": ["equal_width", "vertical_alignment"]}], "metric_anchors": [], "annotation_notes": "Perspective + slope case. Side-facade openings excluded from v0.1 single-facade GT."}}, {"id": "photo_18", "split": "holdout", "category": "tree_occluded", "image_rel": "images/photo_18.jpg", "ground_truth": {"schema_version": "reconstruction-metrics-v1", "photo_id": "photo_18", "annotation_status": "draft_v1", "review_rounds": 1, "facade_bbox": [0.13, 0.03, 0.9, 0.88], "facade": {"width": 1.0, "height": 1.0}, "topology": {"storey_count": 2, "bay_count": 3}, "openings": [{"id": "w21", "type": "window", "bbox": [0.26, 0.22, 0.35, 0.44], "storey": 2, "bay": 1}, {"id": "w22", "type": "window", "bbox": [0.48, 0.22, 0.57, 0.44], "storey": 2, "bay": 2}, {"id": "w23", "type": "window", "bbox": [0.7, 0.22, 0.79, 0.44], "storey": 2, "bay": 3}, {"id": "d12", "type": "door", "bbox": [0.15, 0.58, 0.22, 0.86], "storey": 1, "bay": 1}, {"id": "w11", "type": "window", "bbox": [0.24, 0.54, 0.38, 0.86], "storey": 1, "bay": 1}, {"id": "d11", "type": "door", "bbox": [0.46, 0.58, 0.54, 0.86], "storey": 1, "bay": 2}, {"id": "w12", "type": "window", "bbox": [0.58, 0.54, 0.72, 0.86], "storey": 1, "bay": 2}, {"id": "w13", "type": "window", "bbox": [0.76, 0.54, 0.88, 0.86], "storey": 1, "bay": 3}], "pattern_groups": [{"id": "upper_window_row", "members": ["w21", "w22", "w23"], "constraints": ["equal_width", "equal_height", "equal_sill", "equal_spacing"]}], "metric_anchors": [], "annotation_notes": "Ground floor partially occluded by lamp/flowers. Lower openings are approximate."}}, {"id": "photo_19", "split": "holdout", "category": "old_building", "image_rel": "images/photo_19.jpg", "ground_truth": {"schema_version": "reconstruction-metrics-v1", "photo_id": "photo_19", "annotation_status": "draft_v1", "review_rounds": 1, "facade_bbox": [0.04, 0.02, 0.96, 0.96], "facade": {"width": 1.0, "height": 1.0}, "topology": {"storey_count": 2, "bay_count": 8}, "openings": [{"id": "w21", "type": "window", "bbox": [0.06, 0.14, 0.14, 0.34], "storey": 2, "bay": 1}, {"id": "w22", "type": "window", "bbox": [0.16, 0.14, 0.24, 0.34], "storey": 2, "bay": 2}, {"id": "w23", "type": "window", "bbox": [0.28, 0.14, 0.36, 0.34], "storey": 2, "bay": 3}, {"id": "w24", "type": "window", "bbox": [0.4, 0.14, 0.48, 0.34], "storey": 2, "bay": 4}, {"id": "w25", "type": "window", "bbox": [0.52, 0.14, 0.6, 0.34], "storey": 2, "bay": 5}, {"id": "w26", "type": "window", "bbox": [0.64, 0.14, 0.72, 0.34], "storey": 2, "bay": 6}, {"id": "w27", "type": "window", "bbox": [0.76, 0.14, 0.84, 0.34], "storey": 2, "bay": 7}, {"id": "w28", "type": "window", "bbox": [0.86, 0.14, 0.94, 0.34], "storey": 2, "bay": 8}, {"id": "w11", "type": "window", "bbox": [0.06, 0.52, 0.28, 0.88], "storey": 1, "bay": 1}, {"id": "d11", "type": "door", "bbox": [0.28, 0.62, 0.34, 0.88], "storey": 1, "bay": 1}, {"id": "w12", "type": "window", "bbox": [0.36, 0.52, 0.58, 0.88], "storey": 1, "bay": 2}, {"id": "d12", "type": "door", "bbox": [0.58, 0.62, 0.64, 0.88], "storey": 1, "bay": 2}, {"id": "w13", "type": "window", "bbox": [0.66, 0.52, 0.88, 0.88], "storey": 1, "bay": 3}, {"id": "d13", "type": "door", "bbox": [0.88, 0.62, 0.94, 0.88], "storey": 1, "bay": 3}], "pattern_groups": [{"id": "upper_window_row", "members": ["w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28"], "constraints": ["equal_width", "equal_height", "equal_sill", "equal_spacing"]}], "metric_anchors": [{"id": "anchor_facade_width", "type": "user_distance", "status": "pending_survey", "start": [0.06, 0.94], "end": [0.94, 0.94], "distance_mm": null, "notes": "Requires on-site measurement across full brick facade."}], "annotation_notes": "Irregular old commercial facade. Ground floor modeled as 3 shop bays."}}]};</script>
+  <script src="assets/gt_review.js"></script>
+</body>
+</html>

@@ -15,6 +15,7 @@ from .observations.models import ObservationKind
 from .observations.structural_lines import (
     detect_horizontal_structure_observations,
     horizontal_observations_to_storey_cues,
+    classify_horizontal_structure_roles,
 )
 from .prediction_enrichment import enrich_prediction
 from .vlm_evidence import provider_api_key, request_architectural_evidence
@@ -54,6 +55,15 @@ def reconstruct_facade(
         line_graph = detect_horizontal_structure_observations(
             image_path, photo_id=photo_id, facade_bbox=facade_bbox,
         )
+        detected_openings = [
+            {"type": element.type, "bbox": list(element.bbox_norm), "confidence": element.confidence}
+            for element in detection.elements
+        ]
+        role_counts = classify_horizontal_structure_roles(
+            line_graph.observations, openings=detected_openings, facade_bbox=facade_bbox,
+        )
+        line_graph.debug["role_counts"] = role_counts
+        line_graph.debug["semantic_classifier"] = "opening_context_v0.1"
         observation_graph.observations.extend(line_graph.observations)
         observation_graph.debug["horizontal_structure"] = line_graph.debug
         storey_cues = horizontal_observations_to_storey_cues(line_graph.observations)

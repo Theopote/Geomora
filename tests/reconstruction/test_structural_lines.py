@@ -5,9 +5,21 @@ import numpy as np
 
 from geomora_reconstruct.observations.models import ObservationKind
 from geomora_reconstruct.observations.structural_lines import (
+    classify_horizontal_structure_roles,
     detect_horizontal_structure_observations,
     horizontal_observations_to_storey_cues,
 )
+from geomora_reconstruct.observations.models import Observation, ObservationSource
+
+
+def _line(line_id, y, x1=0.05, x2=0.95, confidence=0.9):
+    return Observation(
+        id=line_id, kind=ObservationKind.HORIZONTAL_LINE,
+        geometry={"y": y, "x_range": [x1, x2]},
+        semantic_candidates={"horizontal_structure": confidence}, confidence=confidence,
+        sources=[ObservationSource("fixture", confidence)],
+        uncertainties=["architectural_role_unclassified"],
+    )
 
 
 def test_detects_and_clusters_long_horizontal_structure(tmp_path):
@@ -42,3 +54,43 @@ def test_line_observations_become_non_semantic_storey_cues(tmp_path):
     assert cues
     assert all(cue["role"] == "horizontal_structure" for cue in cues)
     assert all(cue["role"] != "floor_slab" for cue in cues)
+
+
+def test_line_between_two_stable_window_rows_is_floor_slab_candidate():
+    lines = [_line("between_rows", 0.49)]
+    openings = [
+        {"type": "window", "bbox": [0.1, 0.12, 0.25, 0.32]},
+        {"type": "window", "bbox": [0.55, 0.12, 0.7, 0.32]},
+        {"type": "window", "bbox": [0.1, 0.62, 0.25, 0.82]},
+        {"type": "window", "bbox": [0.55, 0.62, 0.7, 0.82]},
+    ]
+
+    counts = classify_horizontal_structure_roles(lines, openings=openings)
+
+    assert counts == {"floor_slab": 1}
+    assert max(lines[0].semantic_candidates, key=lines[0].semantic_candidates.get) == "floor_slab"
+    assert "architectural_role_inferred_from_opening_context" in lines[0].uncertainties
+
+
+def test_lone_row_cannot_promote_unrelated_line_to_floor_slab():
+    lines = [_line("unrelated", 0.65)]
+    openings = [
+        {"type": "window", "bbox": [0.1, 0.2, 0.25, 0.4]},
+        {"type": "window", "bbox": [0.55, 0.2, 0.7, 0.4]},
+    ]
+
+    classify_horizontal_structure_roles(lines, openings=openings)
+
+    assert "floor_slab" not in lines[0].semantic_candidates
+
+
+def test_repeated_window_edge_is_opening_alignment_not_slab():
+    lines = [_line("lintel", 0.2)]
+    openings = [
+        {"type": "window", "bbox": [0.1, 0.2, 0.25, 0.4]},
+        {"type": "window", "bbox": [0.55, 0.2, 0.7, 0.4]},
+    ]
+
+    classify_horizontal_structure_roles(lines, openings=openings)
+
+    assert max(lines[0].semantic_candidates, key=lines[0].semantic_candidates.get) == "opening_alignment"

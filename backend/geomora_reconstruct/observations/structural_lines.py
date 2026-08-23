@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 import math
+from collections import Counter
 
 import cv2
 
@@ -117,3 +118,76 @@ def horizontal_observations_to_storey_cues(observations: list[Observation]) -> l
                      "y": observation.geometry["y"], "confidence": observation.confidence,
                      "source": observation.sources[0].type if observation.sources else "observation_layer"})
     return cues
+
+
+def classify_horizontal_structure_roles(
+    observations: list[Observation],
+    *,
+    openings: list[dict[str, Any]],
+    facade_bbox: list[float] | None = None,
+) -> dict[str, int]:
+    """Attach conservative architectural roles using opening-layout context.
+
+    This classifier only emits ``floor_slab`` when a long line lies in the
+    clear gap between two window rows. It therefore cannot turn a lone cornice
+    or window lintel into a new storey boundary.
+    """
+    windows = [item for item in openings if item.get("type") == "window" and len(item.get("bbox", [])) >= 4]
+    facade = facade_bbox or [0.0, 0.0, 1.0, 1.0]
+    facade_width = max(float(facade[2]) - float(facade[0]), 1e-6)
+
+    rows: list[list[dict[str, Any]]] = []
+    for window in sorted(windows, key=lambda item: (item["bbox"][1] + item["bbox"][3]) / 2.0):
+        center = (window["bbox"][1] + window["bbox"][3]) / 2.0
+        if not rows:
+            rows.append([window])
+            continue
+        previous_center = sum((item["bbox"][1] + item["bbox"][3]) / 2.0 for item in rows[-1]) / len(rows[-1])
+        if abs(center - previous_center) <= 0.08:
+            rows[-1].append(window)
+        else:
+            rows.append([window])
+    stable_rows = [row for row in rows if len(row) >= 2]
+
+    role_counts: Counter[str] = Counter()
+    for observation in observations:
+        if observation.kind != ObservationKind.HORIZONTAL_LINE:
+            continue
+        y = float(observation.geometry.get("y", -1.0))
+        x_range = observation.geometry.get("x_range") or [0.0, 0.0]
+        coverage = max(0.0, float(x_range[1]) - float(x_range[0])) / facade_width
+        role = "horizontal_structure"
+        semantic_confidence = observation.confidence * 0.55
+
+        # A slab candidate needs two independently stable opening rows and a
+        # line in their empty inter-storey zone, not merely near an opening edge.
+        for upper, lower in zip(stable_rows[:-1], stable_rows[1:]):
+            upper_bottom = max(float(item["bbox"][3]) for item in upper)
+            lower_top = min(float(item["bbox"][1]) for item in lower)
+            margin = min(0.025, max(0.008, (lower_top - upper_bottom) * 0.12))
+            if coverage >= 0.55 and upper_bottom + margin <= y <= lower_top - margin:
+                role = "floor_slab"
+                semantic_confidence = min(0.94, observation.confidence * (0.72 + 0.22 * min(coverage, 1.0)))
+                break
+
+        if role == "horizontal_structure" and windows:
+            top_hits = sum(abs(y - float(item["bbox"][1])) <= 0.015 for item in windows)
+            bottom_hits = sum(abs(y - float(item["bbox"][3])) <= 0.015 for item in windows)
+            if max(top_hits, bottom_hits) >= 2:
+                role = "opening_alignment"
+                semantic_confidence = min(0.9, observation.confidence * 0.82)
+            else:
+                topmost = min(float(item["bbox"][1]) for item in windows)
+                if coverage >= 0.65 and float(facade[1]) <= y < topmost - 0.018:
+                    role = "cornice"
+                    semantic_confidence = min(0.88, observation.confidence * 0.78)
+
+        observation.semantic_candidates = {
+            role: round(semantic_confidence, 4),
+            "horizontal_structure": round(max(0.05, observation.confidence * 0.35), 4),
+        }
+        if role != "horizontal_structure":
+            observation.uncertainties = [item for item in observation.uncertainties if item != "architectural_role_unclassified"]
+            observation.uncertainties.append("architectural_role_inferred_from_opening_context")
+        role_counts[role] += 1
+    return dict(sorted(role_counts.items()))

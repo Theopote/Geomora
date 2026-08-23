@@ -18,6 +18,7 @@ from .vlm_adapter import vlm_evidence_to_observations
 from .structural_lines import (
     detect_horizontal_structure_observations,
     horizontal_observations_to_storey_cues,
+    classify_horizontal_structure_roles,
 )
 
 __all__ = [
@@ -34,4 +35,5 @@ __all__ = [
     "vlm_evidence_to_observations",
     "detect_horizontal_structure_observations",
     "horizontal_observations_to_storey_cues",
+    "classify_horizontal_structure_roles",
 ]

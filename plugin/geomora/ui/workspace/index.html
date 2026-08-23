@@ -19,7 +19,6 @@
     <ol class="workflow-steps" aria-label="Reconstruction workflow">
       <li class="active">1 Source</li><li>2 AI analysis</li><li>3 Review</li><li>4 Generate</li>
     </ol>
-    <div class="subtitle">v0.35.0 — Photo/Video Reconstruction</div>
     <div id="status" class="status">Ready</div>
   </header>
 
@@ -29,15 +28,20 @@
       <div class="workflow-card">
       <div class="workflow-card-label">Start here</div>
       <button id="btn-pick-image" class="btn primary"><svg class="icon"><use href="#i-image"/></svg>Load facade photo</button>
+      <details class="tool-group">
+      <summary>Additional sources</summary>
       <button id="btn-pick-video" class="btn secondary">Load Video</button>
       <div id="video-frame-picker" class="video-frame-picker" hidden></div>
       <button id="btn-pick-secondary" class="btn secondary">Load Secondary Image</button>
       <button id="btn-register-views" class="btn secondary">Register Views</button>
       <button id="btn-fuse-views" class="btn secondary">Fuse Openings</button>
       <button id="btn-reset-corners" class="btn secondary">Reset Corners</button>
+      </details>
       <button id="btn-rectify" class="btn"><svg class="icon"><use href="#i-tools"/></svg>Rectify perspective</button>
       <button id="btn-detect" class="btn"><svg class="icon"><use href="#i-spark"/></svg>Analyze building</button>
       </div>
+      <details class="tool-group">
+      <summary>Detection settings</summary>
       <div class="yolo-export-row">
         <button id="btn-export-yolo-labels" class="btn secondary" type="button">Export YOLO Labels</button>
         <select id="yolo-split" class="detect-method" aria-label="YOLO dataset split">
@@ -71,6 +75,7 @@
         <option value="gradient_laplacian_v1">Gradient proxy</option>
       </select>
       <button id="btn-load-template" class="btn secondary">Load Phase 0 Template</button>
+      </details>
       <div class="view-toggle">
         <button id="btn-view-original" class="btn secondary active" type="button">Original</button>
         <button id="btn-view-rectified" class="btn secondary" type="button">Rectified</button>

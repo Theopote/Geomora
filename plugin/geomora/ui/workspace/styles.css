@@ -16,10 +16,31 @@ body {
   padding: 12px 16px;
   background: #111214;
   border-bottom: 1px solid #2d2f34;
+  min-height: 58px;
+}
+
+.icon-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 7px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: -3px;
 }
 
 .brand {
   font-weight: 700;
+  font-size: 15px;
 }
 
 .subtitle {
@@ -31,11 +52,46 @@ body {
   margin-left: auto;
   font-size: 12px;
   color: #8ab4f8;
+  max-width: 290px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #1b2738;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.workflow-steps {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 0 18px;
+  padding: 0;
+  list-style: none;
+  color: #777d86;
+  font-size: 11px;
+}
+
+.workflow-steps li {
+  padding: 5px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.workflow-steps li.active {
+  color: #dbe8ff;
+  background: #243b63;
+}
+
+.workflow-steps li.complete {
+  color: #9bd5b0;
+}
+
+.workflow-steps li.complete::before {
+  content: "✓ ";
 }
 
 .layout {
   display: grid;
-  grid-template-columns: 220px 1.4fr 260px 320px;
+  grid-template-columns: 210px minmax(320px, 1.5fr) 230px 310px;
   gap: 12px;
   padding: 12px;
   height: calc(100vh - 110px);
@@ -67,15 +123,66 @@ body {
   background: #31343a;
   color: #fff;
   cursor: pointer;
+  min-height: 36px;
+  font-weight: 600;
+  transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
 }
 
 .btn:hover {
   background: #3a3e45;
+  border-color: #69707c;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:focus-visible,
+.btn-link:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #8ab4f8;
+  outline-offset: 2px;
 }
 
 .btn.primary {
   background: #3367d6;
   border-color: #3367d6;
+}
+
+.workflow-card {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #3d4654;
+  border-radius: 8px;
+  background: #20242a;
+}
+
+.workflow-card-label {
+  margin-bottom: 8px;
+  color: #8ab4f8;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.tool-group {
+  margin: 8px 0;
+  border-top: 1px solid #343941;
+}
+
+.tool-group summary,
+.footer-tools summary {
+  padding: 9px 2px;
+  color: #b8bec8;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tool-group[open] summary {
+  margin-bottom: 6px;
+  color: #dce6f5;
 }
 
 .btn.secondary {
@@ -478,6 +585,50 @@ body {
   padding: 12px 16px;
   border-top: 1px solid #2d2f34;
   background: #111214;
+  position: relative;
+  min-height: 58px;
+}
+
+.actions .btn {
+  width: auto;
+  min-width: 112px;
+  margin: 0;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-tools {
+  margin-right: auto;
+  position: relative;
+}
+
+.footer-tools summary {
+  list-style: none;
+  padding: 9px 12px;
+  border: 1px solid #3c4048;
+  border-radius: 6px;
+}
+
+.footer-tools-menu {
+  position: absolute;
+  left: 0;
+  bottom: 46px;
+  z-index: 20;
+  width: 210px;
+  padding: 8px;
+  border: 1px solid #454a54;
+  border-radius: 8px;
+  background: #202226;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .38);
+}
+
+.footer-tools-menu .btn {
+  width: 100%;
+  margin-bottom: 6px;
 }
 
 .status.error {
@@ -493,7 +644,9 @@ body {
   padding: 10px;
   border: 1px solid #b7791f;
   border-radius: 6px;
-  background: #fffaf0;
+  background: #3a2d17;
+  color: #ffe3a3;
+  box-shadow: inset 3px 0 0 #f5a623;
 }
 
 .window-row-header {

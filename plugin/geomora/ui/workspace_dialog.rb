@@ -465,6 +465,7 @@ module Geomora
             ir = Core::Project.build_manual_facade(params)
             Core::Project.generate_from_data(ir)
             post_message(dialog, 'success', 'Generation complete.')
+            dialog.execute_script('window.geomora.setWorkflowStage(3)')
             dialog.execute_script("window.geomora.setIrPreview(#{ir.to_json})")
           rescue GeomoraError => e
             post_message(dialog, 'error', e.message)

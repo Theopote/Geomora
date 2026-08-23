@@ -244,6 +244,13 @@
     els.status.className = 'status ' + (level || '');
   }
 
+  function setWorkflowStage(stage) {
+    document.querySelectorAll('.workflow-steps li').forEach(function (step, index) {
+      step.classList.toggle('active', index === stage);
+      step.classList.toggle('complete', index < stage);
+    });
+  }
+
   function clearSelection() {
     state.selectedWindowIndex = null;
     state.selectedDoor = false;
@@ -1398,6 +1405,7 @@
   }
 
   function setImage(fileUrl, sourcePath, sourceKind) {
+    setWorkflowStage(0);
     state.sourcePath = sourcePath;
     state.sourceId = sourcePath ? 'photo_001' : null;
     state.originalImageUrl = fileUrl;
@@ -1516,6 +1524,7 @@
   }
 
   function applyDetection(payload, overlayUrl) {
+    setWorkflowStage(2);
     if (payload.scale_hint) {
       els.form.elements.namedItem('wall_length').value = payload.scale_hint.wall_length_mm;
       els.form.elements.namedItem('wall_height').value = payload.scale_hint.wall_height_mm;
@@ -1747,7 +1756,8 @@
     setDetectionMeta: setDetectionMeta,
     onDetectionEmpty: onDetectionEmpty,
     setIrPreview: setIrPreview,
-    setStatus: setStatus
+    setStatus: setStatus,
+    setWorkflowStage: setWorkflowStage
   };
 
   window.geomoraLayoutBootstrap = {
@@ -1926,6 +1936,7 @@
   });
 
   document.getElementById('btn-detect').addEventListener('click', function () {
+    setWorkflowStage(1);
     if (!state.rectifiedImageUrl) {
       setStatus(
         'error',

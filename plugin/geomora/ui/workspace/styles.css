@@ -11,6 +11,12 @@ body {
   font-family: "Segoe UI", Arial, sans-serif;
   background: #1e1f22;
   color: #ececec;
+  --control-min-height: 26px;
+  --control-pad-y: 4px;
+  --control-pad-x: 6px;
+  --icon-button-size: 27px;
+  --input-pad-y: 4px;
+  --input-pad-x: 6px;
 }
 
 .topbar {
@@ -67,9 +73,9 @@ body {
 .icon-button {
   display: grid;
   place-items: center;
-  flex: 0 0 34px;
-  width: 34px;
-  height: 34px;
+  flex: 0 0 var(--icon-button-size);
+  width: var(--icon-button-size);
+  height: var(--icon-button-size);
   padding: 0;
   border: 1px solid #3b3f47;
   border-radius: 7px;
@@ -90,7 +96,17 @@ body {
 .settings-section { padding: 10px 0 12px; border-bottom: 1px solid #35383e; }
 .settings-section h3 { margin: 0 0 9px; font-size: 13px; color: #d7dbe2; }
 .settings-section > label:not(.checkbox-label) { display: grid; grid-template-columns: 125px 1fr; gap: 10px; align-items: center; margin: 7px 0; color: #bfc4cc; font-size: 12px; }
-.settings-section select, .settings-section input[type="text"] { width: 100%; padding: 7px 8px; border: 1px solid #454a54; border-radius: 6px; background: #17191c; color: #f1f3f4; }
+.settings-section select,
+.settings-section input[type="text"],
+.settings-section input[type="password"],
+.settings-section input[type="url"] {
+  width: 100%;
+  padding: var(--input-pad-y) var(--input-pad-x);
+  border: 1px solid #454a54;
+  border-radius: 6px;
+  background: #17191c;
+  color: #f1f3f4;
+}
 .settings-help { margin: 7px 0 0; color: #9299a4; font-size: 11px; line-height: 1.45; }
 .provider-status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 9px; }
 .provider-status-grid > div { display: flex; justify-content: space-between; padding: 8px; border-radius: 6px; background: #191b1f; font-size: 11px; }
@@ -168,7 +184,7 @@ body {
 .inspector-search input {
   width: 100%;
   margin-top: 3px;
-  padding: 6px 8px;
+  padding: var(--input-pad-y) var(--input-pad-x);
   border: 1px solid #41454e;
   border-radius: 6px;
   background: #1d1f23;
@@ -244,15 +260,16 @@ body {
 .btn {
   display: block;
   width: 100%;
-  margin-bottom: 6px;
-  padding: 6px 8px;
+  margin-bottom: 5px;
+  padding: var(--control-pad-y) var(--control-pad-x);
   border: 1px solid #4a4d55;
   border-radius: 6px;
   background: #31343a;
   color: #fff;
   cursor: pointer;
-  min-height: 32px;
+  min-height: var(--control-min-height);
   font-weight: 600;
+  line-height: 1.2;
   transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
 }
 
@@ -334,12 +351,12 @@ summary:focus-visible {
   width: 100%;
   margin-top: 4px;
   margin-bottom: 6px;
-  padding: 6px 8px;
+  padding: var(--input-pad-y) var(--input-pad-x);
   border-radius: 6px;
   border: 1px solid #3c4043;
   background: #2d2f34;
   color: #ececec;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .yolo-export-row {
@@ -661,7 +678,7 @@ summary:focus-visible {
 .viewer-toolbar .btn {
   width: auto;
   margin: 0;
-  padding: 6px 12px;
+  padding: var(--control-pad-y) 10px;
 }
 
 .viewer-guide-toggle {
@@ -687,8 +704,8 @@ summary:focus-visible {
 }
 
 .uncertainty-review .btn {
-  min-height: 28px;
-  padding: 4px 8px;
+  min-height: 22px;
+  padding: 3px 6px;
 }
 
 .viewer-hint {
@@ -802,14 +819,17 @@ summary:focus-visible {
   color: #c4c7cc;
 }
 
-.form input {
+.form input,
+.form select {
   width: 100%;
   margin-top: 3px;
-  padding: 5px 7px;
+  padding: var(--input-pad-y) var(--input-pad-x);
   border: 1px solid #444851;
   border-radius: 4px;
   background: #151619;
   color: #fff;
+  font-size: 12px;
+  line-height: 1.2;
 }
 
 .section-title {
@@ -865,11 +885,11 @@ summary:focus-visible {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 6px 12px;
   border-top: 1px solid #2d2f34;
   background: #111214;
   position: relative;
-  min-height: 48px;
+  min-height: 40px;
 }
 
 .actions .btn {
@@ -891,7 +911,7 @@ summary:focus-visible {
 
 .footer-tools summary {
   list-style: none;
-  padding: 7px 10px;
+  padding: 5px 8px;
   border: 1px solid #3c4048;
   border-radius: 6px;
 }
@@ -1022,8 +1042,8 @@ summary:focus-visible {
   background: #303134;
   color: #e8eaed;
   border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 11px;
+  padding: 3px 8px;
+  font-size: 10px;
   cursor: grab;
 }
 
@@ -1063,6 +1083,7 @@ summary:focus-visible {
 
 .layout-item-size input {
   width: 72px;
+  padding: var(--input-pad-y) var(--input-pad-x);
 }
 
 .layout-item-size-label {

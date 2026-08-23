@@ -81,6 +81,7 @@
                 "properties": {
                   "decision": { "type": "string", "enum": ["accepted_ai", "manual_edit", "ignored"] },
                   "opening_id": { "type": "string" },
+                  "model_opening_index": { "type": ["integer", "null"], "minimum": 0 },
                   "reviewer": { "type": "string" },
                   "reviewed_at": { "type": "string" }
                 }

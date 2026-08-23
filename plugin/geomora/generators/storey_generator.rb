@@ -237,15 +237,34 @@ module Geomora
         @opening_gen.cut_openings(wall_group, wall, openings, storey.elevation)
 
         openings.each do |opening|
+          evidence = opening_evidence(opening, document)
           case opening.type
           when 'window'
-            @window_gen.generate(opening, wall, storey.elevation, storey_group.entities)
+            @window_gen.generate(opening, wall, storey.elevation, storey_group.entities, evidence: evidence)
           when 'door'
-            @door_gen.generate(opening, wall, storey.elevation, storey_group.entities)
+            @door_gen.generate(opening, wall, storey.elevation, storey_group.entities, evidence: evidence)
           end
         end
 
         wall_group
+      end
+
+      def opening_evidence(opening, document)
+        source = opening.source.is_a?(Hash) ? opening.source : {}
+        review = document.reconstruction.is_a?(Hash) ? document.reconstruction['uncertainty_review'] : nil
+        decisions = review.is_a?(Hash) ? (review['decisions'] || []) : []
+        decision = decisions.find do |item|
+          item.is_a?(Hash) && !item['model_opening_index'].nil? && !source['opening_index'].nil? &&
+            item['model_opening_index'].to_i == source['opening_index'].to_i
+        end
+        {
+          source: source['type'] || opening.source || 'unknown',
+          confidence: opening.confidence,
+          decision: decision && decision['decision'],
+          evidence_opening_id: decision && decision['opening_id'],
+          reviewer: decision && decision['reviewer'],
+          reviewed_at: decision && decision['reviewed_at']
+        }
       end
     end
   end

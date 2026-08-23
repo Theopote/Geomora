@@ -331,7 +331,9 @@ class IRBuilderTest < Minitest::Test
   def test_preserves_uncertainty_decisions_and_summary
     params = {
       'wall_length' => 10_000, 'wall_height' => 3300, 'wall_thickness' => 240,
-      'windows' => [], 'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 },
+      'windows' => [{ 'offset' => 1000, 'width' => 1200, 'height' => 1500, 'sill_height' => 900 }],
+      'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 },
+      'detection' => { 'method' => 'auto_fusion_v1' },
       'uncertainty_decisions' => {
         '0' => { 'decision' => 'accepted_ai', 'opening_id' => 'pred_001', 'reviewed_at' => '2026-08-23T12:00:00Z' },
         '1' => { 'decision' => 'manual_edit', 'opening_id' => 'pred_002', 'reviewed_at' => '2026-08-23T12:01:00Z' }
@@ -344,5 +346,7 @@ class IRBuilderTest < Minitest::Test
     assert_equal 2, review['decisions'].length
     assert_equal 1, review.dig('summary', 'accepted_ai')
     assert_equal 1, review.dig('summary', 'manual_edit')
+    assert_equal 'auto_fusion_v1', ir.dig('openings', 0, 'source', 'type')
+    assert_equal 0, ir.dig('openings', 0, 'source', 'opening_index')
   end
 end

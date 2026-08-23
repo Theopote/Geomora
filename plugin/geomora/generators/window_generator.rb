@@ -18,7 +18,7 @@ module Geomora
         @lod_level = lod_level
       end
 
-      def generate(window, wall, storey_elevation, parent_entities)
+      def generate(window, wall, storey_elevation, parent_entities, evidence: {})
         definition_id = window.component&.fetch('definition_id', nil) ||
                         "window_#{window.width.to_i}"
 
@@ -34,8 +34,14 @@ module Geomora
           entity_id: window.id,
           entity_type: window.type,
           schema_version: @schema_version,
-          project_id: @project_id
-        })
+          project_id: @project_id,
+          ai_source: evidence[:source],
+          ai_confidence: evidence[:confidence],
+          review_decision: evidence[:decision],
+          evidence_opening_id: evidence[:evidence_opening_id],
+          reviewed_by: evidence[:reviewer],
+          reviewed_at: evidence[:reviewed_at]
+        }.compact)
 
         @tags.apply(instance, 'Geomora_Windows')
         instance

@@ -15,7 +15,7 @@ module Geomora
         @schema_version = schema_version
       end
 
-      def generate(door, wall, storey_elevation, parent_entities)
+      def generate(door, wall, storey_elevation, parent_entities, evidence: {})
         definition_id = door.component&.fetch('definition_id', nil) ||
                         "door_#{door.width.to_i}"
 
@@ -31,8 +31,14 @@ module Geomora
           entity_id: door.id,
           entity_type: door.type,
           schema_version: @schema_version,
-          project_id: @project_id
-        })
+          project_id: @project_id,
+          ai_source: evidence[:source],
+          ai_confidence: evidence[:confidence],
+          review_decision: evidence[:decision],
+          evidence_opening_id: evidence[:evidence_opening_id],
+          reviewed_by: evidence[:reviewer],
+          reviewed_at: evidence[:reviewed_at]
+        }.compact)
 
         @tags.apply(instance, 'Geomora_Doors')
         instance

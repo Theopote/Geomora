@@ -52,6 +52,7 @@
     showAiGuides: document.getElementById('show-ai-guides'),
     uncertaintyReview: document.getElementById('uncertainty-review'),
     uncertaintyReviewLabel: document.getElementById('uncertainty-review-label'),
+    openingEvidence: document.getElementById('opening-evidence'),
     cornerGuide: document.getElementById('corner-guide'),
     viewerToolbar: document.getElementById('viewer-toolbar'),
     btnDrawWindow: document.getElementById('btn-draw-window'),
@@ -343,8 +344,30 @@
       row.classList.toggle('selected', state.selectedWindowIndex === index);
     });
     const hasSelection = state.selectedDoor || state.selectedWindowIndex !== null;
+    renderOpeningEvidence();
     els.btnDeleteSelected.disabled = !hasSelection;
     renderDetectionOverlay();
+  }
+
+  function renderOpeningEvidence() {
+    if (!els.openingEvidence) return;
+    const index = state.selectedWindowIndex;
+    const selected = state.selectedDoor ? { confidence: state.doorConfidence } :
+      (index == null ? null : state.windows[index]);
+    els.openingEvidence.hidden = !selected;
+    if (!selected) return;
+    const decision = Object.keys(state.uncertaintyDecisions).map(function (key) {
+      return state.uncertaintyDecisions[key];
+    }).find(function (item) {
+      return item && !state.selectedDoor && item.model_opening_index === index;
+    });
+    const source = state.detection ? state.detection.method : 'manual';
+    const confidence = confidenceNumber(selected.confidence);
+    els.openingEvidence.innerHTML =
+      '<strong>' + (state.selectedDoor ? 'Door evidence' : 'Window ' + (index + 1) + ' evidence') + '</strong>' +
+      '<span>Source: ' + escapeHtml(source) + '</span>' +
+      '<span>AI confidence: ' + (confidence == null ? 'unknown' : Math.round(confidence * 100) + '%') + '</span>' +
+      '<span>Review: ' + escapeHtml(decision ? decision.decision.replace(/_/g, ' ') : 'not reviewed') + '</span>';
   }
 
   function removeWindowAt(index) {
@@ -1323,6 +1346,7 @@
     state.uncertaintyDecisions[state.selectedUncertaintyIndex] = {
       decision: decision,
       opening_id: item.id || ('uncertain_' + (state.selectedUncertaintyIndex + 1)),
+      model_opening_index: nearestWindowIndex(item.bbox),
       reviewer: 'sketchup_user',
       reviewed_at: new Date().toISOString()
     };
@@ -1331,19 +1355,25 @@
     scheduleOverlayRender();
   }
 
-  function editSelectedUncertainty() {
-    const items = (state.understanding && state.understanding.uncertain_openings) || [];
-    const item = items[state.selectedUncertaintyIndex];
-    if (!item || !item.bbox) return;
+  function nearestWindowIndex(targetBbox) {
+    if (!targetBbox) return null;
     let bestIndex = null;
     let bestDistance = Infinity;
     state.windows.forEach(function (win, index) {
       const bbox = resolveWindowBbox(win);
       if (!bbox) return;
-      const distance = Math.abs(bbox[0] - item.bbox[0]) + Math.abs(bbox[1] - item.bbox[1]) +
-        Math.abs(bbox[2] - item.bbox[2]) + Math.abs(bbox[3] - item.bbox[3]);
+      const distance = Math.abs(bbox[0] - targetBbox[0]) + Math.abs(bbox[1] - targetBbox[1]) +
+        Math.abs(bbox[2] - targetBbox[2]) + Math.abs(bbox[3] - targetBbox[3]);
       if (distance < bestDistance) { bestDistance = distance; bestIndex = index; }
     });
+    return bestIndex;
+  }
+
+  function editSelectedUncertainty() {
+    const items = (state.understanding && state.understanding.uncertain_openings) || [];
+    const item = items[state.selectedUncertaintyIndex];
+    if (!item || !item.bbox) return;
+    const bestIndex = nearestWindowIndex(item.bbox);
     if (bestIndex != null) selectWindow(bestIndex);
     decideUncertainty('manual_edit');
     setStatus('warning', 'Opening selected · drag its box or handles to correct the geometry.');

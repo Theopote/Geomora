@@ -375,7 +375,11 @@ module Geomora
             'component' => {
               'definition_id' => window_definition_id(win, width, height)
             },
-            'confidence' => win['confidence'] || 1.0
+            'confidence' => win['confidence'] || 1.0,
+            'source' => {
+              'type' => @params['detection'].is_a?(Hash) ? @params['detection']['method'] : 'manual',
+              'opening_index' => index
+            }
           }
         end
       end

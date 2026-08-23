@@ -146,6 +146,22 @@ body {
   box-shadow: 0 0 0 2px rgba(138, 180, 248, .18);
 }
 
+.opening-evidence {
+  display: grid;
+  gap: 3px;
+  margin: 0 0 8px;
+  padding: 7px 8px;
+  border: 1px solid #3d5878;
+  border-radius: 6px;
+  background: #1d2938;
+  color: #aeb8c6;
+  font-size: 11px;
+}
+
+.opening-evidence strong {
+  color: #d7e7ff;
+}
+
 .inspector-group {
   margin: 6px 0;
   border: 1px solid #383b42;

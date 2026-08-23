@@ -26,6 +26,7 @@
     secondaryImageUrl: null,
     multiview: null,
     fusion: null,
+    doorConfidence: null,
     constraintSolution: null,
     reconstructionReview: null,
     activeStoreyIndex: 0,
@@ -52,6 +53,8 @@
     viewerHint: document.getElementById('viewer-hint'),
     placeholder: document.getElementById('viewer-placeholder'),
     tree: document.getElementById('element-tree'),
+    treeSummary: document.getElementById('tree-summary'),
+    treeReviewOnly: document.getElementById('tree-review-only'),
     form: document.getElementById('facade-form'),
     windowsContainer: document.getElementById('windows-container'),
     btnViewOriginal: document.getElementById('btn-view-original'),
@@ -1104,7 +1107,7 @@
     renderTree();
   }
 
-  function renderTree() {
+  function renderTreeLegacy() {
     const params = collectParams();
     const items = [
       'Project: ' + params.project_name,
@@ -1181,6 +1184,53 @@
     }).join('');
   }
 
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (character) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character];
+    });
+  }
+
+  function confidenceNumber(value) {
+    const number = Number(value);
+    return value == null || !Number.isFinite(number) ? null : number;
+  }
+
+  function renderTree() {
+    const params = collectParams();
+    const items = [
+      { type: 'project', title: params.project_name, detail: 'Project' },
+      { type: 'wall', title: 'Facade wall', detail: params.wall_length + ' × ' + params.wall_height + ' × ' + params.wall_thickness + ' mm' },
+      { type: 'storey', title: params.storey_count + ' storey' + (params.storey_count === 1 ? '' : 's'), detail: params.storey_height ? params.storey_height + ' mm each' : 'Automatic height' },
+      { type: 'lod', title: (params.lod_level || 'lod_200').toUpperCase(), detail: 'Model detail' }
+    ];
+    if (state.detection) items.push({ type: 'ai', title: 'AI detection', detail: state.detection.method, confidence: confidenceNumber(state.detection.confidence) });
+    if (state.rectification) items.push({ type: 'rectify', title: 'Perspective corrected', detail: state.rectification.method, confidence: confidenceNumber(state.rectification.confidence) });
+    if (state.multiview) items.push({ type: 'views', title: 'Multi-view', detail: state.multiview.match_count + ' matches · ' + state.multiview.inlier_count + ' inliers', confidence: confidenceNumber(state.multiview.confidence) });
+    if (state.fusion) items.push({ type: 'ai', title: 'View fusion', detail: (state.fusion.fused_elements || []).length + ' openings', confidence: confidenceNumber(state.fusion.fusion_confidence) });
+    if (requiresReconstructionReview()) items.push({ type: 'review', title: 'Confirmation required', detail: 'Review the AI geometry before Generate', needsReview: true });
+    state.windows.forEach(function (win, index) {
+      items.push({ type: 'window', title: 'Window ' + (index + 1), detail: win.width + ' × ' + win.height + ' mm · sill ' + win.sill_height, confidence: confidenceNumber(win.confidence), index: index });
+    });
+    if (params.door.width > 0) items.push({ type: 'door', title: 'Door', detail: params.door.width + ' × ' + params.door.height + ' mm', confidence: state.doorConfidence, door: true });
+
+    const reviewOnly = els.treeReviewOnly && els.treeReviewOnly.checked;
+    const visible = items.filter(function (item) {
+      return !reviewOnly || item.needsReview || (item.confidence != null && item.confidence < 0.65);
+    });
+    els.tree.innerHTML = visible.map(function (item) {
+      const confidence = item.confidence == null ? '' : '<span class="confidence ' + (item.confidence < 0.65 ? 'low' : item.confidence < 0.82 ? 'medium' : 'high') + '">' + Math.round(item.confidence * 100) + '%</span>';
+      const action = item.index != null ? ' data-tree-window="' + item.index + '"' : item.door ? ' data-tree-door="true"' : '';
+      return '<li class="tree-item' + (action ? ' actionable' : '') + '"' + action + '><span class="tree-icon ' + item.type + '" aria-hidden="true"></span><span class="tree-copy"><strong>' + escapeHtml(item.title) + '</strong><small>' + escapeHtml(item.detail || '') + '</small></span>' + confidence + '</li>';
+    }).join('');
+    els.treeSummary.textContent = params.windows.length + ' windows' + (params.door.width > 0 ? ' · 1 door' : '') + (reviewOnly ? ' · review filter' : '');
+    els.tree.querySelectorAll('[data-tree-window]').forEach(function (item) {
+      item.addEventListener('click', function () { selectWindow(Number(item.dataset.treeWindow)); setActiveView('overlay'); });
+    });
+    els.tree.querySelectorAll('[data-tree-door]').forEach(function (item) {
+      item.addEventListener('click', function () { selectDoor(); setActiveView('overlay'); });
+    });
+  }
+
   function parsePartitionDoorOffsets(raw) {
     if (!raw || !String(raw).trim()) {
       return null;
@@ -1222,7 +1272,9 @@
           offset: Number(win.offset),
           width: Number(win.width),
           height: Number(win.height),
-          sill_height: Number(win.sill_height)
+          sill_height: Number(win.sill_height),
+          confidence: confidenceNumber(win.confidence),
+          bbox_norm: win.bbox_norm || null
         };
       });
     });
@@ -1292,7 +1344,9 @@
       door: {
         offset: Number(formData.get('door_offset')),
         width: Number(formData.get('door_width')),
-        height: Number(formData.get('door_height'))
+        height: Number(formData.get('door_height')),
+        confidence: state.doorConfidence,
+        bbox_norm: state.doorBbox
       },
       source_path: state.sourcePath,
       source_id: state.sourceId,
@@ -1590,7 +1644,8 @@
         width: Number(win.width),
         height: Number(win.height),
         sill_height: Number(win.sill_height),
-        bbox_norm: win.bbox_norm
+        bbox_norm: win.bbox_norm,
+        confidence: confidenceNumber(win.confidence)
       };
     });
     state.storeyWindows[0] = cloneWindows(windows);
@@ -1613,6 +1668,7 @@
     } else {
       state.doorBbox = doorWidth > 0 ? doorBboxFromMm(door) : null;
     }
+    state.doorConfidence = confidenceNumber(door.confidence);
 
     state.detection = payload.detection || null;
     state.overlayImageUrl = overlayUrl || null;
@@ -1935,6 +1991,7 @@
   });
 
   enhanceInspector();
+  if (els.treeReviewOnly) els.treeReviewOnly.addEventListener('change', renderTree);
 
   document.getElementById('btn-pick-image').addEventListener('click', function () {
     sketchupCall('pick_image');

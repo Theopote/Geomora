@@ -27,10 +27,13 @@ def test_workspace_has_unique_ids_and_primary_workflow_controls():
     assert 'class="footer-tools"' in html
     assert html.count('class="icon"') >= 6
     assert 'id="inspector-filter"' in html
+    assert 'id="tree-review-only"' in html
 
     script = (WORKSPACE / "app.js").read_text(encoding="utf-8")
     assert "function enhanceInspector()" in script
     assert "group.open = rawName === 'Windows' || rawName === 'Door'" in script
+    assert "data-tree-window" in script
+    assert "function escapeHtml(value)" in script
 
 
 def test_reconstruction_review_remains_accessible():

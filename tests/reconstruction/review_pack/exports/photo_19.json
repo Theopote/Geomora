@@ -2,7 +2,7 @@
   "schema_version": "reconstruction-metrics-v1",
   "photo_id": "photo_19",
   "annotation_status": "reviewed_v1",
-  "review_rounds": 2,
+  "review_rounds": 1,
   "facade_bbox": [
     0.0295,
     0.02,

@@ -27,13 +27,15 @@ Baseline exporter: `backend/scripts/run_reconstruction_baseline.py`
 **R0 exit (phased):** 5-photo minimal set reviewed twice + baseline recorded;
 then expand to 20 A1 photos. Metric scores only where a real scale anchor exists.
 
-### R1 — Observation Graph v0.1 (in progress)
+### R1 — Observation Graph + VLM Evidence v0.1 (in progress)
 
 **Goal:** Perception outputs become evidence, not architectural facts.
 
-Implementation: `backend/geomora_reconstruct/observations/`
-YOLO and facade-row adapters + fusion are in place. VLM evidence and
-Architectural Understanding are next.
+Implementation: `backend/geomora_reconstruct/observations/` and
+`backend/geomora_reconstruct/vlm_evidence.py`. YOLO, facade-row, and cached VLM
+architectural evidence now share the Observation Graph. Architectural
+Understanding must next reconcile these sources instead of treating VLM output
+as final IR.
 
 ### A2 — Failure-driven Improvement (completed)
 

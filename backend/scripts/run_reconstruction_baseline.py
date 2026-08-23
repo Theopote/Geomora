@@ -25,6 +25,8 @@ from geomora_reconstruct.observations.adapters import (  # noqa: E402
     yolo_to_observations,
 )
 from geomora_reconstruct.observations.fusion import fuse_observation_graphs  # noqa: E402
+from geomora_reconstruct.observations.vlm_adapter import vlm_evidence_to_observations  # noqa: E402
+from geomora_reconstruct.vlm_evidence import read_evidence_cache  # noqa: E402
 
 MINIMAL_SET = REPO_ROOT / "tests" / "reconstruction" / "minimal_set.json"
 DEFAULT_BASELINE = REPO_ROOT / "tests" / "reconstruction" / "baselines" / "current"
@@ -37,6 +39,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--out", type=Path, default=DEFAULT_BASELINE)
     parser.add_argument("--method", default="auto")
     parser.add_argument("--photo-id", action="append", dest="photo_ids")
+    parser.add_argument(
+        "--vlm-cache-dir",
+        type=Path,
+        help="Optional directory containing <photo_id>.json architectural evidence",
+    )
     return parser.parse_args()
 
 
@@ -61,13 +68,26 @@ def write_overlay(image_path: Path, detection, out_path: Path) -> None:
     imwrite_bgr(out_path, overlay)
 
 
-def build_observation_graph(photo_id: str, image) -> dict:
+def build_observation_graph(photo_id: str, image, *, vlm_cache_dir: Path | None = None) -> dict:
     graphs = []
     row_result = detect_facade_row_elements(image, return_overlay=False)
     graphs.append(facade_row_to_observations(row_result, photo_id=photo_id))
     if model_available():
         yolo_result = detect_yolo_elements(image, return_overlay=False)
         graphs.append(yolo_to_observations(yolo_result, photo_id=photo_id))
+    if vlm_cache_dir is not None:
+        evidence_path = vlm_cache_dir / f"{photo_id}.json"
+        if evidence_path.exists():
+            evidence = read_evidence_cache(evidence_path)
+            if evidence.photo_id != photo_id:
+                raise ValueError(f"VLM evidence photo_id mismatch: {evidence_path}")
+            graphs.append(
+                vlm_evidence_to_observations(
+                    evidence,
+                    image_width=int(image.shape[1]),
+                    image_height=int(image.shape[0]),
+                )
+            )
     if len(graphs) == 1:
         return detection_result_to_observations(row_result, photo_id=photo_id).to_dict()
     return fuse_observation_graphs(*graphs).to_dict()
@@ -79,6 +99,7 @@ def run_photo(
     *,
     method: str,
     out_root: Path,
+    vlm_cache_dir: Path | None = None,
 ) -> dict:
     entry = entry_by_id(manifest, photo_id)
     image_path = resolve_image_path(manifest, entry["file"])
@@ -97,7 +118,7 @@ def run_photo(
 
     detection = detect_facade(str(image_path), method=method, return_overlay=False)
     image = imread_bgr(image_path)
-    observation_graph = build_observation_graph(photo_id, image)
+    observation_graph = build_observation_graph(photo_id, image, vlm_cache_dir=vlm_cache_dir)
 
     rectification = {
         "photo_id": photo_id,
@@ -183,7 +204,15 @@ def main() -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     results = []
     for photo_id in photo_ids:
-        results.append(run_photo(photo_id, manifest, method=args.method, out_root=args.out))
+        results.append(
+            run_photo(
+                photo_id,
+                manifest,
+                method=args.method,
+                out_root=args.out,
+                vlm_cache_dir=args.vlm_cache_dir,
+            )
+        )
 
     summary = {
         "generated_at": datetime.now(UTC).isoformat(),

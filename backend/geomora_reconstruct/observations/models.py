@@ -6,6 +6,7 @@ from typing import Any
 
 
 class ObservationKind(str, Enum):
+    ARCHITECTURAL_EVIDENCE = "architectural_evidence"
     FACADE_CANDIDATE = "facade_candidate"
     OPENING_CANDIDATE = "opening_candidate"
     HORIZONTAL_LINE = "horizontal_line"

@@ -14,6 +14,7 @@ from .adapters import (
     yolo_to_observations,
 )
 from .fusion import fuse_observation_graphs
+from .vlm_adapter import vlm_evidence_to_observations
 
 __all__ = [
     "Observation",
@@ -26,4 +27,5 @@ __all__ = [
     "facade_row_to_observations",
     "yolo_to_observations",
     "fuse_observation_graphs",
+    "vlm_evidence_to_observations",
 ]

@@ -81,9 +81,16 @@ module Geomora
           end
 
           dialog.add_action_callback('save_settings') do |_ctx, json|
-            settings = Core::Settings.save(JSON.parse(json))
-            dialog.execute_script("window.geomora.setSettings(#{settings.to_json})")
-            post_message(dialog, 'success', 'Settings saved on this computer.')
+            raw = JSON.parse(json)
+            api_key = raw.delete('vlm_api_key').to_s
+            settings = Core::Settings.save(raw)
+            Perception::SettingsClient.configure_credentials(
+              provider: settings['vlm_provider'], api_key: api_key.empty? ? nil : api_key,
+              base_url: settings['vlm_base_url']
+            )
+            capabilities = Perception::SettingsClient.capabilities
+            dialog.execute_script("window.geomora.setSettings(#{settings.to_json}, #{capabilities.to_json})")
+            post_message(dialog, 'success', api_key.empty? ? 'Settings saved.' : 'Settings saved; API key held in backend memory for this session.')
           rescue JSON::ParserError => e
             post_message(dialog, 'error', "Invalid settings: #{e.message}")
           end

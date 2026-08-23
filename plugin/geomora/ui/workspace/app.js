@@ -149,16 +149,18 @@
       else input.value = state.settings[key];
     });
     renderSettingsCapabilities();
+    if (els.detectMethod && state.settings.detection_method) els.detectMethod.value = state.settings.detection_method;
+    if (els.depthMethod && state.settings.depth_method) els.depthMethod.value = state.settings.depth_method;
   }
 
   function settingsFormValue() {
     const data = new FormData(els.settingsForm);
     return {
       routing_mode: data.get('routing_mode'), vlm_provider: data.get('vlm_provider'),
-      vlm_model: data.get('vlm_model') || 'auto', detection_method: data.get('detection_method'),
+      vlm_model: data.get('vlm_model') || 'auto', vlm_api_key: data.get('vlm_api_key') || '',
+      vlm_base_url: data.get('vlm_base_url') || '', detection_method: data.get('detection_method'),
       depth_method: data.get('depth_method'), onnx_device: data.get('onnx_device'),
       cloud_upload_confirm: data.get('cloud_upload_confirm') === 'on',
-      cache_vlm_evidence: data.get('cache_vlm_evidence') === 'on',
       require_review_before_generate: data.get('require_review_before_generate') === 'on'
     };
   }
@@ -166,8 +168,8 @@
   function renderSettingsCapabilities() {
     const caps = state.capabilities || {};
     const providers = caps.cloud_providers || {};
-    [['openai', providers.openai], ['gemini', providers.gemini]].forEach(function (entry) {
-      const node = document.getElementById(entry[0] + '-status');
+    [['openai-status', providers.openai], ['gemini-status', providers.gemini], ['openai-compatible-status', providers.openai_compatible]].forEach(function (entry) {
+      const node = document.getElementById(entry[0]);
       if (!node) return;
       const ready = !!(entry[1] && entry[1].configured);
       node.textContent = ready ? 'Configured' : 'Not configured';
@@ -2430,6 +2432,7 @@
   document.getElementById('btn-settings-save').addEventListener('click', function () {
     state.settings = settingsFormValue();
     sketchupCall('save_settings', JSON.stringify(state.settings));
+    delete state.settings.vlm_api_key;
     closeSettings(false);
   });
   document.addEventListener('keydown', function (event) {
@@ -2503,9 +2506,13 @@
     }
     setStatus('', 'Analyzing facade structure, scale and architectural constraints…');
     state.cloudUploadAuthorized = false;
-    if (state.settings.routing_mode === 'cloud_enhanced') {
-      const provider = state.settings.vlm_provider === 'gemini' ? 'Google Gemini' : 'OpenAI';
-      const approved = window.confirm(
+    const providerCaps = (state.capabilities.cloud_providers || {})[state.settings.vlm_provider] || {};
+    const wantsCloud = state.settings.routing_mode === 'cloud_enhanced' ||
+      (state.settings.routing_mode === 'automatic' && providerCaps.configured);
+    if (wantsCloud) {
+      const provider = state.settings.vlm_provider === 'gemini' ? 'Google Gemini' :
+        (state.settings.vlm_provider === 'openai_compatible' ? 'the configured local endpoint' : 'OpenAI');
+      const approved = !state.settings.cloud_upload_confirm || window.confirm(
         'Cloud-enhanced analysis will upload the current facade photo to ' + provider + '.\n\n' +
         'The photo may contain location, people, signs or other private details. Continue with this one upload?'
       );

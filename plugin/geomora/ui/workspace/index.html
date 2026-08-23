@@ -38,10 +38,12 @@
       </section>
       <section class="settings-section" id="cloud-provider-settings">
         <h3>Multimodal provider</h3>
-        <label>Provider<select name="vlm_provider"><option value="openai">OpenAI</option><option value="gemini">Google Gemini</option></select></label>
+        <label>Provider<select name="vlm_provider"><option value="openai">OpenAI</option><option value="gemini">Google Gemini</option><option value="openai_compatible">Local / OpenAI compatible</option></select></label>
         <label>Model<input name="vlm_model" type="text" value="auto" maxlength="100" placeholder="auto"></label>
-        <div class="provider-status-grid"><div><span>OpenAI</span><strong id="openai-status">Checking…</strong></div><div><span>Gemini</span><strong id="gemini-status">Checking…</strong></div></div>
-        <p class="settings-help">API keys are read by the local backend from environment variables. Geomora never displays or stores the key value.</p>
+        <label>API key<input name="vlm_api_key" type="password" maxlength="500" autocomplete="new-password" placeholder="Leave blank to keep the current key"></label>
+        <label>Base URL<input name="vlm_base_url" type="url" maxlength="300" placeholder="e.g. http://127.0.0.1:1234/v1"></label>
+        <div class="provider-status-grid"><div><span>OpenAI</span><strong id="openai-status">Checking…</strong></div><div><span>Gemini</span><strong id="gemini-status">Checking…</strong></div><div><span>Local</span><strong id="openai-compatible-status">Checking…</strong></div></div>
+        <p class="settings-help">Keys entered here stay in backend memory only and are cleared when the service stops. Environment variables remain supported.</p>
       </section>
       <section class="settings-section">
         <h3>Local inference</h3>
@@ -52,7 +54,6 @@
       <section class="settings-section">
         <h3>Privacy and review</h3>
         <label class="checkbox-label"><input name="cloud_upload_confirm" type="checkbox"> Ask before uploading a photo</label>
-        <label class="checkbox-label"><input name="cache_vlm_evidence" type="checkbox"> Cache AI evidence locally</label>
         <label class="checkbox-label"><input name="require_review_before_generate" type="checkbox"> Require review before model generation</label>
       </section>
       <section class="settings-section">

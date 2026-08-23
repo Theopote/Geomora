@@ -161,18 +161,20 @@ def mask_to_full_image(
     return cropped
 
 
-@lru_cache(maxsize=2)
-def _load_encoder_session(encoder_path: str):
+@lru_cache(maxsize=8)
+def _load_encoder_session(encoder_path: str, provider_key: str):
     import onnxruntime as ort
+    from geomora_multiview.onnx_providers import resolve_onnx_providers
 
-    return ort.InferenceSession(encoder_path, providers=["CPUExecutionProvider"])
+    return ort.InferenceSession(encoder_path, providers=resolve_onnx_providers())
 
 
-@lru_cache(maxsize=2)
-def _load_decoder_session(decoder_path: str):
+@lru_cache(maxsize=8)
+def _load_decoder_session(decoder_path: str, provider_key: str):
     import onnxruntime as ort
+    from geomora_multiview.onnx_providers import resolve_onnx_providers
 
-    return ort.InferenceSession(decoder_path, providers=["CPUExecutionProvider"])
+    return ort.InferenceSession(decoder_path, providers=resolve_onnx_providers())
 
 
 class MobileSamOnnxRunner:
@@ -186,8 +188,10 @@ class MobileSamOnnxRunner:
         self.encoder_path = encoder_path
         self.decoder_path = decoder_path
         self.input_size = input_size
-        self.encoder = _load_encoder_session(str(encoder_path))
-        self.decoder = _load_decoder_session(str(decoder_path))
+        from geomora_multiview.onnx_providers import active_onnx_provider
+        provider = active_onnx_provider()
+        self.encoder = _load_encoder_session(str(encoder_path), provider)
+        self.decoder = _load_decoder_session(str(decoder_path), provider)
         self._embedding: np.ndarray | None = None
         self._resized_size: tuple[int, int] | None = None
         self._original_size: tuple[int, int] | None = None

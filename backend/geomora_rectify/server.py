@@ -6,15 +6,23 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from geomora_detect.pipeline import SUPPORTED_METHODS, detect_facade
 from geomora_capture.video_frames import extract_frames
 from geomora_multiview.pipeline import fuse_openings, multiview_capabilities, register_views
 from geomora_reconstruct.service import reconstruct_facade
+from geomora_reconstruct.runtime_settings import configure_provider, credential_status
 
 from .pipeline import parse_corners, rectify_image
 
 app = FastAPI(title="Geomora Perception", version="0.19.0")
+
+
+class CredentialSettings(BaseModel):
+    provider: str
+    api_key: str | None = None
+    base_url: str | None = None
 
 
 @app.get("/")
@@ -48,17 +56,9 @@ def settings_capabilities() -> dict[str, object]:
         "service_available": True,
         "service_version": app.version,
         "cloud_providers": {
-            "openai": {
-                "configured": bool(os.getenv("OPENAI_API_KEY", "").strip()),
-                "credential_source": "OPENAI_API_KEY",
-            },
-            "gemini": {
-                "configured": bool(
-                    os.getenv("GEMINI_API_KEY", "").strip()
-                    or os.getenv("GOOGLE_API_KEY", "").strip()
-                ),
-                "credential_source": "GEMINI_API_KEY or GOOGLE_API_KEY",
-            },
+            "openai": credential_status("openai"),
+            "gemini": credential_status("gemini"),
+            "openai_compatible": credential_status("openai_compatible"),
         },
         "local_inference": {
             "detection_methods": detection["methods"],
@@ -71,6 +71,15 @@ def settings_capabilities() -> dict[str, object]:
             "settings_store_contains_secrets": False,
         },
     }
+
+
+@app.post("/settings/credentials")
+def settings_credentials(settings: CredentialSettings) -> dict[str, object]:
+    try:
+        configure_provider(settings.provider, api_key=settings.api_key, base_url=settings.base_url)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    return {"provider": settings.provider, **credential_status(settings.provider), "persisted": False}
 
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}
@@ -131,8 +140,10 @@ async def reconstruct(
     routing_mode: str = Form(default="local_only"),
     vlm_provider: str = Form(default="openai"),
     vlm_model: str = Form(default="auto"),
+    vlm_base_url: str | None = Form(default=None),
     cloud_upload_authorized: bool = Form(default=False),
     depth_method: str = Form(default="off"),
+    onnx_device: str = Form(default="auto"),
 ) -> JSONResponse:
     if not is_image_upload(image):
         raise HTTPException(status_code=400, detail="Upload must be an image file")
@@ -157,8 +168,10 @@ async def reconstruct(
                 routing_mode=routing_mode,
                 vlm_provider=vlm_provider,
                 vlm_model=vlm_model,
+                vlm_base_url=vlm_base_url,
                 cloud_upload_authorized=cloud_upload_authorized,
                 depth_method=depth_method,
+                onnx_device=onnx_device,
             )
         except ValueError as error:
             raise HTTPException(status_code=400, detail=str(error)) from error

@@ -21,4 +21,16 @@ class SettingsTest < Minitest::Test
     assert_equal 'automatic', result['routing_mode']
     assert_equal 'auto', result['onnx_device']
   end
+
+
+  def test_openai_compatible_base_url_is_persisted_without_secret
+    result = Geomora::Core::Settings.sanitize(
+      'vlm_provider' => 'openai_compatible',
+      'vlm_base_url' => 'http://127.0.0.1:1234/v1',
+      'vlm_api_key' => 'never-store-this'
+    )
+    assert_equal 'openai_compatible', result['vlm_provider']
+    assert_equal 'http://127.0.0.1:1234/v1', result['vlm_base_url']
+    refute result.key?('vlm_api_key')
+  end
 end

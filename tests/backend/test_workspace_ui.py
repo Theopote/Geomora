@@ -105,12 +105,16 @@ def test_workspace_has_safe_ai_settings_center():
     assert 'id="settings-panel"' in html
     assert 'name="routing_mode"' in html
     assert 'name="vlm_provider"' in html
+    assert 'name="vlm_api_key"' in html
+    assert 'value="openai_compatible"' in html
+    assert 'name="vlm_base_url"' in html
     assert 'name="api_key"' not in html
     assert "setSettings: setSettings" in script
     assert "ai_settings: Object.assign({}, state.settings)" in script
     assert "add_action_callback('save_settings')" in dialog
     assert "Continue with this one upload?" in script
     assert "cloud_upload_authorized: state.cloudUploadAuthorized" in script
+    assert "!state.settings.cloud_upload_confirm" in script
     assert 'id="ai-evidence-review"' in html
     assert "function renderEvidenceReview()" in script
     assert "evidence_review: state.evidenceReview" in script

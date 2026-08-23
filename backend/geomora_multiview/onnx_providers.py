@@ -3,6 +3,16 @@ from __future__ import annotations
 import os
 
 
+def configure_onnx_device(device: str) -> str:
+    normalized = (device or "auto").strip().lower()
+    if normalized == "directml":
+        normalized = "dml"
+    if normalized not in {"auto", "cpu", "cuda", "dml"}:
+        raise ValueError("ONNX device must be auto, cpu, cuda or directml")
+    os.environ["GEOMORA_ONNX_DEVICE"] = normalized
+    return normalized
+
+
 def _available_providers() -> list[str]:
     try:
         import onnxruntime as ort

@@ -42,8 +42,10 @@ module Geomora
           add_field(parts, boundary, 'routing_mode', ai_settings['routing_mode'] || 'local_only')
           add_field(parts, boundary, 'vlm_provider', ai_settings['vlm_provider'] || 'openai')
           add_field(parts, boundary, 'vlm_model', ai_settings['vlm_model'] || 'auto')
+          add_field(parts, boundary, 'vlm_base_url', ai_settings['vlm_base_url'] || '')
           add_field(parts, boundary, 'cloud_upload_authorized', cloud_upload_authorized)
           add_field(parts, boundary, 'depth_method', ai_settings['depth_method'] || 'auto')
+          add_field(parts, boundary, 'onnx_device', ai_settings['onnx_device'] || 'auto')
           add_field(parts, boundary, 'wall_length_mm', metric[:width]) if metric && metric[:width].positive?
           add_field(parts, boundary, 'wall_height_mm', metric[:height]) if metric && metric[:height].positive?
           parts << "--#{boundary}--\r\n"

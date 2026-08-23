@@ -27,13 +27,14 @@ def _load_config(config_path: str) -> dict:
         return json.load(handle)
 
 
-@lru_cache(maxsize=1)
-def _load_session(model_path: str):
+@lru_cache(maxsize=4)
+def _load_session(model_path: str, provider_key: str):
     import onnxruntime as ort
+    from geomora_multiview.onnx_providers import resolve_onnx_providers
 
     return ort.InferenceSession(
         model_path,
-        providers=["CPUExecutionProvider"],
+        providers=resolve_onnx_providers(),
     )
 
 
@@ -252,7 +253,8 @@ def detect_yolo_elements(
     confidence_threshold = float(config.get("confidence_threshold", 0.25))
     iou_threshold = float(config.get("iou_threshold", 0.45))
 
-    session = _load_session(str(model_path))
+    from geomora_multiview.onnx_providers import active_onnx_provider
+    session = _load_session(str(model_path), active_onnx_provider())
     input_name = session.get_inputs()[0].name
     blob, scale, padding = _prepare_input(bgr, input_size)
     outputs = session.run(None, {input_name: blob})

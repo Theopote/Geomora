@@ -11,23 +11,23 @@ module Geomora
         'routing_mode' => 'automatic',
         'vlm_provider' => 'openai',
         'vlm_model' => 'auto',
+        'vlm_base_url' => '',
         'detection_method' => 'auto',
         'depth_method' => 'auto',
         'onnx_device' => 'auto',
         'cloud_upload_confirm' => true,
-        'cache_vlm_evidence' => true,
         'require_review_before_generate' => true,
         'log_level' => 'info'
       }.freeze
       ENUMS = {
         'routing_mode' => %w[automatic local_only cloud_enhanced],
-        'vlm_provider' => %w[openai gemini],
+        'vlm_provider' => %w[openai gemini openai_compatible],
         'detection_method' => %w[auto sam_v1 facade_row_v1 yolo_v1 contour_v1],
         'depth_method' => %w[auto colmap_dense_v1 depth_anything_v2_small_v1 depth_anything_v2_small_q4_v1 marigold_v1_1_v1 midas_v21_v1 gradient_laplacian_v1],
         'onnx_device' => %w[auto cpu cuda directml],
         'log_level' => %w[error warning info debug]
       }.freeze
-      BOOLEAN_KEYS = %w[cloud_upload_confirm cache_vlm_evidence require_review_before_generate].freeze
+      BOOLEAN_KEYS = %w[cloud_upload_confirm require_review_before_generate].freeze
 
       module_function
 
@@ -54,6 +54,8 @@ module Geomora
         BOOLEAN_KEYS.each { |key| clean[key] = !!input[key] if input.key?(key) }
         model = input['vlm_model'].to_s.strip
         clean['vlm_model'] = model[0, 100] unless model.empty?
+        base_url = input['vlm_base_url'].to_s.strip
+        clean['vlm_base_url'] = base_url[0, 300] if base_url.empty? || base_url.match?(%r{\Ahttps?://}i)
         clean
       end
     end

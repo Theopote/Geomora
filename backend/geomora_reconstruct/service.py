@@ -9,6 +9,7 @@ import cv2
 from geomora_detect.pipeline import detect_facade
 from geomora_detect.image_io import imread_bgr
 from geomora_multiview.depth import compute_depth_map
+from geomora_multiview.onnx_providers import configure_onnx_device
 
 from .export import detection_to_prediction
 from .observations.adapters import detection_result_to_observations
@@ -28,7 +29,8 @@ from .observations.balconies import (
     balcony_observations_to_storey_cues,
 )
 from .prediction_enrichment import enrich_prediction
-from .vlm_evidence import provider_api_key, request_architectural_evidence
+from .vlm_evidence import request_architectural_evidence
+from .runtime_settings import provider_api_key, provider_base_url
 from geomora_detect.vlm_prelabel import default_model, sanitize_error_message
 
 
@@ -43,14 +45,17 @@ def reconstruct_facade(
     routing_mode: str = "local_only",
     vlm_provider: str = "openai",
     vlm_model: str = "auto",
+    vlm_base_url: str | None = None,
     cloud_upload_authorized: bool = False,
     depth_method: str = "off",
+    onnx_device: str = "auto",
 ) -> dict[str, Any]:
     """Turn one facade image into evidence, understanding and editable IR.
 
     This is deliberately provider-neutral. Detectors emit observations; the
     understanding/constraint layers decide which architectural facts reach IR.
     """
+    configure_onnx_device(onnx_device)
     detection = detect_facade(str(image_path), method=method, return_overlay=return_overlay)
     observation_graph = detection_result_to_observations(
         detection,
@@ -111,9 +116,12 @@ def reconstruct_facade(
         except (ValueError, RuntimeError, cv2.error) as error:
             depth_evidence.update({"status": "failed", "error": str(error)})
             observation_graph.debug["depth_discontinuity"] = depth_evidence
-    cloud = {"requested": routing_mode == "cloud_enhanced", "used": False, "provider": vlm_provider}
+    cloud_enabled = routing_mode == "cloud_enhanced" or (
+        routing_mode == "automatic" and cloud_upload_authorized and bool(provider_api_key(vlm_provider))
+    )
+    cloud = {"requested": cloud_enabled, "used": False, "provider": vlm_provider}
     architectural_evidence = None
-    if routing_mode == "cloud_enhanced":
+    if cloud_enabled:
         if not cloud_upload_authorized:
             cloud["status"] = "authorization_required"
         else:
@@ -123,7 +131,11 @@ def reconstruct_facade(
             else:
                 active_model = default_model(vlm_provider) if vlm_model in {"", "auto"} else vlm_model
                 try:
-                    architectural_evidence = request_architectural_evidence(Path(image_path), photo_id=photo_id, provider=vlm_provider, model=active_model, api_key=key)
+                    architectural_evidence = request_architectural_evidence(
+                        Path(image_path), photo_id=photo_id, provider=vlm_provider,
+                        model=active_model, api_key=key,
+                        base_url=provider_base_url(vlm_provider, vlm_base_url),
+                    )
                     vlm_graph = vlm_evidence_to_observations(architectural_evidence, image_width=detection.image_width, image_height=detection.image_height)
                     observation_graph.observations.extend(vlm_graph.observations)
                     observation_graph.debug["vlm_evidence_count"] = len(vlm_graph.observations)

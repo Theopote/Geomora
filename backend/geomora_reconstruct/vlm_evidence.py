@@ -226,7 +226,7 @@ def request_architectural_evidence(
     normalized = provider.lower().strip()
     mime, data = encode_image_base64(image_path, max_dim=1536, jpeg_quality=88)
     user_text = "Analyze this facade as architectural evidence. Return JSON only."
-    if normalized == "openai":
+    if normalized in {"openai", "openai_compatible"}:
         payload = {
             "model": model,
             "store": False,
@@ -254,13 +254,10 @@ def request_architectural_evidence(
         body = post_json_with_retries(gemini_generate_url(model), payload, headers=gemini_headers(api_key), timeout=timeout)
         content = body["candidates"][0]["content"]["parts"][0]["text"]
     else:
-        raise ValueError("provider must be openai or gemini")
+        raise ValueError("provider must be openai, openai_compatible or gemini")
     return parse_architectural_evidence(content, photo_id=photo_id, provider=normalized, model=model)
 
 
 def provider_api_key(provider: str) -> str | None:
-    if provider == "openai":
-        return os.getenv("OPENAI_API_KEY")
-    if provider == "gemini":
-        return os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-    return None
+    from .runtime_settings import provider_api_key as runtime_provider_api_key
+    return runtime_provider_api_key(provider)

@@ -14,7 +14,7 @@
     "height": 1
   },
   "topology": {
-    "storey_count": 2,
+    "storey_count": 3,
     "bay_count": 8
   },
   "openings": [
@@ -67,6 +67,6 @@
     }
   ],
   "metric_anchors": [],
-  "annotation_notes": "Irregular old commercial facade. Ground floor modeled as 3 shop bays.",
-  "reviewed_at": "2026-08-23T08:06:21.297Z"
+  "annotation_notes": "\nThe façade of the two-story residential building features one window on the second floor, and one window and one door on the first floor.",
+  "reviewed_at": "2026-08-23T08:34:01.928Z"
 }

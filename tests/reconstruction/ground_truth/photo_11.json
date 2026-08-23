@@ -14,7 +14,7 @@
     "height": 1
   },
   "topology": {
-    "storey_count": 2,
+    "storey_count": 3,
     "bay_count": 8
   },
   "openings": [
@@ -151,6 +151,6 @@
       "notes": "Requires on-site tape or survey measurement. Do not infer from door height."
     }
   ],
-  "annotation_notes": "Irregular old commercial facade. Ground floor modeled as 3 shop bays.",
-  "reviewed_at": "2026-08-23T08:06:21.298Z"
+  "annotation_notes": "The facade of a two-story commercial building features five identical windows on the second floor. The ground floor consists of a combined door-and-window unit—with doors at both ends and windows in the middle—positioned on the right half of the ground-floor frontage.\n",
+  "reviewed_at": "2026-08-23T08:35:28.552Z"
 }

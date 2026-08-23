@@ -15,7 +15,7 @@
   },
   "topology": {
     "storey_count": 2,
-    "bay_count": 8
+    "bay_count": 9
   },
   "openings": [
     {
@@ -237,6 +237,6 @@
       "notes": "Requires on-site measurement across full brick facade."
     }
   ],
-  "annotation_notes": "Irregular old commercial facade. Ground floor modeled as 3 shop bays.",
-  "reviewed_at": "2026-08-23T08:06:21.305Z"
+  "annotation_notes": "The facade of the two-story commercial building features two large windows, one small window, and three doorways on the ground floor, while the second floor has nine small windows.",
+  "reviewed_at": "2026-08-23T08:50:41.544Z"
 }

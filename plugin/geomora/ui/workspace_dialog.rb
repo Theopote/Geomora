@@ -743,6 +743,7 @@ module Geomora
             'source_path' => nil,
             'source_id' => nil,
             'constraint_solution' => data.dig('reconstruction', 'constraint_solver'),
+            'reconstruction_review' => data.dig('reconstruction', 'review'),
             'ir_preview' => data
           }
         end

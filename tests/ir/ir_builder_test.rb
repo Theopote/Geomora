@@ -309,6 +309,22 @@ class IRBuilderTest < Minitest::Test
     assert_equal 'accepted_after_soft_weight_retry', solver['safety_status']
     assert_in_delta 0.25, solver['soft_weight_scale']
     assert_equal 2, solver['attempt_count']
-    assert_equal false, solver['human_review_required']
+    assert_equal true, solver['human_review_required']
+  end
+
+  def test_preserves_structured_reconstruction_review
+    params = {
+      'wall_length' => 10_000, 'wall_height' => 3300, 'wall_thickness' => 240,
+      'windows' => [], 'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 },
+      'reconstruction_review' => {
+        'decision' => 'accepted_observed_geometry',
+        'reviewer' => 'sketchup_user',
+        'reviewed_at' => '2026-08-23T12:00:00Z'
+      }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+
+    assert_equal 'accepted_observed_geometry', ir.dig('reconstruction', 'review', 'decision')
   end
 end

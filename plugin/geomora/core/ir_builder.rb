@@ -53,9 +53,13 @@ module Geomora
               'soft_weight_scale' => solution.fetch('soft_weight_scale', 1.0),
               'attempt_count' => solution.fetch('attempt_count', (solution['safety_attempts'] || []).length),
               'fallback_reasons' => solution['fallback_reasons'] || [],
-              'human_review_required' => status == 'fallback_observed_geometry'
+              'human_review_required' => %w[accepted_after_soft_weight_retry fallback_observed_geometry].include?(status)
             }
           }
+        end
+        if @params['reconstruction_review'].is_a?(Hash)
+          ir['reconstruction'] ||= {}
+          ir['reconstruction']['review'] = @params['reconstruction_review']
         end
         ir
       end

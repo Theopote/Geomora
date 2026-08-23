@@ -5,6 +5,7 @@ from copy import deepcopy
 import pytest
 
 from geomora_reconstruct.constraints import solve_opening_constraints, solve_prediction_constraints
+from geomora_reconstruct.ir_export import prediction_to_ir
 from geomora_reconstruct.prediction_enrichment import enrich_prediction
 
 
@@ -138,3 +139,21 @@ def test_solver_safety_status_is_exported_to_ir():
     assert solver["safety_status"] == prediction["constraint_solution"]["safety_status"]
     assert solver["attempt_count"] >= 1
     assert solver["human_review_required"] is False
+
+
+def test_structured_reconstruction_review_is_exported_to_ir():
+    prediction = {
+        "photo_id": "reviewed_ir",
+        "topology": {"storey_count": 1},
+        "openings": [],
+        "metric": {"facade_width_mm": 10000, "facade_height_mm": 3000},
+        "reconstruction_review": {
+            "decision": "accepted_manual_adjustments",
+            "reviewer": "sketchup_user",
+            "reviewed_at": "2026-08-23T12:00:00Z",
+        },
+    }
+
+    ir = prediction_to_ir(prediction)
+
+    assert ir["reconstruction"]["review"]["decision"] == "accepted_manual_adjustments"

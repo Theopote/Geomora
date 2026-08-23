@@ -488,6 +488,14 @@ body {
   color: #fdd663;
 }
 
+.reconstruction-review {
+  margin: 8px 0 12px;
+  padding: 10px;
+  border: 1px solid #b7791f;
+  border-radius: 6px;
+  background: #fffaf0;
+}
+
 .window-row-header {
   display: flex;
   align-items: center;

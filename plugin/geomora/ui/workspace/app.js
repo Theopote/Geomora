@@ -26,6 +26,8 @@
     secondaryImageUrl: null,
     multiview: null,
     fusion: null,
+    constraintSolution: null,
+    reconstructionReview: null,
     activeStoreyIndex: 0,
     storeyWindows: [[]]
   };
@@ -37,6 +39,8 @@
     multiviewMeta: document.getElementById('multiview-meta'),
     rectifyMeta: document.getElementById('rectify-meta'),
     detectMeta: document.getElementById('detect-meta'),
+    reconstructionReview: document.getElementById('reconstruction-review'),
+    reconstructionReviewDetail: document.getElementById('reconstruction-review-detail'),
     imageStack: document.getElementById('image-stack'),
     image: document.getElementById('reference-image'),
     overlaySvg: document.getElementById('detection-overlay'),
@@ -1241,7 +1245,9 @@
       rationalization: state.rationalization,
       pattern: state.pattern,
       multiview: state.multiview,
-      fusion: state.fusion
+      fusion: state.fusion,
+      constraint_solution: state.constraintSolution,
+      reconstruction_review: state.reconstructionReview
     };
   }
 
@@ -1323,6 +1329,9 @@
     state.detection = null;
     state.rationalization = null;
     state.constraintSolution = payload.constraint_solution || null;
+    state.reconstructionReview = null;
+    renderReconstructionReview();
+    state.reconstructionReview = payload.reconstruction_review || null;
     state.pattern = null;
     state.overlayImageUrl = null;
     state.doorBbox = null;
@@ -1652,6 +1661,8 @@
     state.doorBbox = doorWidth > 0 ? (door.bbox_norm || doorBboxFromMm(door)) : null;
 
     state.constraintSolution = payload.constraint_solution || null;
+    state.reconstructionReview = null;
+    renderReconstructionReview();
     scheduleOverlayRender();
     renderTree();
     setStatus('success', 'Constraint solution applied — review Inspector, then Validate or Generate.');
@@ -1661,6 +1672,9 @@
     if (!ir || !ir.openings) return;
     renderTree();
     const solver = ir.reconstruction && ir.reconstruction.constraint_solver;
+    state.constraintSolution = solver || state.constraintSolution;
+    state.reconstructionReview = (ir.reconstruction && ir.reconstruction.review) || state.reconstructionReview;
+    renderReconstructionReview();
     if (!solver) return;
     if (solver.safety_status === 'fallback_observed_geometry') {
       setStatus('warning', 'Unsafe AI optimization was rejected. Original detected geometry is preserved; review is recommended.');
@@ -1669,6 +1683,39 @@
     } else {
       setStatus('success', 'AI geometry was optimized and passed safety checks.');
     }
+  }
+
+  function reviewDecision(decision) {
+    state.reconstructionReview = {
+      decision: decision,
+      reviewer: 'sketchup_user',
+      reviewed_at: new Date().toISOString(),
+      solver_status: state.constraintSolution && state.constraintSolution.safety_status
+    };
+    renderReconstructionReview();
+    setStatus('success', 'Reconstruction review recorded: ' + decision.replace(/_/g, ' ') + '.');
+  }
+
+  function requiresReconstructionReview() {
+    if (!state.constraintSolution) return false;
+    return ['fallback_observed_geometry', 'accepted_after_soft_weight_retry'].indexOf(state.constraintSolution.safety_status) >= 0;
+  }
+
+  function reconstructionReviewApproved() {
+    if (!state.reconstructionReview) return false;
+    return ['accepted_observed_geometry', 'accepted_manual_adjustments'].indexOf(state.reconstructionReview.decision) >= 0;
+  }
+
+  function renderReconstructionReview() {
+    if (!els.reconstructionReview) return;
+    const needsReview = requiresReconstructionReview();
+    els.reconstructionReview.hidden = !needsReview;
+    if (!needsReview) return;
+    const reasons = state.constraintSolution.fallback_reasons || [];
+    const decision = state.reconstructionReview && state.reconstructionReview.decision;
+    els.reconstructionReviewDetail.textContent = decision
+      ? 'Recorded: ' + decision.replace(/_/g, ' ')
+      : 'Reason: ' + (reasons.join(', ') || 'unsafe constraint result');
   }
 
   function applyRoomLayoutSuggestion(layout) {
@@ -1955,6 +2002,19 @@
     sketchupCall('solve_constraints', JSON.stringify(collectParams()));
   });
 
+  document.getElementById('btn-accept-observed').addEventListener('click', function () {
+    reviewDecision('accepted_observed_geometry');
+  });
+
+  document.getElementById('btn-accept-adjusted').addEventListener('click', function () {
+    reviewDecision('accepted_manual_adjustments');
+  });
+
+  document.getElementById('btn-retry-constraints').addEventListener('click', function () {
+    reviewDecision('retry_constraints_requested');
+    sketchupCall('solve_constraints', JSON.stringify(collectParams()));
+  });
+
   document.getElementById('btn-apply-pattern').addEventListener('click', function () {
     if (state.windows.length < 2) {
       setStatus('error', 'Add at least two windows before applying a pattern.');
@@ -1968,6 +2028,10 @@
   });
 
   document.getElementById('btn-generate').addEventListener('click', function () {
+    if (requiresReconstructionReview() && !reconstructionReviewApproved()) {
+      setStatus('error', 'Confirm the AI reconstruction result before generating the SketchUp model.');
+      return;
+    }
     if (state.windows.length > REVIEW_WINDOW_LIMIT) {
       setStatus(
         'error',

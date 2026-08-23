@@ -220,9 +220,12 @@ def prediction_to_ir(prediction: dict[str, Any]) -> dict[str, Any] | None:
                 "soft_weight_scale": solution.get("soft_weight_scale", 1.0),
                 "attempt_count": len(solution.get("safety_attempts") or []),
                 "fallback_reasons": solution.get("fallback_reasons") or [],
-                "human_review_required": status == "fallback_observed_geometry",
+                "human_review_required": status in ("accepted_after_soft_weight_retry", "fallback_observed_geometry"),
             }
         }
+    review = prediction.get("reconstruction_review")
+    if isinstance(review, dict):
+        ir.setdefault("reconstruction", {})["review"] = dict(review)
     return ir
 
 

@@ -233,6 +233,15 @@
         <label>Doctor grid (mm)<input name="doctor_grid_mm" type="number" step="1" value="10"></label>
 
         <div class="section-title">Windows</div>
+        <div id="reconstruction-review" class="reconstruction-review" hidden>
+          <strong>AI reconstruction needs confirmation</strong>
+          <div id="reconstruction-review-detail" class="meta"></div>
+          <div class="inline-actions">
+            <button type="button" id="btn-accept-observed" class="btn-link">Accept original geometry</button>
+            <button type="button" id="btn-accept-adjusted" class="btn-link">Accept my adjustments</button>
+            <button type="button" id="btn-retry-constraints" class="btn-link">Retry constraints</button>
+          </div>
+        </div>
         <div id="storey-window-bar" class="storey-window-bar" hidden></div>
         <div id="windows-container"></div>
 

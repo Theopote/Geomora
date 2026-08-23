@@ -58,6 +58,16 @@
             "fallback_reasons": { "type": "array", "items": { "type": "string" } },
             "human_review_required": { "type": "boolean" }
           }
+        },
+        "review": {
+          "type": "object",
+          "required": ["decision", "reviewed_at"],
+          "properties": {
+            "decision": { "type": "string", "enum": ["accepted_observed_geometry", "accepted_manual_adjustments", "retry_constraints_requested"] },
+            "reviewer": { "type": "string" },
+            "reviewed_at": { "type": "string" },
+            "solver_status": { "type": ["string", "null"] }
+          }
         }
       }
     },

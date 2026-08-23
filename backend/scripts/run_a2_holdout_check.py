@@ -1,4 +1,7 @@
-"""A2 hold-out smoke check after failure-driven detection fixes.
+"""A2 hold-out smoke diagnostic after failure-driven detection fixes.
+
+This command is intentionally not a release gate. A non-empty detection proves
+only that the pipeline ran; use Reconstruction Metrics v1 for A2/A3 decisions.
 
 Example:
   cd backend
@@ -23,7 +26,7 @@ E2E_DEFAULT = BACKEND_ROOT / "cache" / "benchmark_a1_e2e.json"
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="A2 hold-out detection smoke check")
+    parser = argparse.ArgumentParser(description="A2 hold-out detection smoke diagnostic (not a gate)")
     parser.add_argument("--manifest", type=Path, default=MANIFEST_DEFAULT)
     parser.add_argument("--baseline", type=Path, default=E2E_DEFAULT)
     parser.add_argument("--method", default="auto")
@@ -64,7 +67,7 @@ def main() -> int:
         result = detect_facade(str(image_path), method=args.method, return_overlay=False)
         windows = [element for element in result.elements if element.type == "window"]
         doors = [element for element in result.elements if element.type == "door"]
-        passed = len(windows) >= 1
+        passed = len(windows) >= 1  # Pipeline liveness only; never reconstruction quality.
         hints = infer_hints(len(windows), len(doors), result.confidence)
         if passed:
             pass_count += 1
@@ -84,13 +87,9 @@ def main() -> int:
 
     print("-" * 72)
     print(f"Smoke pass: {pass_count}/{len(entries)}")
-    target = 4
-    if pass_count >= target:
-        print(f"A2 hold-out gate progress: {pass_count}/{len(entries)} (target ≥{target})")
-        return 0
-
-    print(f"A2 hold-out gate: {pass_count}/{len(entries)} — need ≥{target}")
-    return 1
+    print("Diagnostic only: this result MUST NOT be used to pass A2 or A3.")
+    print("Run Reconstruction Metrics v1 with reviewed ground truth for gate decisions.")
+    return 0
 
 
 if __name__ == "__main__":

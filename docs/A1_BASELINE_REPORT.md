@@ -1,12 +1,17 @@
 # A1 Detection Baseline Report
 
-**Status:** Detection baseline recorded · SketchUp E2E pending  
+**Status:** Archived A1 snapshot · SketchUp E2E review completed
 **Date:** 2026-08-16  
 **Source:** `backend/cache/benchmark_a1_e2e.json`
 
 ---
 
 ## Summary
+
+> **Archived A1 snapshot.** `docs/ROADMAP.md` is the source of truth for current
+> progress. The E2E review was subsequently completed for 20/20 photos with
+> average legacy RQS 69.3; see `backend/cache/benchmark_a1_e2e.json`. Those
+> subjective scores are a baseline, not Reconstruction Metrics v1 ground truth.
 
 | Metric | Value |
 |--------|-------|
@@ -62,12 +67,14 @@ cd F:\development\Geomora\backend
 
 ---
 
-## E2E status
+## E2E status (updated after score import)
 
 | Field | Status |
 |-------|--------|
-| SketchUp reviewed | 0/20 |
-| RQS recorded | 0/20 |
-| hold-out Generate OK | TBD (need ≥4/5) |
+| SketchUp reviewed | 20/20 |
+| Legacy RQS recorded | 20/20 (average 69.3) |
+| hold-out Generate OK | 5/5 |
 
-Update this file after `import_a1_e2e_scores.py` completes.
+Reconstruction Metrics v1 annotations remain separate work: the legacy review
+does not contain reliable opening boxes, storey/bay assignments, or measured
+dimensions and therefore must not be converted into objective ground truth.

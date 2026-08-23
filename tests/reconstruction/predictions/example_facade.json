@@ -1,0 +1,24 @@
+{
+  "schema_version": "reconstruction-metrics-v1",
+  "photo_id": "example_facade",
+  "facade": {"width": 1.0, "height": 1.0},
+  "topology": {"storey_count": 2, "bay_count": 2},
+  "openings": [
+    {"id": "w11", "type": "window", "bbox": [0.10, 0.58, 0.30, 0.82], "storey": 1, "bay": 1},
+    {"id": "w12", "type": "window", "bbox": [0.60, 0.58, 0.80, 0.82], "storey": 1, "bay": 2},
+    {"id": "w21", "type": "window", "bbox": [0.10, 0.12, 0.30, 0.36], "storey": 2, "bay": 1},
+    {"id": "w22", "type": "window", "bbox": [0.60, 0.12, 0.80, 0.36], "storey": 2, "bay": 2},
+    {"id": "d11", "type": "door", "bbox": [0.39, 0.58, 0.51, 1.00], "storey": 1, "bay": 1}
+  ],
+  "metric": {
+    "facade_width_mm": 10500,
+    "facade_height_mm": 6100,
+    "storey_height_mm": 3050,
+    "window_width_mm": 2050,
+    "window_height_mm": 1450
+  },
+  "rationalization_before": {"width_variance": 0.08, "height_variance": 0.06, "sill_variance": 0.05, "spacing_variance": 0.08, "alignment_deviation": 0.04},
+  "rationalization_after": {"width_variance": 0.01, "height_variance": 0.01, "sill_variance": 0.01, "spacing_variance": 0.02, "alignment_deviation": 0.01},
+  "sketchup": {"generate_stable": true, "editable": true, "openings_are_holes": true, "no_overlapping_openings": true, "correct_storey_assignment": true, "sane_wall_dimensions": true, "component_reuse": true}
+}
+

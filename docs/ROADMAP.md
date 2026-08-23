@@ -10,6 +10,22 @@ Phase design docs (`docs/PHASE_*.md`) explain *what* each layer does. They do **
 
 ## Current milestone
 
+### R0 — Reconstruction Metrics (in progress, P0)
+
+**Goal:** Measure whether Photo → SketchUp reconstruction improves, rather than
+whether a detector returns at least one window.
+
+Reconstruction Metrics v1 evaluates six evidence groups: detection, topology,
+relative geometry, metric scale (only with measured ground truth),
+rationalization, and SketchUp E2E quality. Results must report annotation
+`coverage`; a partial RQS cannot pass a gate.
+
+Implementation: `backend/geomora_reconstruct/metrics/`
+Ground truth and regression fixtures: `tests/reconstruction/`
+
+**R0 exit:** all 20 A1 photos have reviewed opening annotations and topology;
+metric scores are included only for photos with a real scale anchor.
+
 ### A2 — Failure-driven Improvement (in progress)
 
 **Goal:** Fix only documented A1 failure classes — no new lateral features.
@@ -20,7 +36,9 @@ Phase design docs (`docs/PHASE_*.md`) explain *what* each layer does. They do **
 | P1 | `wrong_scale` (14/20) | Span extrapolation from facade bounds + window count |
 | P2 | `false_door` / `missed_door` (15/20) | Door geometry + confidence filter |
 
-**Exit:** Hold-out smoke ≥4/5; val window recall ≥0.80 (A3 gate).
+**Exit:** val window recall ≥ 0.80 and precision ≥ 0.85; door false-positive
+rate decreases; no train/val regression; normalized geometry and scale error do
+not regress. Hold-out is evaluation-only and never used for tuning.
 
 ### A1 — Real Photo Benchmark (completed)
 
@@ -45,7 +63,7 @@ Phase design docs (`docs/PHASE_*.md`) explain *what* each layer does. They do **
 |----|------|------|--------|
 | **A1** | Real Photo Benchmark | 20 photos, baseline recorded | **Completed** |
 | **A2** | Failure-driven Improvement | Fix only documented failure classes | **In progress** |
-| **A3** | Reconstruction Gate | hold-out ≥4/5 usable SketchUp after ~1 min overlay; window recall ≥0.80 on val; Generate stable | Frozen until A2 done |
+| **A3** | Reconstruction Baseline Gate | E2E Photo → SketchUp topology, relative geometry, anchored scale, and editable valid geometry | Frozen until R0 and A2 done |
 | **B0** | Constraint Graph Solver | Equal-width / equal-sill / equal-spacing after A3 | P0 after Stage A |
 | B1 | Multi-view production path | Fuse + depth on real photos | P1 |
 | B2 | Evidence-driven model selection | SAM / depth only if RQS gain proven | P1 |
@@ -83,6 +101,27 @@ Phase design docs (`docs/PHASE_*.md`) explain *what* each layer does. They do **
 - Phase 16–23: LOD tours, layout PDF, MP4 export, interior layout polish
 - New AI models without evidence of RQS improvement
 - New export formats, UI chrome, or parametric elements
+
+---
+
+## Reconstruction Core sequence
+
+| Order | Milestone | Priority |
+|-------|-----------|----------|
+| 1 | R0 — Reconstruction Metrics | P0 |
+| 2 | A2-final — documented failure fixes, no image-specific heuristics | P0 |
+| 3 | A3 — E2E Reconstruction Baseline Gate | P0 |
+| 4 | R1 — Observation Graph | P0 |
+| 5 | R2 — Architectural Understanding (storeys, bays, grouping, patterns) | P0 core |
+| 6 | R3 — Metric Anchors + Scale Solver | P0 core |
+| 7 | R4 — Constraint Graph | P0 core |
+| 8 | R5 — VLM semantic evidence | P1 |
+| 9 | R6 — Multi-view / Video | P1 |
+| 10 | R7 — richer architecture | P2 |
+
+No heuristic may be added solely to make an individual benchmark photo pass.
+Every heuristic requires an architectural rationale and train/val regression
+evidence. Hold-out photos must not influence thresholds or parameters.
 
 ---
 

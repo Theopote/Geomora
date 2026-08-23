@@ -39,6 +39,66 @@ def test_hard_constraint_is_satisfied_exactly():
     assert result["constraints"][0]["satisfied"] is True
 
 
+def test_fixed_opening_width_height_and_sill_are_solved_in_metric_space():
+    opening = {"id": "window_03", "type": "window", "bbox": [0.2, 0.3, 0.3, 0.5]}
+    constraints = [
+        {"id": "fw", "type": "fixed_dimension", "targets": ["window_03"], "priority": "hard", "status": "accepted", "evidence": {"property": "width", "distance_mm": 1500}},
+        {"id": "fh", "type": "fixed_dimension", "targets": ["window_03"], "priority": "hard", "status": "accepted", "evidence": {"property": "height", "distance_mm": 1800}},
+        {"id": "fs", "type": "fixed_dimension", "targets": ["window_03"], "priority": "hard", "status": "accepted", "evidence": {"property": "sill", "distance_mm": 900}},
+    ]
+    result = solve_opening_constraints([opening], constraints, metric={"facade_width_mm": 12000, "facade_height_mm": 6000})
+    box = result["openings"][0]["bbox"]
+    assert box[2] - box[0] == pytest.approx(0.125)
+    assert box[3] - box[1] == pytest.approx(0.3)
+    assert 1.0 - box[3] == pytest.approx(0.15)
+    assert all(item["residual_after"] == pytest.approx(0.0) and item["satisfied"] for item in result["constraints"])
+
+
+def test_fixed_facade_dimension_updates_metric_state():
+    constraint = {"id": "facade", "type": "fixed_dimension", "targets": [], "priority": "hard", "status": "accepted", "evidence": {"property": "facade_width", "distance_mm": 12000}}
+    result = solve_opening_constraints([], [constraint], metric={"facade_width_mm": 10000})
+    assert result["metric"]["facade_width_mm"] == 12000
+    assert result["constraints"][0]["residual_before"] == 2000
+    assert result["constraints"][0]["residual_after"] == 0
+
+
+def test_fixed_bay_pitch_is_projected_exactly():
+    constraint = {"id": "pitch", "type": "fixed_dimension", "targets": ["w1", "w2", "w3"], "priority": "hard", "status": "accepted", "evidence": {"property": "bay_pitch", "distance_mm": 2400}}
+    result = solve_opening_constraints(OPENINGS, [constraint], metric={"facade_width_mm": 12000})
+    centers = [(item["bbox"][0] + item["bbox"][2]) / 2 for item in result["openings"]]
+    assert centers[1] - centers[0] == pytest.approx(0.2)
+    assert centers[2] - centers[1] == pytest.approx(0.2)
+    assert result["constraints"][0]["residual_after"] == 0
+
+
+def test_unresolvable_hard_fixed_dimension_fails_and_falls_back():
+    prediction = {
+        "topology": {"facade_bbox": [0, 0, 1, 1]}, "openings": deepcopy(OPENINGS),
+        "metric": {"facade_width_mm": 12000, "facade_height_mm": 6000},
+        "constraint_suggestions": [{"id": "missing", "type": "fixed_dimension", "targets": ["not_found"], "priority": "hard", "status": "accepted", "evidence": {"property": "width", "distance_mm": 1500}}],
+    }
+    solve_prediction_constraints(prediction)
+    solution = prediction["constraint_solution"]
+    assert solution["safety_status"] == "fallback_observed_geometry"
+    assert solution["constraint_status"] == "failed"
+    assert solution["hard_violations"] == ["missing"]
+    assert "hard_constraint_violation" in solution["fallback_reasons"]
+
+
+def test_conflicting_hard_fixed_dimensions_fail_instead_of_quietly_continuing():
+    fixed = lambda cid, distance: {"id": cid, "type": "fixed_dimension", "targets": ["w1"], "priority": "hard", "status": "accepted", "evidence": {"property": "width", "distance_mm": distance}}
+    prediction = {
+        "topology": {"facade_bbox": [0, 0, 1, 1]}, "openings": deepcopy(OPENINGS),
+        "metric": {"facade_width_mm": 10000, "facade_height_mm": 4000},
+        "constraint_suggestions": [fixed("width_1000", 1000), fixed("width_2000", 2000)],
+    }
+    solve_prediction_constraints(prediction)
+    solution = prediction["constraint_solution"]
+    assert solution["constraint_status"] == "failed"
+    assert "width_1000" in solution["hard_violations"]
+    assert prediction["openings"][0]["bbox"] == OPENINGS[0]["bbox"]
+
+
 def test_unknown_targets_are_ignored_without_creating_geometry():
     invalid = {**constraint("equal_width"), "targets": ["missing_a", "missing_b"]}
     result = solve_opening_constraints(OPENINGS, [invalid])
@@ -55,7 +115,7 @@ def test_prediction_enrichment_applies_solution_before_ir_export():
         "pipeline": {"scale_hint": {"wall_length_mm": 10000, "wall_height_mm": 3000}},
     }
     enrich_prediction(prediction, export_ir=True)
-    assert prediction["constraint_solution"]["method"] == "weighted_projection_v0.1"
+    assert prediction["constraint_solution"]["method"] == "weighted_projection_v0.2"
     assert prediction["architectural_ir"]["constraints"]
     assert all("observed_bbox" in item for item in prediction["openings"])
     assert prediction["rationalization_after"]["width_variance"] < prediction["rationalization_before"]["width_variance"]
@@ -79,6 +139,10 @@ def test_user_metric_anchor_is_exported_as_hard_fixed_dimension():
     assert all(item["type"] == "fixed_dimension" for item in hard)
     assert hard[0]["source"] == "user_anchor"
     assert prediction["architectural_ir"]["metric"]["facade_width_mm"] == 12000
+    solved_fixed = [item for item in prediction["constraint_solution"]["constraints"] if item["type"] == "fixed_dimension"]
+    assert len(solved_fixed) == 2
+    assert all(item["satisfied"] and item["residual_after"] == 0 for item in solved_fixed)
+    assert prediction["constraint_solution"]["constraint_status"] == "satisfied"
 
 
 def test_unsafe_hard_constraint_falls_back_to_observed_geometry():

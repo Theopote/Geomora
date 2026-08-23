@@ -168,10 +168,19 @@ def prediction_to_ir(prediction: dict[str, Any]) -> dict[str, Any] | None:
         if not anchor_has_distance(anchor):
             continue
         axis = anchor_axis(anchor)
+        anchor_type = str(anchor.get("type") or "user_distance")
+        property_name = str(anchor.get("property") or "")
+        if anchor_type == "facade_width": property_name = "facade_width"
+        elif anchor_type == "facade_height": property_name = "facade_height"
+        elif anchor_type == "opening_width": property_name = "width"
+        elif anchor_type == "opening_height": property_name = "height"
+        elif anchor_type in {"storey_height", "bay_pitch"}: property_name = anchor_type
+        elif not property_name: property_name = "facade_width" if axis == "horizontal" else "facade_height"
+        explicit_target = anchor.get("target")
         targets = (
-            [f"wall_{index:02d}_01" for index in range(1, storey_count + 1)]
-            if axis == "horizontal"
-            else [f"storey_{index:02d}" for index in range(1, storey_count + 1)]
+            ([explicit_target] if isinstance(explicit_target, str) and explicit_target != "facade" else list(explicit_target))
+            if explicit_target and explicit_target != "facade"
+            else ([f"wall_{index:02d}_01" for index in range(1, storey_count + 1)] if axis == "horizontal" else [f"storey_{index:02d}" for index in range(1, storey_count + 1)])
         )
         constraints.append(
             {
@@ -186,6 +195,8 @@ def prediction_to_ir(prediction: dict[str, Any]) -> dict[str, Any] | None:
                 "evidence": {
                     "anchor_id": anchor.get("id"),
                     "axis": axis,
+                    "property": property_name,
+                    "target": explicit_target,
                     "distance_mm": float(anchor["distance_mm"]),
                 },
             }

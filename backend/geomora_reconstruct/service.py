@@ -165,6 +165,14 @@ def reconstruct_facade(
         architectural_hypotheses.append({
             **hidden, "label": "Hidden window", "status": "hypothesized",
         })
+    opening_by_id = {item.get("id"): item for item in openings}
+    for door in topology.get("door_hypotheses") or []:
+        observed_door = opening_by_id.get(door.get("door_id")) or {}
+        architectural_hypotheses.append({
+            **door, "id": f"door_storey:{door.get('door_id')}", "type": "door_storey",
+            "label": f"Door on storey {door.get('candidate_storey')}",
+            "bbox": observed_door.get("bbox"), "status": "hypothesized",
+        })
     review_required = bool(uncertainties) or safety_status in {
         "accepted_after_soft_weight_retry",
         "fallback_observed_geometry",
@@ -194,6 +202,7 @@ def reconstruct_facade(
             "hidden_opening_hypotheses": topology.get("hidden_opening_hypotheses") or [],
             "occlusion_awareness": topology.get("occlusion_awareness") or {},
             "architectural_hypotheses": architectural_hypotheses,
+            "door_hypotheses": topology.get("door_hypotheses") or [],
         },
         "constraint_solution": solution or None,
         "prediction": prediction,

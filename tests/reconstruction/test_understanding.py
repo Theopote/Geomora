@@ -101,3 +101,34 @@ def test_structural_line_support_is_traced_on_window_row_hypothesis():
     )
     evidence_types = {item["type"] for item in result.storeys[0].evidence}
     assert evidence_types == {"window_row", "cornice"}
+
+
+def test_door_ground_floor_is_hypothesis_with_observed_facade_evidence():
+    openings = [
+        {"id": "w1", "type": "window", "bbox": [0.1, 0.2, 0.25, 0.4]},
+        {"id": "w2", "type": "window", "bbox": [0.5, 0.2, 0.65, 0.4]},
+        {"id": "d1", "type": "door", "bbox": [0.35, 0.42, 0.48, 0.68], "confidence": 0.9},
+    ]
+    result, enriched = understand_openings(openings, facade_bounds=[0.05, 0.05, 0.95, 0.7])
+    door = next(item for item in enriched if item["id"] == "d1")
+    assert door["storey"] == 1
+    assert door["understanding_status"] == "hypothesized"
+    assert door["storey_hypothesis"]["hypothesis"] == "ground_floor_door"
+    assert "near_observed_facade_bottom" in door["storey_hypothesis"]["evidence"]
+    assert "legacy_low_image_position" not in door["storey_hypothesis"]["evidence"]
+    assert result.door_hypotheses[0]["door_id"] == "d1"
+
+
+def test_door_away_from_ground_uses_nearest_storey_band_not_absolute_threshold():
+    openings = [
+        {"id": "w21", "type": "window", "bbox": [0.1, 0.18, 0.25, 0.38]},
+        {"id": "w22", "type": "window", "bbox": [0.5, 0.18, 0.65, 0.38]},
+        {"id": "w11", "type": "window", "bbox": [0.1, 0.65, 0.25, 0.85]},
+        {"id": "w12", "type": "window", "bbox": [0.5, 0.65, 0.65, 0.85]},
+        {"id": "d2", "type": "door", "bbox": [0.72, 0.16, 0.84, 0.5], "confidence": 0.8},
+    ]
+    _result, enriched = understand_openings(openings, facade_bounds=[0.05, 0.05, 0.95, 1.0])
+    door = next(item for item in enriched if item["id"] == "d2")
+    assert door["storey"] == 2
+    assert "nearest_storey_band" in door["storey_hypothesis"]["evidence"]
+    assert door["storey_hypothesis"]["status"] == "hypothesized"

@@ -2198,6 +2198,7 @@
   function hypothesisTypeLabel(type) {
     if (type === 'hidden_hypothesis' || type === 'window') return 'Hidden window';
     if (type === 'balcony_slab') return 'Balcony slab';
+    if (type === 'door_storey') return 'Door storey';
     return 'Storey hypothesis';
   }
 
@@ -2208,7 +2209,7 @@
   }
 
   function hiddenWindowFromHypothesis(item) {
-    if (!item.bbox || item.bbox.length !== 4) return null;
+    if (item.type !== 'window' || !item.bbox || item.bbox.length !== 4) return null;
     const wallLength = Number(els.form.elements.namedItem('wall_length').value) || 10000;
     const wallHeight = Number(els.form.elements.namedItem('wall_height').value) || 3300;
     return {
@@ -2226,7 +2227,7 @@
     const item = state.architecturalHypotheses[index];
     if (!item) return;
     state.hypothesisDecisions[item.id] = decision;
-    if (decision === 'accepted' && item.bbox) {
+    if (decision === 'accepted' && item.type === 'window' && item.bbox) {
       const win = hiddenWindowFromHypothesis(item);
       const storeyIndex = Math.max(0, Math.min(state.storeyWindows.length - 1, Number(item.storey || 1) - 1));
       if (win && !(state.storeyWindows[storeyIndex] || []).some(function (existing) { return existing.hypothesis_source_id === item.id; })) {
@@ -2253,7 +2254,7 @@
     els.hypothesisList.innerHTML = items.map(function (item, index) {
       const decision = state.hypothesisDecisions[item.id] || 'pending';
       const confidence = Math.round((Number(item.confidence) || 0) * 100);
-      const adjust = item.bbox ? '<button type="button" class="btn-link" data-hypothesis-adjust="' + index + '">Accept &amp; adjust</button>' : '';
+      const adjust = item.type === 'window' && item.bbox ? '<button type="button" class="btn-link" data-hypothesis-adjust="' + index + '">Accept &amp; adjust</button>' : '';
       return '<article class="hypothesis-card ' + decision + '">' +
         '<div class="hypothesis-card-row"><strong>' + escapeHtml(item.label || hypothesisTypeLabel(item.type)) +
         '</strong><span class="evidence-badge">' + confidence + '% · ' + decision + '</span></div>' +

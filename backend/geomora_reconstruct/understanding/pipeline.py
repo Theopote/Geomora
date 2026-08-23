@@ -16,11 +16,9 @@ from .openings import (
 )
 from .patterns import infer_pattern_groups
 from .occlusions import infer_hidden_opening_hypotheses
+from .doors import infer_door_storey_hypothesis
 from .result import UnderstandingResult
 from .storeys import infer_storey_hypotheses
-
-DOOR_FLOOR_Y_MIN = 0.72
-
 
 def _nearest_storey(center_y: float, bands: list) -> int:
     if not bands:
@@ -68,11 +66,20 @@ def understand_openings(
 
     automatic_cues = list(storey_cues or [])
     for index, opening in core_pairs:
-        if opening.get("type") == "door" and opening["bbox"][3] >= DOOR_FLOOR_Y_MIN:
+        if opening.get("type") != "door":
+            continue
+        door_hypothesis = infer_door_storey_hypothesis(
+            opening, facade_bbox=facade_bbox, storeys=[],
+            facade_bounds_observed=facade_bounds is not None,
+        )
+        if door_hypothesis["candidate_storey"] == 1 and any(
+            item in door_hypothesis["evidence"]
+            for item in ("near_observed_facade_bottom", "near_inferred_facade_bottom")
+        ):
             automatic_cues.append({
                 "id": f"door_baseline:{opening.get('id', index)}", "type": "door_baseline",
                 "role": "door_baseline", "y": opening["bbox"][3],
-                "confidence": float(opening.get("confidence", 0.65)), "source": "opening_detection",
+                "confidence": door_hypothesis["confidence"], "source": "door_storey_hypothesis",
             })
     storeys, storey_labels, storey_audit = infer_storey_hypotheses(
         core_windows, tolerance=storey_tol, facade_bbox=facade_bbox, cues=automatic_cues,
@@ -107,17 +114,16 @@ def understand_openings(
             next((column.confidence for column in bays if column.id == bay), 0.6),
         )
 
-    max_window_storey = max(storey_by_index.values()) if storey_by_index else 0
     for global_index, opening in core_pairs:
         if opening.get("type") != "door":
             continue
-        bbox = opening["bbox"]
-        if bbox[3] >= DOOR_FLOOR_Y_MIN:
-            storey_by_index[global_index] = 1
-        else:
-            storey_by_index[global_index] = max(max_window_storey, 1)
-        bay_by_index[global_index] = _nearest_bay(bbox_center(bbox)[0], bays)
-        assignment_confidence[global_index] = 0.65
+        hypothesis = infer_door_storey_hypothesis(
+            opening, facade_bbox=facade_bbox, storeys=storeys,
+            facade_bounds_observed=facade_bounds is not None,
+        )
+        storey_by_index[global_index] = hypothesis["candidate_storey"]
+        bay_by_index[global_index] = _nearest_bay(bbox_center(opening["bbox"])[0], bays)
+        assignment_confidence[global_index] = hypothesis["confidence"]
 
     for global_index, opening in outlier_pairs:
         center_x, center_y = bbox_center(opening["bbox"])
@@ -159,10 +165,31 @@ def understand_openings(
 
     if result.storeys:
         for item in enriched:
-            if item.get("type") == "door" and item.get("bbox", [0, 0, 0, 0])[3] >= DOOR_FLOOR_Y_MIN:
-                item["storey"] = 1
+            if item.get("type") == "door" and item.get("bbox"):
+                hypothesis = infer_door_storey_hypothesis(
+                    item, facade_bbox=result.facade_bbox or facade_bbox, storeys=result.storeys,
+                    facade_bounds_observed=facade_bounds is not None,
+                )
+                item["storey"] = hypothesis["candidate_storey"]
+                item["storey_hypothesis"] = hypothesis
+                item["assignment_confidence"] = hypothesis["confidence"]
+                item["understanding_status"] = "hypothesized"
+                result.door_hypotheses.append({"door_id": item.get("id"), **hypothesis})
             elif item.get("bbox"):
                 item["storey"] = _nearest_storey(bbox_center(item["bbox"])[1], result.storeys)
+    else:
+        for item in enriched:
+            if item.get("type") != "door" or not item.get("bbox"):
+                continue
+            hypothesis = infer_door_storey_hypothesis(
+                item, facade_bbox=result.facade_bbox or facade_bbox, storeys=[],
+                facade_bounds_observed=facade_bounds is not None,
+            )
+            item["storey"] = hypothesis["candidate_storey"]
+            item["storey_hypothesis"] = hypothesis
+            item["assignment_confidence"] = hypothesis["confidence"]
+            item["understanding_status"] = "hypothesized"
+            result.door_hypotheses.append({"door_id": item.get("id"), **hypothesis})
 
     if architectural_evidence is not None and architectural_evidence.occlusions:
         result.hidden_opening_hypotheses = infer_hidden_opening_hypotheses(
@@ -196,6 +223,7 @@ def understanding_to_topology(result: UnderstandingResult) -> dict[str, Any]:
         "storey_hypothesis": result.debug.get("storey_hypothesis", {}),
         "hidden_opening_hypotheses": result.hidden_opening_hypotheses,
         "occlusion_awareness": result.debug.get("occlusion_awareness", {}),
+        "door_hypotheses": result.door_hypotheses,
     }
     if "evidence_coordination" in result.debug:
         topology["evidence_coordination"] = result.debug["evidence_coordination"]

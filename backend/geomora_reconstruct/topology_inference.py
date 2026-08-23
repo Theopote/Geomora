@@ -9,9 +9,6 @@ from .understanding.pipeline import understand_openings, understanding_to_topolo
 
 DEFAULT_STOREY_TOLERANCE = 0.08
 DEFAULT_BAY_TOLERANCE = 0.10
-DOOR_FLOOR_Y_MIN = 0.72
-
-
 def infer_topology_from_openings(
     openings: list[dict[str, Any]],
     *,

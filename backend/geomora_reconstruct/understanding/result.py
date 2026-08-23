@@ -47,6 +47,7 @@ class UnderstandingResult:
     bays: list[BayColumn] = field(default_factory=list)
     pattern_groups: list[dict[str, Any]] = field(default_factory=list)
     hidden_opening_hypotheses: list[dict[str, Any]] = field(default_factory=list)
+    door_hypotheses: list[dict[str, Any]] = field(default_factory=list)
     uncertainties: list[str] = field(default_factory=list)
     debug: dict[str, Any] = field(default_factory=dict)
 
@@ -58,6 +59,7 @@ class UnderstandingResult:
             "bays": [bay.to_dict() for bay in self.bays],
             "pattern_groups": self.pattern_groups,
             "hidden_opening_hypotheses": self.hidden_opening_hypotheses,
+            "door_hypotheses": self.door_hypotheses,
             "uncertainties": self.uncertainties,
             "debug": self.debug,
         }

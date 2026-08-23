@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from .detection_metrics import evaluate_detection
+from .constraint_solver_metrics import evaluate_constraint_solver
 from .geometry_metrics import evaluate_geometry
 from .rationalization_metrics import evaluate_rationalization
 from .scale_metrics import evaluate_scale
@@ -53,6 +54,7 @@ def evaluate_reconstruction(truth: dict[str, Any], prediction: dict[str, Any]) -
         "scale": evaluate_scale(truth, prediction),
         "rationalization": evaluate_rationalization(prediction),
         "sketchup": evaluate_sketchup(prediction),
+        "constraint_solver": evaluate_constraint_solver(prediction),
     }
     rqs, coverage = _score(groups)
     return {
@@ -60,6 +62,6 @@ def evaluate_reconstruction(truth: dict[str, Any], prediction: dict[str, Any]) -
         **groups,
         "rqs": rqs,
         "coverage": coverage,
-        "not_evaluated": [key for key, value in groups.items() if value is None],
+        # Diagnostic groups do not reduce annotation coverage or legacy RQS.
+        "not_evaluated": [key for key in WEIGHTS if groups[key] is None],
     }
-

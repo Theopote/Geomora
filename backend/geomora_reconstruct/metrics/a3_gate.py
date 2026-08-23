@@ -17,6 +17,10 @@ class GateThresholds:
     sketchup_pass_rate_min: float = 0.85
     rationalization_improvement_min: float = 0.10
     min_gt_review_rounds: int = 2
+    solver_residual_reduction_min: float = 0.0
+    solver_hard_satisfaction_min: float = 1.0
+    solver_mean_bbox_drift_max: float = 0.03
+    solver_max_bbox_drift_max: float = 0.10
 
 
 @dataclass
@@ -281,6 +285,29 @@ def evaluate_a3_gate(
     if phase not in ("r0_objective",) and not holdout_passed:
         report.passed = False
 
+    if phase != "r0_objective":
+        solver_metrics = [row["metrics"].get("constraint_solver") for row in evaluated]
+        solver_metrics = [item for item in solver_metrics if item is not None]
+        if phase == "stage_a_full" and not solver_metrics:
+            report.blockers.append("missing_constraint_solver_metrics")
+            report.passed = False
+        if solver_metrics:
+            reductions = [item["residual_reduction"] for item in solver_metrics if item.get("residual_reduction") is not None]
+            mean_reduction = _mean(reductions)
+            hard_rate = min(item.get("hard_satisfaction_rate", 0.0) for item in solver_metrics)
+            mean_drift = max((item.get("mean_bbox_drift") or 0.0) for item in solver_metrics)
+            max_drift = max((item.get("max_bbox_drift") or 0.0) for item in solver_metrics)
+            introduced = sum(item.get("introduced_overlaps", 0) + item.get("introduced_boundary_violations", 0) for item in solver_metrics)
+            solver_checks = [
+                GateCheck("solver_residual_reduction", mean_reduction is not None and mean_reduction >= thresholds.solver_residual_reduction_min, round(mean_reduction, 4) if mean_reduction is not None else None, thresholds.solver_residual_reduction_min, "Mean relative constraint residual reduction"),
+                GateCheck("solver_hard_satisfaction", hard_rate >= thresholds.solver_hard_satisfaction_min, hard_rate, thresholds.solver_hard_satisfaction_min, "Minimum hard-constraint satisfaction rate"),
+                GateCheck("solver_geometry_drift", mean_drift <= thresholds.solver_mean_bbox_drift_max and max_drift <= thresholds.solver_max_bbox_drift_max, {"mean_max": mean_drift, "coordinate_max": max_drift}, {"mean_max": thresholds.solver_mean_bbox_drift_max, "coordinate_max": thresholds.solver_max_bbox_drift_max}, "Maximum drift from observed opening boxes"),
+                GateCheck("solver_introduced_violations", introduced == 0, introduced, 0, "New overlap or facade-boundary violations"),
+            ]
+            report.checks.extend(solver_checks)
+            if not all(check.passed for check in solver_checks):
+                report.passed = False
+
     if truths and phase == "stage_a_full":
         pending_anchors = [
             photo_id
@@ -309,5 +336,6 @@ def evaluate_a3_gate(
         "mean_coverage": round(mean_coverage, 4) if mean_coverage is not None else None,
         "val_window_recall": round(val_recall, 4) if val_recall is not None else None,
         "holdout_generate_stable": generate_stable_count,
+        "solver_evaluated": sum(1 for row in evaluated if row["metrics"].get("constraint_solver") is not None),
     }
     return report

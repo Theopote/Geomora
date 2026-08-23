@@ -1,5 +1,183 @@
 {
   "photo_id": "photo_11",
-  "status": "not_run",
-  "notes": "Rationalize stage deferred until Architectural Understanding v0.1"
+  "status": "topology_inferred",
+  "topology": {
+    "storey_count": 5,
+    "bay_count": 5,
+    "method": "cluster_v0.1",
+    "window_row_count": 5,
+    "window_column_count": 5
+  },
+  "openings": [
+    {
+      "id": "pred_001",
+      "type": "window",
+      "bbox": [
+        0.0,
+        0.5443,
+        0.0371,
+        0.7701
+      ],
+      "confidence": 0.7309,
+      "storey": 2,
+      "bay": 1
+    },
+    {
+      "id": "pred_002",
+      "type": "window",
+      "bbox": [
+        0.0,
+        0.2604,
+        1.0,
+        0.9127
+      ],
+      "confidence": 0.658,
+      "storey": 2,
+      "bay": 3
+    },
+    {
+      "id": "pred_003",
+      "type": "window",
+      "bbox": [
+        0.0,
+        0.8532,
+        0.0451,
+        0.9266
+      ],
+      "confidence": 0.6411,
+      "storey": 1,
+      "bay": 1
+    },
+    {
+      "id": "pred_004",
+      "type": "window",
+      "bbox": [
+        0.0,
+        0.0026,
+        0.0525,
+        0.2814
+      ],
+      "confidence": 0.4657,
+      "storey": 5,
+      "bay": 1
+    },
+    {
+      "id": "pred_005",
+      "type": "window",
+      "bbox": [
+        0.0459,
+        0.7452,
+        0.2456,
+        0.9141
+      ],
+      "confidence": 0.6739,
+      "storey": 1,
+      "bay": 2
+    },
+    {
+      "id": "pred_006",
+      "type": "window",
+      "bbox": [
+        0.1153,
+        0.217,
+        0.1947,
+        0.426
+      ],
+      "confidence": 0.3524,
+      "storey": 3,
+      "bay": 2
+    },
+    {
+      "id": "pred_007",
+      "type": "window",
+      "bbox": [
+        0.2208,
+        0.6801,
+        0.2606,
+        0.7562
+      ],
+      "confidence": 0.6396,
+      "storey": 2,
+      "bay": 2
+    },
+    {
+      "id": "pred_008",
+      "type": "window",
+      "bbox": [
+        0.2553,
+        0.2161,
+        0.3684,
+        0.4529
+      ],
+      "confidence": 0.8225,
+      "storey": 3,
+      "bay": 2
+    },
+    {
+      "id": "pred_009",
+      "type": "window",
+      "bbox": [
+        0.2747,
+        0.5609,
+        0.3525,
+        0.5997
+      ],
+      "confidence": 0.7043,
+      "storey": 2,
+      "bay": 2
+    },
+    {
+      "id": "pred_010",
+      "type": "window",
+      "bbox": [
+        0.4187,
+        0.2175,
+        0.5283,
+        0.4543
+      ],
+      "confidence": 0.8301,
+      "storey": 3,
+      "bay": 3
+    },
+    {
+      "id": "pred_011",
+      "type": "window",
+      "bbox": [
+        0.5822,
+        0.2175,
+        0.6917,
+        0.4612
+      ],
+      "confidence": 0.8135,
+      "storey": 3,
+      "bay": 4
+    },
+    {
+      "id": "pred_012",
+      "type": "window",
+      "bbox": [
+        0.7571,
+        0.2175,
+        0.8419,
+        0.2493
+      ],
+      "confidence": 0.6954,
+      "storey": 4,
+      "bay": 5
+    },
+    {
+      "id": "pred_013",
+      "type": "window",
+      "bbox": [
+        0.7577,
+        0.2201,
+        0.8416,
+        0.434
+      ],
+      "confidence": 0.5939,
+      "storey": 3,
+      "bay": 5
+    }
+  ],
+  "notes": "Rule-based storey/bay clustering from detection (cluster_v0.1)"
 }

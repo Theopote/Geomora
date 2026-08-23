@@ -5,12 +5,15 @@ from typing import Any
 
 from geomora_detect.models import DetectionResult
 
+from .topology_inference import infer_topology_from_openings
+
 
 def detection_to_prediction(
     photo_id: str,
     detection: DetectionResult,
     *,
     topology: dict[str, Any] | None = None,
+    infer_topology: bool = True,
     metric: dict[str, Any] | None = None,
     rationalization_before: dict[str, float] | None = None,
     rationalization_after: dict[str, float] | None = None,
@@ -27,6 +30,10 @@ def detection_to_prediction(
             }
         )
 
+    topology_payload = topology
+    if topology_payload is None and infer_topology and openings:
+        topology_payload, openings = infer_topology_from_openings(openings)
+
     payload: dict[str, Any] = {
         "schema_version": "reconstruction-metrics-v1",
         "photo_id": photo_id,
@@ -38,8 +45,8 @@ def detection_to_prediction(
             "scale_hint": detection.scale_hint,
         },
     }
-    if topology is not None:
-        payload["topology"] = topology
+    if topology_payload is not None:
+        payload["topology"] = topology_payload
     if metric is not None:
         payload["metric"] = metric
     if rationalization_before is not None:

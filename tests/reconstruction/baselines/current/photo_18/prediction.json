@@ -15,7 +15,9 @@
         0.8943,
         0.9165
       ],
-      "confidence": 0.6957
+      "confidence": 0.6957,
+      "storey": 1,
+      "bay": 2
     },
     {
       "id": "pred_002",
@@ -26,7 +28,9 @@
         0.3129,
         0.7641
       ],
-      "confidence": 0.7398
+      "confidence": 0.7398,
+      "storey": 1,
+      "bay": 1
     },
     {
       "id": "pred_003",
@@ -37,7 +41,9 @@
         0.4947,
         0.7477
       ],
-      "confidence": 0.6996
+      "confidence": 0.6996,
+      "storey": 1,
+      "bay": 2
     },
     {
       "id": "pred_004",
@@ -48,7 +54,9 @@
         0.5518,
         0.8022
       ],
-      "confidence": 0.6428
+      "confidence": 0.6428,
+      "storey": 1,
+      "bay": 2
     },
     {
       "id": "pred_005",
@@ -59,7 +67,9 @@
         0.7456,
         0.6286
       ],
-      "confidence": 0.3426
+      "confidence": 0.3426,
+      "storey": 2,
+      "bay": 3
     },
     {
       "id": "pred_006",
@@ -70,7 +80,9 @@
         0.6998,
         0.8185
       ],
-      "confidence": 0.6603
+      "confidence": 0.6603,
+      "storey": 1,
+      "bay": 3
     },
     {
       "id": "pred_007",
@@ -81,7 +93,9 @@
         0.859,
         0.6306
       ],
-      "confidence": 0.3542
+      "confidence": 0.3542,
+      "storey": 2,
+      "bay": 4
     }
   ],
   "pipeline": {
@@ -94,5 +108,12 @@
       "confidence": 0.696,
       "opening_span_norm": 0.8943
     }
+  },
+  "topology": {
+    "storey_count": 2,
+    "bay_count": 4,
+    "method": "cluster_v0.1",
+    "window_row_count": 2,
+    "window_column_count": 4
   }
 }

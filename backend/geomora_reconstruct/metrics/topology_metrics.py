@@ -2,18 +2,50 @@ from __future__ import annotations
 
 from typing import Any
 
+from geomora_detect.acceptance_metrics import bbox_iou
+
 from .common import accuracy_from_error, relative_error, rounded
 
 
-def _assignment_accuracy(truth: list[dict[str, Any]], prediction: list[dict[str, Any]], field: str) -> float | None:
-    predicted_by_id = {item.get("id"): item for item in prediction if item.get("id")}
-    comparable = [item for item in truth if item.get("id") and item.get(field) is not None]
+def _match_openings_by_iou(
+    truth_openings: list[dict[str, Any]],
+    predicted_openings: list[dict[str, Any]],
+    *,
+    iou_threshold: float = 0.5,
+) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    used_predictions: set[int] = set()
+
+    for truth in truth_openings:
+        best_index = None
+        best_iou = 0.0
+        for index, prediction in enumerate(predicted_openings):
+            if index in used_predictions:
+                continue
+            if truth.get("type") != prediction.get("type"):
+                continue
+            iou = bbox_iou(truth["bbox"], prediction["bbox"])
+            if iou > best_iou:
+                best_iou = iou
+                best_index = index
+        if best_index is not None and best_iou >= iou_threshold:
+            pairs.append((truth, predicted_openings[best_index]))
+            used_predictions.add(best_index)
+    return pairs
+
+
+def _assignment_accuracy(
+    truth_openings: list[dict[str, Any]],
+    predicted_openings: list[dict[str, Any]],
+    field: str,
+    *,
+    iou_threshold: float = 0.5,
+) -> float | None:
+    pairs = _match_openings_by_iou(truth_openings, predicted_openings, iou_threshold=iou_threshold)
+    comparable = [(truth, prediction) for truth, prediction in pairs if truth.get(field) is not None]
     if not comparable:
         return None
-    correct = sum(
-        predicted_by_id.get(item["id"], {}).get(field) == item[field]
-        for item in comparable
-    )
+    correct = sum(truth[field] == prediction.get(field) for truth, prediction in comparable)
     return correct / len(comparable)
 
 
@@ -23,26 +55,44 @@ def evaluate_topology(truth: dict[str, Any], prediction: dict[str, Any]) -> dict
     if gt is None or pred is None:
         return None
 
-    storey_error = relative_error(float(pred.get("storey_count", 0)), float(gt["storey_count"])) if "storey_count" in gt else None
-    bay_error = relative_error(float(pred.get("bay_count", 0)), float(gt["bay_count"])) if "bay_count" in gt else None
+    storey_error = (
+        relative_error(float(pred.get("storey_count", 0)), float(gt["storey_count"]))
+        if "storey_count" in gt
+        else None
+    )
+    bay_error = (
+        relative_error(float(pred.get("bay_count", 0)), float(gt["bay_count"]))
+        if "bay_count" in gt
+        else None
+    )
     gt_openings = truth.get("openings", [])
     pred_openings = prediction.get("openings", [])
     ground_doors = [item for item in gt_openings if item.get("type") == "door"]
     door_ground = None
     if ground_doors:
-        predicted_by_id = {item.get("id"): item for item in pred_openings}
-        door_ground = sum(
-            predicted_by_id.get(item.get("id"), {}).get("storey") == 1
-            for item in ground_doors
-        ) / len(ground_doors)
+        door_pairs = _match_openings_by_iou(ground_doors, pred_openings)
+        if door_pairs:
+            door_ground = sum(prediction.get("storey") == 1 for _, prediction in door_pairs) / len(door_pairs)
 
     return {
         "storey_count_error": rounded(storey_error),
         "storey_accuracy": rounded(accuracy_from_error(storey_error)),
         "bay_count_error": rounded(bay_error),
         "bay_accuracy": rounded(accuracy_from_error(bay_error)),
-        "window_to_storey_assignment_accuracy": rounded(_assignment_accuracy(gt_openings, pred_openings, "storey")),
-        "window_to_bay_assignment_accuracy": rounded(_assignment_accuracy(gt_openings, pred_openings, "bay")),
+        "window_to_storey_assignment_accuracy": rounded(
+            _assignment_accuracy(
+                [item for item in gt_openings if item.get("type") == "window"],
+                pred_openings,
+                "storey",
+            )
+        ),
+        "window_to_bay_assignment_accuracy": rounded(
+            _assignment_accuracy(
+                [item for item in gt_openings if item.get("type") == "window"],
+                pred_openings,
+                "bay",
+            )
+        ),
         "door_ground_floor_accuracy": rounded(door_ground),
+        "matched_openings": len(_match_openings_by_iou(gt_openings, pred_openings)),
     }
-

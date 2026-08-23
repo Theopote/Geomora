@@ -15,7 +15,9 @@
         0.8275,
         0.8231
       ],
-      "confidence": 0.8307
+      "confidence": 0.8307,
+      "storey": 1,
+      "bay": 4
     },
     {
       "id": "pred_002",
@@ -26,7 +28,9 @@
         0.0295,
         0.6084
       ],
-      "confidence": 0.6631
+      "confidence": 0.6631,
+      "storey": 4,
+      "bay": 1
     },
     {
       "id": "pred_003",
@@ -37,7 +41,9 @@
         0.1611,
         0.7046
       ],
-      "confidence": 0.6457
+      "confidence": 0.6457,
+      "storey": 2,
+      "bay": 2
     },
     {
       "id": "pred_004",
@@ -48,7 +54,9 @@
         0.1498,
         0.4329
       ],
-      "confidence": 0.695
+      "confidence": 0.695,
+      "storey": 4,
+      "bay": 2
     },
     {
       "id": "pred_005",
@@ -59,7 +67,9 @@
         0.2246,
         0.4095
       ],
-      "confidence": 0.693
+      "confidence": 0.693,
+      "storey": 4,
+      "bay": 2
     },
     {
       "id": "pred_006",
@@ -70,7 +80,9 @@
         0.2465,
         0.9384
       ],
-      "confidence": 0.6639
+      "confidence": 0.6639,
+      "storey": 1,
+      "bay": 2
     },
     {
       "id": "pred_007",
@@ -81,7 +93,9 @@
         0.311,
         0.4126
       ],
-      "confidence": 0.623
+      "confidence": 0.623,
+      "storey": 4,
+      "bay": 2
     },
     {
       "id": "pred_008",
@@ -92,7 +106,9 @@
         0.4192,
         0.4156
       ],
-      "confidence": 0.552
+      "confidence": 0.552,
+      "storey": 4,
+      "bay": 3
     },
     {
       "id": "pred_009",
@@ -103,7 +119,9 @@
         0.4495,
         0.7488
       ],
-      "confidence": 0.7402
+      "confidence": 0.7402,
+      "storey": 2,
+      "bay": 3
     },
     {
       "id": "pred_010",
@@ -114,7 +132,9 @@
         0.5,
         0.4074
       ],
-      "confidence": 0.8841
+      "confidence": 0.8841,
+      "storey": 4,
+      "bay": 3
     },
     {
       "id": "pred_011",
@@ -125,7 +145,9 @@
         0.5915,
         0.6303
       ],
-      "confidence": 0.6697
+      "confidence": 0.6697,
+      "storey": 3,
+      "bay": 3
     },
     {
       "id": "pred_012",
@@ -136,7 +158,9 @@
         0.5636,
         0.109
       ],
-      "confidence": 0.6681
+      "confidence": 0.6681,
+      "storey": 5,
+      "bay": 3
     },
     {
       "id": "pred_013",
@@ -147,7 +171,9 @@
         0.5797,
         0.4056
       ],
-      "confidence": 0.7779
+      "confidence": 0.7779,
+      "storey": 4,
+      "bay": 3
     },
     {
       "id": "pred_014",
@@ -158,7 +184,9 @@
         0.6927,
         0.4089
       ],
-      "confidence": 0.7633
+      "confidence": 0.7633,
+      "storey": 4,
+      "bay": 4
     },
     {
       "id": "pred_015",
@@ -169,7 +197,9 @@
         0.7788,
         0.404
       ],
-      "confidence": 0.8328
+      "confidence": 0.8328,
+      "storey": 4,
+      "bay": 4
     },
     {
       "id": "pred_016",
@@ -180,7 +210,9 @@
         0.8542,
         0.4084
       ],
-      "confidence": 0.718
+      "confidence": 0.718,
+      "storey": 4,
+      "bay": 4
     },
     {
       "id": "pred_017",
@@ -191,7 +223,9 @@
         0.9704,
         1.0
       ],
-      "confidence": 0.7308
+      "confidence": 0.7308,
+      "storey": 1,
+      "bay": 5
     },
     {
       "id": "pred_018",
@@ -202,7 +236,9 @@
         0.9998,
         0.3095
       ],
-      "confidence": 0.9491
+      "confidence": 0.9491,
+      "storey": 5,
+      "bay": 5
     }
   ],
   "pipeline": {
@@ -215,5 +251,12 @@
       "confidence": 0.831,
       "opening_span_norm": 0.98
     }
+  },
+  "topology": {
+    "storey_count": 5,
+    "bay_count": 5,
+    "method": "cluster_v0.1",
+    "window_row_count": 5,
+    "window_column_count": 5
   }
 }

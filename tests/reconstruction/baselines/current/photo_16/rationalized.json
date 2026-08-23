@@ -1,5 +1,66 @@
 {
   "photo_id": "photo_16",
-  "status": "not_run",
-  "notes": "Rationalize stage deferred until Architectural Understanding v0.1"
+  "status": "topology_inferred",
+  "topology": {
+    "storey_count": 2,
+    "bay_count": 4,
+    "method": "cluster_v0.1",
+    "window_row_count": 2,
+    "window_column_count": 4
+  },
+  "openings": [
+    {
+      "id": "pred_001",
+      "type": "window",
+      "bbox": [
+        0.0108,
+        0.4143,
+        0.0431,
+        0.4661
+      ],
+      "confidence": 0.7779,
+      "storey": 1,
+      "bay": 1
+    },
+    {
+      "id": "pred_002",
+      "type": "window",
+      "bbox": [
+        0.1521,
+        0.3429,
+        0.424,
+        0.5282
+      ],
+      "confidence": 0.7814,
+      "storey": 1,
+      "bay": 2
+    },
+    {
+      "id": "pred_003",
+      "type": "window",
+      "bbox": [
+        0.4832,
+        0.3314,
+        0.6541,
+        0.5696
+      ],
+      "confidence": 0.6752,
+      "storey": 1,
+      "bay": 3
+    },
+    {
+      "id": "pred_004",
+      "type": "window",
+      "bbox": [
+        0.7187,
+        0.0,
+        0.9838,
+        0.7054
+      ],
+      "confidence": 0.6536,
+      "storey": 2,
+      "bay": 4
+    }
+  ],
+  "notes": "Rule-based storey/bay clustering from detection (cluster_v0.1)"
 }

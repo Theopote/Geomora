@@ -66,6 +66,10 @@ Batch metrics + aggregate report:
 .venv\Scripts\python scripts\run_reconstruction_metrics_batch.py
 ```
 
+`prediction.json` now includes inferred `topology` (`cluster_v0.1`) with per-opening
+`storey` / `bay` assignments. Topology assignment metrics match detections to GT
+by IoU, not by opening id.
+
 Single pair:
 
 ```powershell

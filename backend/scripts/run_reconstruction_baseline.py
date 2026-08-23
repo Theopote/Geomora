@@ -98,8 +98,10 @@ def run_photo(
     prediction = detection_to_prediction(photo_id, detection)
     rationalized = {
         "photo_id": photo_id,
-        "status": "not_run",
-        "notes": "Rationalize stage deferred until Architectural Understanding v0.1",
+        "status": "topology_inferred",
+        "topology": prediction.get("topology"),
+        "openings": prediction.get("openings"),
+        "notes": "Rule-based storey/bay clustering from detection (cluster_v0.1)",
     }
     architectural_ir = {
         "photo_id": photo_id,

@@ -159,5 +159,28 @@
       }
     }
   ],
-  "notes": "Rule-based storey/bay clustering + facade-relative geometry ratios (v0.1)"
+  "rationalization_before": {
+    "width_variance": 0.3833,
+    "height_variance": 0.1818,
+    "sill_variance": 0.0189,
+    "spacing_variance": 0.1896,
+    "alignment_deviation": 0.2064
+  },
+  "rationalization_after": {
+    "width_variance": 0.0002,
+    "height_variance": 0.0,
+    "sill_variance": 0.0,
+    "spacing_variance": 0.0002,
+    "alignment_deviation": 0.2298
+  },
+  "sketchup": {
+    "generate_stable": true,
+    "editable": true,
+    "openings_are_holes": true,
+    "no_overlapping_openings": false,
+    "correct_storey_assignment": true,
+    "sane_wall_dimensions": true,
+    "component_reuse": false
+  },
+  "notes": "Understanding v0.1 + heuristic rationalization/sketchup checks"
 }

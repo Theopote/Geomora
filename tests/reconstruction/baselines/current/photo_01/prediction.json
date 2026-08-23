@@ -141,5 +141,166 @@
   "geometry": {
     "method": "bbox_ratios_v0.1",
     "opening_count": 5
+  },
+  "rationalization_before": {
+    "width_variance": 1.0724,
+    "height_variance": 0.764,
+    "sill_variance": 0.1407,
+    "spacing_variance": 2.4658,
+    "alignment_deviation": 0.5109
+  },
+  "rationalization_after": {
+    "width_variance": 0.0001,
+    "height_variance": 0.0,
+    "sill_variance": 0.0,
+    "spacing_variance": 0.0001,
+    "alignment_deviation": 0.4741
+  },
+  "metric": {
+    "facade_width_mm": 4000.0,
+    "facade_height_mm": 2600.0,
+    "storey_height_mm": 2600.0,
+    "window_width_mm": 1486.0,
+    "window_height_mm": 493.5
+  },
+  "sketchup": {
+    "generate_stable": true,
+    "editable": true,
+    "openings_are_holes": true,
+    "no_overlapping_openings": false,
+    "correct_storey_assignment": true,
+    "sane_wall_dimensions": true,
+    "component_reuse": false
+  },
+  "architectural_ir": {
+    "schema_version": "0.1",
+    "project": {
+      "id": "project_photo_01",
+      "name": "photo_01",
+      "unit": "mm",
+      "coordinate_system": "z_up",
+      "default_wall_thickness": 240.0
+    },
+    "buildings": [
+      {
+        "id": "building_001",
+        "name": "Main Building",
+        "storeys": [
+          {
+            "id": "storey_01",
+            "name": "Storey 1",
+            "elevation": 0.0,
+            "height": 2600.0,
+            "elements": [
+              {
+                "id": "wall_01_01",
+                "type": "wall",
+                "storey_id": "storey_01",
+                "geometry": {
+                  "baseline": [
+                    [
+                      0,
+                      0,
+                      0.0
+                    ],
+                    [
+                      4000.0,
+                      0,
+                      0.0
+                    ]
+                  ],
+                  "height": 2600.0,
+                  "thickness": 240.0
+                },
+                "semantic": {
+                  "exterior": true
+                },
+                "opening_ids": [
+                  "pred_001",
+                  "pred_002",
+                  "pred_003",
+                  "pred_004",
+                  "pred_005"
+                ],
+                "confidence": 0.8
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "openings": [
+      {
+        "id": "pred_001",
+        "type": "window",
+        "parent_id": "wall_01_01",
+        "geometry": {
+          "offset": 0.0,
+          "width": 4000.0,
+          "height": 802.1,
+          "sill_height": 0.8,
+          "depth": 240.0
+        },
+        "confidence": 0.662
+      },
+      {
+        "id": "pred_002",
+        "type": "window",
+        "parent_id": "wall_01_01",
+        "geometry": {
+          "offset": 506.8,
+          "width": 239.6,
+          "height": 138.3,
+          "sill_height": 0.5,
+          "depth": 240.0
+        },
+        "confidence": 0.7422
+      },
+      {
+        "id": "pred_003",
+        "type": "window",
+        "parent_id": "wall_01_01",
+        "geometry": {
+          "offset": 1229.2,
+          "width": 295.2,
+          "height": 129.5,
+          "sill_height": 0.6,
+          "depth": 240.0
+        },
+        "confidence": 0.7933
+      },
+      {
+        "id": "pred_004",
+        "type": "window",
+        "parent_id": "wall_01_01",
+        "geometry": {
+          "offset": 1913.2,
+          "width": 1486.0,
+          "height": 493.5,
+          "sill_height": 0.7,
+          "depth": 240.0
+        },
+        "confidence": 0.8115
+      },
+      {
+        "id": "pred_005",
+        "type": "window",
+        "parent_id": "wall_01_01",
+        "geometry": {
+          "offset": 3430.4,
+          "width": 569.6,
+          "height": 170.0,
+          "sill_height": 0.6,
+          "depth": 240.0
+        },
+        "confidence": 0.7687
+      }
+    ],
+    "constraints": [],
+    "metric": {
+      "facade_width_mm": 4000.0,
+      "facade_height_mm": 2600.0,
+      "storey_height_mm": 2600.0
+    }
   }
 }

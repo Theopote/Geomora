@@ -11,6 +11,7 @@ REPO_ROOT = BACKEND_ROOT.parent
 sys.path.insert(0, str(BACKEND_ROOT))
 
 from geomora_reconstruct.metrics import evaluate_reconstruction  # noqa: E402
+from geomora_reconstruct.metrics.a3_gate import evaluate_a3_gate  # noqa: E402
 
 MINIMAL_SET = REPO_ROOT / "tests" / "reconstruction" / "minimal_set.json"
 GT_DIR = REPO_ROOT / "tests" / "reconstruction" / "ground_truth"
@@ -47,7 +48,7 @@ def resolve_prediction(prediction_dir: Path, photo_id: str) -> Path | None:
     return None
 
 
-def aggregate(results: list[dict]) -> dict:
+def aggregate(results: list[dict], *, minimal_set: dict | None = None, truths: dict[str, dict] | None = None) -> dict:
     evaluated = [row for row in results if row.get("metrics")]
     coverages = [row["metrics"]["coverage"] for row in evaluated if row["metrics"].get("coverage") is not None]
     rqss = [row["metrics"]["rqs"] for row in evaluated if row["metrics"].get("rqs") is not None]
@@ -56,6 +57,10 @@ def aggregate(results: list[dict]) -> dict:
     detection_rows = [row["metrics"]["detection"] for row in evaluated if row["metrics"].get("detection")]
     window_recalls = [row["window"]["recall"] for row in detection_rows if row.get("window")]
     window_precisions = [row["window"]["precision"] for row in detection_rows if row.get("window")]
+
+    gate_report = None
+    if minimal_set is not None:
+        gate_report = evaluate_a3_gate(minimal_set, results, truths=truths, phase="r0_objective").to_dict()
 
     return {
         "photos": len(results),
@@ -66,6 +71,7 @@ def aggregate(results: list[dict]) -> dict:
         "mean_window_recall": round(sum(window_recalls) / len(window_recalls), 4) if window_recalls else None,
         "mean_window_precision": round(sum(window_precisions) / len(window_precisions), 4) if window_precisions else None,
         "gate_ready": len(full_coverage) == len(results) and len(results) > 0,
+        "a3_gate_r0": gate_report,
     }
 
 
@@ -75,6 +81,7 @@ def main() -> int:
     photo_ids = [item["id"] for item in minimal["photos"]]
 
     rows = []
+    truths: dict[str, dict] = {}
     for photo_id in photo_ids:
         truth_path = args.ground_truth_dir / f"{photo_id}.json"
         pred_path = resolve_prediction(args.prediction_dir, photo_id)
@@ -88,6 +95,7 @@ def main() -> int:
             rows.append(row)
             continue
         truth = load_json(truth_path)
+        truths[photo_id] = truth
         prediction = load_json(pred_path)
         row["prediction"] = str(pred_path)
         row["metrics"] = evaluate_reconstruction(truth, prediction)
@@ -95,7 +103,7 @@ def main() -> int:
 
     payload = {
         "minimal_set": str(args.minimal_set),
-        "aggregate": aggregate(rows),
+        "aggregate": aggregate(rows, minimal_set=minimal, truths=truths),
         "results": rows,
     }
 
@@ -104,12 +112,15 @@ def main() -> int:
     out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     aggregate_summary = payload["aggregate"]
+    gate = aggregate_summary.get("a3_gate_r0") or {}
     print(f"Metrics aggregate -> {out_path.resolve()}")
     print(
         f"  evaluated={aggregate_summary['evaluated']}/{aggregate_summary['photos']} "
         f"mean_rqs={aggregate_summary['mean_rqs']} "
         f"mean_window_recall={aggregate_summary['mean_window_recall']} "
-        f"gate_ready={aggregate_summary['gate_ready']}"
+        f"mean_coverage={aggregate_summary['mean_coverage']} "
+        f"gate_ready={aggregate_summary['gate_ready']} "
+        f"a3_gate_r0_passed={gate.get('passed')}"
     )
     for row in rows:
         metrics = row.get("metrics") or {}

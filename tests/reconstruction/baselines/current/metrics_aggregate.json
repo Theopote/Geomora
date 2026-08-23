@@ -4,11 +4,68 @@
     "photos": 5,
     "evaluated": 5,
     "full_coverage_count": 0,
-    "mean_coverage": 0.66,
-    "mean_rqs": 46.0,
+    "mean_coverage": 0.86,
+    "mean_rqs": 53.9,
     "mean_window_recall": 0.4967,
     "mean_window_precision": 0.3228,
-    "gate_ready": false
+    "gate_ready": false,
+    "a3_gate_r0": {
+      "phase": "r0_objective",
+      "passed": true,
+      "checks": [
+        {
+          "id": "val_window_recall",
+          "passed": true,
+          "actual": 0.8333,
+          "threshold": 0.8,
+          "detail": "Validation split window recall"
+        },
+        {
+          "id": "mean_rqs",
+          "passed": true,
+          "actual": 53.9,
+          "threshold": 45.0,
+          "detail": "Mean RQS over evaluated metric groups"
+        },
+        {
+          "id": "mean_coverage",
+          "passed": true,
+          "actual": 0.86,
+          "threshold": 0.7,
+          "detail": "Mean annotation coverage across metric groups"
+        },
+        {
+          "id": "topology_storey_accuracy",
+          "passed": true,
+          "actual": 0.5667,
+          "threshold": 0.5,
+          "detail": "Mean storey count accuracy"
+        },
+        {
+          "id": "geometry_normalized_mae",
+          "passed": true,
+          "actual": 0.1846,
+          "threshold": 0.25,
+          "detail": "Mean normalized geometry MAE (lower is better)"
+        },
+        {
+          "id": "holdout_generate_stable",
+          "passed": false,
+          "actual": "3/3",
+          "threshold": ">=4/5",
+          "detail": "Hold-out photos with heuristic generate_stable check"
+        }
+      ],
+      "blockers": [],
+      "summary": {
+        "photos": 5,
+        "evaluated": 5,
+        "mean_rqs": 53.9,
+        "mean_coverage": 0.86,
+        "val_window_recall": 0.8333,
+        "holdout_generate_stable": 3
+      }
+    }
   },
   "results": [
     {
@@ -56,14 +113,44 @@
           "iou_threshold": 0.5
         },
         "scale": null,
-        "rationalization": null,
-        "sketchup": null,
-        "rqs": 53.8,
-        "coverage": 0.7,
+        "rationalization": {
+          "before": {
+            "width_variance": 1.0724,
+            "height_variance": 0.764,
+            "sill_variance": 0.1407,
+            "spacing_variance": 2.4658,
+            "alignment_deviation": 0.5109
+          },
+          "after": {
+            "width_variance": 0.0001,
+            "height_variance": 0.0,
+            "sill_variance": 0.0,
+            "spacing_variance": 0.0001,
+            "alignment_deviation": 0.4741
+          },
+          "improvement": {
+            "width_variance": 0.9999,
+            "height_variance": 1.0,
+            "sill_variance": 1.0,
+            "spacing_variance": 1.0,
+            "alignment_deviation": 0.072
+          },
+          "mean_improvement": 0.8144
+        },
+        "sketchup": {
+          "generate_stable": true,
+          "editable": true,
+          "openings_are_holes": true,
+          "no_overlapping_openings": false,
+          "correct_storey_assignment": true,
+          "sane_wall_dimensions": true,
+          "component_reuse": false,
+          "pass_rate": 0.7143
+        },
+        "rqs": 58.8,
+        "coverage": 0.9,
         "not_evaluated": [
-          "scale",
-          "rationalization",
-          "sketchup"
+          "scale"
         ]
       }
     },
@@ -112,14 +199,44 @@
           "iou_threshold": 0.5
         },
         "scale": null,
-        "rationalization": null,
-        "sketchup": null,
-        "rqs": 44.0,
-        "coverage": 0.7,
+        "rationalization": {
+          "before": {
+            "width_variance": 1.5802,
+            "height_variance": 0.7381,
+            "sill_variance": 0.3946,
+            "spacing_variance": 3.1808,
+            "alignment_deviation": 0.7866
+          },
+          "after": {
+            "width_variance": 0.0003,
+            "height_variance": 0.0,
+            "sill_variance": 0.0,
+            "spacing_variance": 0.0003,
+            "alignment_deviation": 0.5262
+          },
+          "improvement": {
+            "width_variance": 0.9998,
+            "height_variance": 1.0,
+            "sill_variance": 1.0,
+            "spacing_variance": 0.9999,
+            "alignment_deviation": 0.331
+          },
+          "mean_improvement": 0.8662
+        },
+        "sketchup": {
+          "generate_stable": true,
+          "editable": true,
+          "openings_are_holes": true,
+          "no_overlapping_openings": false,
+          "correct_storey_assignment": true,
+          "sane_wall_dimensions": true,
+          "component_reuse": false,
+          "pass_rate": 0.7143
+        },
+        "rqs": 51.8,
+        "coverage": 0.9,
         "not_evaluated": [
-          "scale",
-          "rationalization",
-          "sketchup"
+          "scale"
         ]
       }
     },
@@ -168,14 +285,44 @@
           "iou_threshold": 0.5
         },
         "scale": null,
-        "rationalization": null,
-        "sketchup": null,
-        "rqs": 39.0,
-        "coverage": 0.7,
+        "rationalization": {
+          "before": {
+            "width_variance": 0.5231,
+            "height_variance": 0.8347,
+            "sill_variance": 0.1548,
+            "spacing_variance": 0.0353,
+            "alignment_deviation": 0.7099
+          },
+          "after": {
+            "width_variance": 0.0003,
+            "height_variance": 0.0,
+            "sill_variance": 0.0,
+            "spacing_variance": 0.0,
+            "alignment_deviation": 0.5905
+          },
+          "improvement": {
+            "width_variance": 0.9994,
+            "height_variance": 1.0,
+            "sill_variance": 1.0,
+            "spacing_variance": 1.0,
+            "alignment_deviation": 0.1682
+          },
+          "mean_improvement": 0.8335
+        },
+        "sketchup": {
+          "generate_stable": true,
+          "editable": true,
+          "openings_are_holes": true,
+          "no_overlapping_openings": true,
+          "correct_storey_assignment": true,
+          "sane_wall_dimensions": true,
+          "component_reuse": false,
+          "pass_rate": 0.8571
+        },
+        "rqs": 49.1,
+        "coverage": 0.9,
         "not_evaluated": [
-          "scale",
-          "rationalization",
-          "sketchup"
+          "scale"
         ]
       }
     },
@@ -224,14 +371,44 @@
           "iou_threshold": 0.5
         },
         "scale": null,
-        "rationalization": null,
-        "sketchup": null,
-        "rqs": 37.5,
-        "coverage": 0.5,
+        "rationalization": {
+          "before": {
+            "width_variance": 0.3833,
+            "height_variance": 0.1818,
+            "sill_variance": 0.0189,
+            "spacing_variance": 0.1896,
+            "alignment_deviation": 0.2064
+          },
+          "after": {
+            "width_variance": 0.0002,
+            "height_variance": 0.0,
+            "sill_variance": 0.0,
+            "spacing_variance": 0.0002,
+            "alignment_deviation": 0.2298
+          },
+          "improvement": {
+            "width_variance": 0.9995,
+            "height_variance": 1.0,
+            "sill_variance": 1.0,
+            "spacing_variance": 0.9989,
+            "alignment_deviation": -0.1134
+          },
+          "mean_improvement": 0.777
+        },
+        "sketchup": {
+          "generate_stable": true,
+          "editable": true,
+          "openings_are_holes": true,
+          "no_overlapping_openings": false,
+          "correct_storey_assignment": true,
+          "sane_wall_dimensions": true,
+          "component_reuse": false,
+          "pass_rate": 0.7143
+        },
+        "rqs": 48.1,
+        "coverage": 0.7,
         "not_evaluated": [
-          "scale",
-          "rationalization",
-          "sketchup"
+          "scale"
         ]
       }
     },
@@ -280,14 +457,44 @@
           "iou_threshold": 0.5
         },
         "scale": null,
-        "rationalization": null,
-        "sketchup": null,
-        "rqs": 55.5,
-        "coverage": 0.7,
+        "rationalization": {
+          "before": {
+            "width_variance": 0.3679,
+            "height_variance": 0.8651,
+            "sill_variance": 0.4293,
+            "spacing_variance": 0.6516,
+            "alignment_deviation": 0.5991
+          },
+          "after": {
+            "width_variance": 0.0,
+            "height_variance": 0.0,
+            "sill_variance": 0.0,
+            "spacing_variance": 0.0,
+            "alignment_deviation": 0.5772
+          },
+          "improvement": {
+            "width_variance": 1.0,
+            "height_variance": 1.0,
+            "sill_variance": 1.0,
+            "spacing_variance": 1.0,
+            "alignment_deviation": 0.0366
+          },
+          "mean_improvement": 0.8073
+        },
+        "sketchup": {
+          "generate_stable": true,
+          "editable": true,
+          "openings_are_holes": true,
+          "no_overlapping_openings": true,
+          "correct_storey_assignment": true,
+          "sane_wall_dimensions": true,
+          "component_reuse": false,
+          "pass_rate": 0.8571
+        },
+        "rqs": 61.7,
+        "coverage": 0.9,
         "not_evaluated": [
-          "scale",
-          "rationalization",
-          "sketchup"
+          "scale"
         ]
       }
     }

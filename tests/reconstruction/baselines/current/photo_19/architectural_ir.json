@@ -1,5 +1,313 @@
 {
-  "photo_id": "photo_19",
-  "status": "not_run",
-  "notes": "IR export deferred until Architectural Model layer exists"
+  "schema_version": "0.1",
+  "project": {
+    "id": "project_photo_19",
+    "name": "photo_19",
+    "unit": "mm",
+    "coordinate_system": "z_up",
+    "default_wall_thickness": 240.0
+  },
+  "buildings": [
+    {
+      "id": "building_001",
+      "name": "Main Building",
+      "storeys": [
+        {
+          "id": "storey_01",
+          "name": "Storey 1",
+          "elevation": 0.0,
+          "height": 6000.0,
+          "elements": [
+            {
+              "id": "wall_01_01",
+              "type": "wall",
+              "storey_id": "storey_01",
+              "geometry": {
+                "baseline": [
+                  [
+                    0,
+                    0,
+                    0.0
+                  ],
+                  [
+                    12100.0,
+                    0,
+                    0.0
+                  ]
+                ],
+                "height": 6000.0,
+                "thickness": 240.0
+              },
+              "semantic": {
+                "exterior": true
+              },
+              "opening_ids": [
+                "pred_001",
+                "pred_002",
+                "pred_003",
+                "pred_004",
+                "pred_005",
+                "pred_006",
+                "pred_007",
+                "pred_008",
+                "pred_009",
+                "pred_010",
+                "pred_011",
+                "pred_012",
+                "pred_013",
+                "pred_014",
+                "pred_015",
+                "pred_016",
+                "pred_017",
+                "pred_018"
+              ],
+              "confidence": 0.8
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "openings": [
+    {
+      "id": "pred_001",
+      "type": "door",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 8822.1,
+        "width": 1190.6,
+        "height": 1308.0,
+        "sill_height": 0.8,
+        "depth": 240.0
+      },
+      "confidence": 0.8307
+    },
+    {
+      "id": "pred_002",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 1.2,
+        "width": 355.7,
+        "height": 3640.2,
+        "sill_height": 0.6,
+        "depth": 240.0
+      },
+      "confidence": 0.6631
+    },
+    {
+      "id": "pred_003",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 917.2,
+        "width": 1032.1,
+        "height": 265.8,
+        "sill_height": 0.7,
+        "depth": 240.0
+      },
+      "confidence": 0.6457
+    },
+    {
+      "id": "pred_004",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 1159.2,
+        "width": 653.4,
+        "height": 1090.2,
+        "sill_height": 0.4,
+        "depth": 240.0
+      },
+      "confidence": 0.695
+    },
+    {
+      "id": "pred_005",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 2142.9,
+        "width": 574.7,
+        "height": 902.4,
+        "sill_height": 0.4,
+        "depth": 240.0
+      },
+      "confidence": 0.693
+    },
+    {
+      "id": "pred_006",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 2244.6,
+        "width": 738.1,
+        "height": 256.2,
+        "sill_height": 0.9,
+        "depth": 240.0
+      },
+      "confidence": 0.6639
+    },
+    {
+      "id": "pred_007",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 3182.3,
+        "width": 580.8,
+        "height": 910.2,
+        "sill_height": 0.4,
+        "depth": 240.0
+      },
+      "confidence": 0.623
+    },
+    {
+      "id": "pred_008",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 4541.1,
+        "width": 531.2,
+        "height": 930.0,
+        "sill_height": 0.4,
+        "depth": 240.0
+      },
+      "confidence": 0.552
+    },
+    {
+      "id": "pred_009",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 4690.0,
+        "width": 749.0,
+        "height": 417.0,
+        "sill_height": 0.7,
+        "depth": 240.0
+      },
+      "confidence": 0.7402
+    },
+    {
+      "id": "pred_010",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 5500.7,
+        "width": 549.3,
+        "height": 873.0,
+        "sill_height": 0.4,
+        "depth": 240.0
+      },
+      "confidence": 0.8841
+    },
+    {
+      "id": "pred_011",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 5660.4,
+        "width": 1496.8,
+        "height": 435.6,
+        "sill_height": 0.6,
+        "depth": 240.0
+      },
+      "confidence": 0.6697
+    },
+    {
+      "id": "pred_012",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 6029.4,
+        "width": 790.1,
+        "height": 227.4,
+        "sill_height": 0.1,
+        "depth": 240.0
+      },
+      "confidence": 0.6681
+    },
+    {
+      "id": "pred_013",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 6483.2,
+        "width": 531.2,
+        "height": 867.0,
+        "sill_height": 0.4,
+        "depth": 240.0
+      },
+      "confidence": 0.7779
+    },
+    {
+      "id": "pred_014",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 7849.3,
+        "width": 532.4,
+        "height": 889.2,
+        "sill_height": 0.4,
+        "depth": 240.0
+      },
+      "confidence": 0.7633
+    },
+    {
+      "id": "pred_015",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 8891.1,
+        "width": 532.4,
+        "height": 861.6,
+        "sill_height": 0.4,
+        "depth": 240.0
+      },
+      "confidence": 0.8328
+    },
+    {
+      "id": "pred_016",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 9787.7,
+        "width": 548.1,
+        "height": 921.0,
+        "sill_height": 0.4,
+        "depth": 240.0
+      },
+      "confidence": 0.718
+    },
+    {
+      "id": "pred_017",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 11046.1,
+        "width": 695.8,
+        "height": 208.8,
+        "sill_height": 1.0,
+        "depth": 240.0
+      },
+      "confidence": 0.7308
+    },
+    {
+      "id": "pred_018",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 11193.7,
+        "width": 903.9,
+        "height": 1839.6,
+        "sill_height": 0.3,
+        "depth": 240.0
+      },
+      "confidence": 0.9491
+    }
+  ],
+  "constraints": [],
+  "metric": {
+    "facade_width_mm": 12100.0,
+    "facade_height_mm": 6000.0,
+    "storey_height_mm": 6000.0
+  }
 }

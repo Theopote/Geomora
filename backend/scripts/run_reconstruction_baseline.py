@@ -18,6 +18,7 @@ from geomora_detect.facade_row_detector import detect_facade_row_elements  # noq
 from geomora_detect.yolo_detector import detect_yolo_elements, model_available  # noqa: E402
 from geomora_reconstruct.export import detection_to_prediction  # noqa: E402
 from geomora_reconstruct.metrics import evaluate_reconstruction  # noqa: E402
+from geomora_reconstruct.prediction_enrichment import enrich_prediction  # noqa: E402
 from geomora_reconstruct.observations.adapters import (  # noqa: E402
     detection_result_to_observations,
     facade_row_to_observations,
@@ -96,18 +97,22 @@ def run_photo(
     }
     detections = detection.to_dict()
     prediction = detection_to_prediction(photo_id, detection)
+    enrich_prediction(prediction, detection, export_ir=True)
+    architectural_ir = prediction.get("architectural_ir") or {
+        "photo_id": photo_id,
+        "status": "not_run",
+        "notes": "IR export requires scale_hint from detection",
+    }
     rationalized = {
         "photo_id": photo_id,
         "status": "topology_geometry_inferred",
         "topology": prediction.get("topology"),
         "geometry": prediction.get("geometry"),
         "openings": prediction.get("openings"),
-        "notes": "Rule-based storey/bay clustering + facade-relative geometry ratios (v0.1)",
-    }
-    architectural_ir = {
-        "photo_id": photo_id,
-        "status": "not_run",
-        "notes": "IR export deferred until Architectural Model layer exists",
+        "rationalization_before": prediction.get("rationalization_before"),
+        "rationalization_after": prediction.get("rationalization_after"),
+        "sketchup": prediction.get("sketchup"),
+        "notes": "Understanding v0.1 + heuristic rationalization/sketchup checks",
     }
 
     metrics_result = None

@@ -1,5 +1,243 @@
 {
-  "photo_id": "photo_11",
-  "status": "not_run",
-  "notes": "IR export deferred until Architectural Model layer exists"
+  "schema_version": "0.1",
+  "project": {
+    "id": "project_photo_11",
+    "name": "photo_11",
+    "unit": "mm",
+    "coordinate_system": "z_up",
+    "default_wall_thickness": 240.0
+  },
+  "buildings": [
+    {
+      "id": "building_001",
+      "name": "Main Building",
+      "storeys": [
+        {
+          "id": "storey_01",
+          "name": "Storey 1",
+          "elevation": 0.0,
+          "height": 2400.0,
+          "elements": [
+            {
+              "id": "wall_01_01",
+              "type": "wall",
+              "storey_id": "storey_01",
+              "geometry": {
+                "baseline": [
+                  [
+                    0,
+                    0,
+                    0.0
+                  ],
+                  [
+                    4200.0,
+                    0,
+                    0.0
+                  ]
+                ],
+                "height": 2400.0,
+                "thickness": 240.0
+              },
+              "semantic": {
+                "exterior": true
+              },
+              "opening_ids": [
+                "pred_001",
+                "pred_002",
+                "pred_003",
+                "pred_004",
+                "pred_005",
+                "pred_006",
+                "pred_007",
+                "pred_008",
+                "pred_009",
+                "pred_010",
+                "pred_011",
+                "pred_012",
+                "pred_013"
+              ],
+              "confidence": 0.8
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "openings": [
+    {
+      "id": "pred_001",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 0.0,
+        "width": 155.8,
+        "height": 541.9,
+        "sill_height": 0.8,
+        "depth": 240.0
+      },
+      "confidence": 0.7309
+    },
+    {
+      "id": "pred_002",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 0.0,
+        "width": 4200.0,
+        "height": 1565.5,
+        "sill_height": 0.9,
+        "depth": 240.0
+      },
+      "confidence": 0.658
+    },
+    {
+      "id": "pred_003",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 0.0,
+        "width": 189.4,
+        "height": 176.2,
+        "sill_height": 0.9,
+        "depth": 240.0
+      },
+      "confidence": 0.6411
+    },
+    {
+      "id": "pred_004",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 0.0,
+        "width": 220.5,
+        "height": 669.1,
+        "sill_height": 0.3,
+        "depth": 240.0
+      },
+      "confidence": 0.4657
+    },
+    {
+      "id": "pred_005",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 192.8,
+        "width": 838.7,
+        "height": 405.4,
+        "sill_height": 0.9,
+        "depth": 240.0
+      },
+      "confidence": 0.6739
+    },
+    {
+      "id": "pred_006",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 484.3,
+        "width": 333.5,
+        "height": 501.6,
+        "sill_height": 0.4,
+        "depth": 240.0
+      },
+      "confidence": 0.3524
+    },
+    {
+      "id": "pred_007",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 927.4,
+        "width": 167.2,
+        "height": 182.6,
+        "sill_height": 0.8,
+        "depth": 240.0
+      },
+      "confidence": 0.6396
+    },
+    {
+      "id": "pred_008",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 1072.3,
+        "width": 475.0,
+        "height": 568.3,
+        "sill_height": 0.5,
+        "depth": 240.0
+      },
+      "confidence": 0.8225
+    },
+    {
+      "id": "pred_009",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 1153.7,
+        "width": 326.8,
+        "height": 93.1,
+        "sill_height": 0.6,
+        "depth": 240.0
+      },
+      "confidence": 0.7043
+    },
+    {
+      "id": "pred_010",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 1758.5,
+        "width": 460.3,
+        "height": 568.3,
+        "sill_height": 0.5,
+        "depth": 240.0
+      },
+      "confidence": 0.8301
+    },
+    {
+      "id": "pred_011",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 2445.2,
+        "width": 459.9,
+        "height": 584.9,
+        "sill_height": 0.5,
+        "depth": 240.0
+      },
+      "confidence": 0.8135
+    },
+    {
+      "id": "pred_012",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 3179.8,
+        "width": 356.2,
+        "height": 76.3,
+        "sill_height": 0.2,
+        "depth": 240.0
+      },
+      "confidence": 0.6954
+    },
+    {
+      "id": "pred_013",
+      "type": "window",
+      "parent_id": "wall_01_01",
+      "geometry": {
+        "offset": 3182.3,
+        "width": 352.4,
+        "height": 513.4,
+        "sill_height": 0.4,
+        "depth": 240.0
+      },
+      "confidence": 0.5939
+    }
+  ],
+  "constraints": [],
+  "metric": {
+    "facade_width_mm": 4200.0,
+    "facade_height_mm": 2400.0,
+    "storey_height_mm": 2400.0
+  }
 }

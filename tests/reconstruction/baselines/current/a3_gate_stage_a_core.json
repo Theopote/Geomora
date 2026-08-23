@@ -1,15 +1,74 @@
 {
-  "generated_at": "2026-08-23T09:37:46.354203+00:00",
-  "method": "auto",
-  "photos": 5,
+  "minimal_set": "F:\\development\\Geomora\\tests\\reconstruction\\minimal_set.json",
+  "prediction_dir": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current",
+  "gate": {
+    "phase": "stage_a_core",
+    "passed": false,
+    "checks": [
+      {
+        "id": "val_window_recall",
+        "passed": true,
+        "actual": 0.8333,
+        "threshold": 0.8,
+        "detail": "Validation split window recall"
+      },
+      {
+        "id": "mean_rqs",
+        "passed": false,
+        "actual": 53.9,
+        "threshold": 70.0,
+        "detail": "Mean RQS over evaluated metric groups"
+      },
+      {
+        "id": "mean_coverage",
+        "passed": false,
+        "actual": 0.86,
+        "threshold": 0.9,
+        "detail": "Mean annotation coverage across metric groups"
+      },
+      {
+        "id": "topology_storey_accuracy",
+        "passed": true,
+        "actual": 0.5667,
+        "threshold": 0.5,
+        "detail": "Mean storey count accuracy"
+      },
+      {
+        "id": "geometry_normalized_mae",
+        "passed": true,
+        "actual": 0.1846,
+        "threshold": 0.25,
+        "detail": "Mean normalized geometry MAE (lower is better)"
+      },
+      {
+        "id": "sketchup_pass_rate",
+        "passed": false,
+        "actual": 0.7714,
+        "threshold": 0.85,
+        "detail": "Mean heuristic SketchUp readiness pass rate"
+      },
+      {
+        "id": "holdout_generate_stable",
+        "passed": true,
+        "actual": "3/3",
+        "threshold": ">=2/3",
+        "detail": "Hold-out photos with heuristic generate_stable check"
+      }
+    ],
+    "blockers": [],
+    "summary": {
+      "photos": 5,
+      "evaluated": 5,
+      "mean_rqs": 53.9,
+      "mean_coverage": 0.86,
+      "val_window_recall": 0.8333,
+      "holdout_generate_stable": 3
+    }
+  },
   "results": [
     {
       "photo_id": "photo_01",
       "split": "train",
-      "category": "residential",
-      "detection_method": "auto_fusion_v1",
-      "window_count": 5,
-      "door_count": 0,
       "metrics": {
         "photo_id": "photo_01",
         "detection": {
@@ -91,15 +150,11 @@
           "scale"
         ]
       },
-      "preview": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_01\\preview.png"
+      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_01\\prediction.json"
     },
     {
       "photo_id": "photo_11",
       "split": "val",
-      "category": "commercial",
-      "detection_method": "auto_fusion_v1",
-      "window_count": 13,
-      "door_count": 0,
       "metrics": {
         "photo_id": "photo_11",
         "detection": {
@@ -181,15 +236,11 @@
           "scale"
         ]
       },
-      "preview": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_11\\preview.png"
+      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_11\\prediction.json"
     },
     {
       "photo_id": "photo_16",
       "split": "holdout",
-      "category": "strong_perspective",
-      "detection_method": "auto_fusion_v1",
-      "window_count": 4,
-      "door_count": 0,
       "metrics": {
         "photo_id": "photo_16",
         "detection": {
@@ -271,15 +322,11 @@
           "scale"
         ]
       },
-      "preview": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_16\\preview.png"
+      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_16\\prediction.json"
     },
     {
       "photo_id": "photo_18",
       "split": "holdout",
-      "category": "tree_occluded",
-      "detection_method": "auto_fusion_v1",
-      "window_count": 6,
-      "door_count": 1,
       "metrics": {
         "photo_id": "photo_18",
         "detection": {
@@ -361,15 +408,11 @@
           "scale"
         ]
       },
-      "preview": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_18\\preview.png"
+      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_18\\prediction.json"
     },
     {
       "photo_id": "photo_19",
       "split": "holdout",
-      "category": "old_building",
-      "detection_method": "auto_fusion_v1",
-      "window_count": 17,
-      "door_count": 1,
       "metrics": {
         "photo_id": "photo_19",
         "detection": {
@@ -451,7 +494,7 @@
           "scale"
         ]
       },
-      "preview": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_19\\preview.png"
+      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_19\\prediction.json"
     }
   ]
 }

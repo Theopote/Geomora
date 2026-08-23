@@ -39,13 +39,43 @@
     "iou_threshold": 0.5
   },
   "scale": null,
-  "rationalization": null,
-  "sketchup": null,
-  "rqs": 55.5,
-  "coverage": 0.7,
+  "rationalization": {
+    "before": {
+      "width_variance": 0.3679,
+      "height_variance": 0.8651,
+      "sill_variance": 0.4293,
+      "spacing_variance": 0.6516,
+      "alignment_deviation": 0.5991
+    },
+    "after": {
+      "width_variance": 0.0,
+      "height_variance": 0.0,
+      "sill_variance": 0.0,
+      "spacing_variance": 0.0,
+      "alignment_deviation": 0.5772
+    },
+    "improvement": {
+      "width_variance": 1.0,
+      "height_variance": 1.0,
+      "sill_variance": 1.0,
+      "spacing_variance": 1.0,
+      "alignment_deviation": 0.0366
+    },
+    "mean_improvement": 0.8073
+  },
+  "sketchup": {
+    "generate_stable": true,
+    "editable": true,
+    "openings_are_holes": true,
+    "no_overlapping_openings": true,
+    "correct_storey_assignment": true,
+    "sane_wall_dimensions": true,
+    "component_reuse": false,
+    "pass_rate": 0.8571
+  },
+  "rqs": 61.7,
+  "coverage": 0.9,
   "not_evaluated": [
-    "scale",
-    "rationalization",
-    "sketchup"
+    "scale"
   ]
 }

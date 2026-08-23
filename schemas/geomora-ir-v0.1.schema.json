@@ -156,7 +156,12 @@
           "type": "array",
           "items": { "type": "string" }
         },
-        "priority": { "type": "string", "enum": ["hard", "soft"] }
+        "priority": { "type": "string", "enum": ["hard", "soft"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "weight": { "type": "number", "minimum": 0 },
+        "source": { "type": "string" },
+        "evidence": { "type": "object" },
+        "status": { "type": "string", "enum": ["proposed", "accepted", "rejected"] }
       }
     },
     "source": {

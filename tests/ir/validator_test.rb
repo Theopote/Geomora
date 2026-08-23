@@ -54,7 +54,9 @@ class ValidatorTest < Minitest::Test
 
   def test_door_below_window_is_not_overlap
     data = JSON.parse(File.read(File.join(ROOT, 'examples', 'facade_phase0.json')))
-    data['openings'].find { |o| o['id'] == 'door_001' }['geometry']['offset'] = 500
+    door = data['openings'].find { |o| o['id'] == 'door_001' }
+    door['geometry']['offset'] = 500
+    door['geometry']['height'] = 800
     doc = Geomora::IR::Parser.parse(data)
 
     assert Geomora::IR::Validator.validate(doc)

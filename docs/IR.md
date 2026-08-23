@@ -109,6 +109,26 @@ equal_width, equal_height, equal_spacing, symmetry, align,
 fixed_dimension, grid
 ```
 
+Reconstruction Core may attach evidence metadata to a constraint:
+
+```json
+{
+  "id": "constraint_001",
+  "type": "equal_width",
+  "targets": ["window_01", "window_02"],
+  "priority": "soft",
+  "confidence": 0.86,
+  "weight": 0.86,
+  "source": "cv_pattern+vlm",
+  "status": "proposed",
+  "evidence": {}
+}
+```
+
+Only user or surveyed dimensions may create hard constraints. CV and VLM
+pattern inference produces soft proposals; VLM may strengthen a proposal but
+cannot invent target entities.
+
 ## Confidence and Source
 
 Elements may carry:

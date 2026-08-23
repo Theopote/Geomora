@@ -175,7 +175,11 @@ def prediction_to_ir(prediction: dict[str, Any]) -> dict[str, Any] | None:
             }
         ],
         "openings": ir_openings,
-        "constraints": [],
+        "constraints": [
+            dict(item)
+            for item in prediction.get("constraint_suggestions", [])
+            if item.get("status", "proposed") == "proposed"
+        ],
         "metric": metric,
         "metric_source": metric_source,
     }

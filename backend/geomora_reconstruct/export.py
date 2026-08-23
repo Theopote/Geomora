@@ -6,6 +6,7 @@ from typing import Any
 from geomora_detect.models import DetectionResult
 
 from .geometry_inference import attach_geometry_to_openings, summarize_geometry
+from .constraints import infer_constraint_suggestions
 from .topology_inference import infer_topology_from_openings
 from .vlm_evidence import ArchitecturalEvidence
 
@@ -89,6 +90,15 @@ def detection_to_prediction(
         payload["topology"] = topology_payload
     if geometry_payload is not None:
         payload["geometry"] = geometry_payload
+    if topology_payload is not None:
+        payload["constraint_suggestions"] = [
+            item.to_dict()
+            for item in infer_constraint_suggestions(
+                openings,
+                topology_payload,
+                architectural_evidence=architectural_evidence,
+            )
+        ]
     if metric is not None:
         payload["metric"] = metric
         payload["metric_source"] = "explicit_metric"

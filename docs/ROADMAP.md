@@ -38,6 +38,14 @@ Understanding v0.2 now reconciles CV counts with VLM evidence conservatively:
 agreement increases confidence, high-confidence VLM may supplement weak/sparse
 geometry, and unresolved conflicts remain explicit instead of becoming IR.
 
+### R4 — Pattern/Constraint Evidence v0.1 (in progress)
+
+Measured row/column repetition now produces IR-compatible soft constraint
+proposals with targets, confidence, weight, source, and evidence. VLM can raise
+confidence for a geometrically identified group but cannot create target
+entities. The next step is a Python weighted solver with hard user anchors and
+soft architectural constraints.
+
 ### A2 — Failure-driven Improvement (completed)
 
 Detection smoke hold-out **5/5** via `auto_fusion_v1`. No further threshold

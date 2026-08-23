@@ -79,6 +79,18 @@ module Geomora
             }
           end
         end
+        if @params['hypothesis_decisions'].is_a?(Hash) && !@params['hypothesis_decisions'].empty?
+          decisions = @params['hypothesis_decisions'].each_with_object({}) do |(id, decision), result|
+            result[id.to_s] = decision if %w[accepted rejected].include?(decision)
+          end
+          unless decisions.empty?
+            ir['reconstruction'] ||= {}
+            ir['reconstruction']['hypothesis_review'] = {
+              'decisions' => decisions,
+              'summary' => decisions.values.each_with_object(Hash.new(0)) { |decision, counts| counts[decision] += 1 }
+            }
+          end
+        end
         ir
       end
 

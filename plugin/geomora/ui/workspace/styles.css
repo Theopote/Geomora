@@ -934,6 +934,24 @@ summary:focus-visible {
   box-shadow: inset 3px 0 0 #f5a623;
 }
 
+.hypothesis-review { margin: 8px 0 12px; padding: 9px; border: 1px solid #65558f; border-radius: 7px; background: #242033; }
+.hypothesis-review-head { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+.hypothesis-review-head > div { display: grid; gap: 2px; }
+.hypothesis-review-head strong { font-size: 12px; color: #e5d8ff; }
+.hypothesis-review-head span, .hypothesis-legend { font-size: 10px; color: #aaa0bd; }
+.hypothesis-list { display: grid; gap: 6px; margin-top: 8px; }
+.hypothesis-card { padding: 7px; border: 1px solid #4d465c; border-radius: 5px; background: #1b1923; }
+.hypothesis-card.accepted { border-color: #34785a; background: #18271f; }
+.hypothesis-card.rejected { opacity: .62; }
+.hypothesis-card-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.hypothesis-card strong { font-size: 11px; }
+.hypothesis-card .meta { margin: 3px 0 6px; }
+.hypothesis-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.hypothesis-actions .btn-link { color: #bda7ff; }
+.hypothesis-overlay { fill: rgba(176, 130, 255, .12); stroke: #bd93ff; stroke-width: 2; stroke-dasharray: 7 5; pointer-events: none; }
+.hypothesis-overlay.accepted { fill: rgba(66, 190, 125, .12); stroke: #57d38c; }
+.hypothesis-balcony { stroke: #ffb65c; stroke-width: 4; stroke-dasharray: 9 5; pointer-events: none; }
+
 .window-row-header {
   display: flex;
   align-items: center;

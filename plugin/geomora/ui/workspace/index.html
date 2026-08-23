@@ -322,6 +322,13 @@
         <label>Doctor grid (mm)<input name="doctor_grid_mm" type="number" step="1" value="10"></label>
 
         <div class="section-title">Windows</div>
+        <section id="hypothesis-review" class="hypothesis-review" hidden aria-live="polite">
+          <div class="hypothesis-review-head">
+            <div><strong>Architectural hypotheses</strong><span id="hypothesis-review-summary"></span></div>
+            <span class="hypothesis-legend">AI proposal · not geometry</span>
+          </div>
+          <div id="hypothesis-list" class="hypothesis-list"></div>
+        </section>
         <div id="reconstruction-review" class="reconstruction-review" hidden>
           <strong>AI reconstruction needs confirmation</strong>
           <div id="reconstruction-review-detail" class="meta"></div>

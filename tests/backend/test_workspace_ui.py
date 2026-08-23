@@ -43,6 +43,13 @@ def test_reconstruction_review_remains_accessible():
     assert 'id="btn-accept-observed"' in html
     assert 'id="btn-accept-adjusted"' in html
     assert 'id="btn-retry-constraints"' in html
+    assert 'id="hypothesis-review"' in html
+    assert 'id="hypothesis-list"' in html
+    script = (WORKSPACE / "app.js").read_text(encoding="utf-8")
+    assert "function renderHypothesisReview()" in script
+    assert "function decideHypothesis(index, decision, adjust)" in script
+    assert "hypothesis_decisions: Object.assign({}, state.hypothesisDecisions)" in script
+    assert "Review all architectural hypotheses before generating" in script
 
 
 def test_workspace_empty_and_narrow_panel_states_do_not_overflow():

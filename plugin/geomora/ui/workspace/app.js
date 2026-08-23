@@ -41,6 +41,8 @@
     cloudUploadAuthorized: false,
     cloudEvidence: null,
     evidenceReview: null
+    ,architecturalHypotheses: []
+    ,hypothesisDecisions: {}
   };
 
   const els = {
@@ -88,6 +90,9 @@
     evidenceProvider: document.getElementById('evidence-provider'),
     evidenceVerdict: document.getElementById('evidence-verdict'),
     evidenceNote: document.getElementById('evidence-note')
+    ,hypothesisReview: document.getElementById('hypothesis-review')
+    ,hypothesisReviewSummary: document.getElementById('hypothesis-review-summary')
+    ,hypothesisList: document.getElementById('hypothesis-list')
   };
 
   function percent(value) { return Math.round((Number(value) || 0) * 100) + '%'; }
@@ -1034,6 +1039,24 @@
     let markup =
       '<rect class="det-hitlayer" x="0" y="0" width="' + nw + '" height="' + nh + '" />';
     markup += renderUnderstandingMarkup();
+    (state.architecturalHypotheses || []).forEach(function (item, index) {
+      const decision = state.hypothesisDecisions[item.id];
+      if (decision === 'rejected') return;
+      const css = 'hypothesis-overlay' + (decision === 'accepted' ? ' accepted' : '');
+      if (item.bbox && item.bbox.length === 4) {
+        const box = bboxPixelsFromNorm(item.bbox);
+        markup += '<rect class="' + css + '" x="' + box.x + '" y="' + box.y +
+          '" width="' + box.w + '" height="' + box.h + '" />';
+      } else if (item.y_range && item.y_range.length === 2) {
+        const band = bboxPixelsFromNorm([0, item.y_range[0], 1, item.y_range[1]]);
+        markup += '<rect class="' + css + '" x="' + band.x + '" y="' + band.y +
+          '" width="' + band.w + '" height="' + band.h + '" />';
+      } else if (item.y !== undefined && item.x_range && item.x_range.length === 2) {
+        const line = bboxPixelsFromNorm([item.x_range[0], item.y, item.x_range[1], item.y]);
+        markup += '<line class="hypothesis-balcony" x1="' + line.x + '" y1="' + line.y +
+          '" x2="' + (line.x + line.w) + '" y2="' + line.y + '" />';
+      }
+    });
 
     state.windows.forEach(function (win, index) {
       const bbox = resolveWindowBbox(win);
@@ -1663,7 +1686,8 @@
       fusion: state.fusion,
       constraint_solution: state.constraintSolution,
       reconstruction_review: state.reconstructionReview,
-      uncertainty_decisions: state.uncertaintyDecisions
+      uncertainty_decisions: state.uncertaintyDecisions,
+      hypothesis_decisions: Object.assign({}, state.hypothesisDecisions)
     };
   }
 
@@ -1941,6 +1965,8 @@
     state.uncertaintyDecisions = {};
     state.constraintSolution = payload.constraint_solution || null;
     state.reconstructionReview = payload.reconstruction_review || null;
+    state.architecturalHypotheses = (state.understanding && state.understanding.architectural_hypotheses) || [];
+    state.hypothesisDecisions = {};
     if (state.understanding && state.understanding.storey_count) {
       els.form.elements.namedItem('storey_count').value = state.understanding.storey_count;
       onStoreyCountChange();
@@ -1948,6 +1974,7 @@
     if (payload.ir_preview) setIrPreview(payload.ir_preview);
     renderReconstructionReview();
     renderEvidenceReview();
+    renderHypothesisReview();
     renderTree();
 
     const summary = state.understanding;
@@ -2166,6 +2193,74 @@
     els.reconstructionReviewDetail.textContent = decision
       ? 'Recorded: ' + decision.replace(/_/g, ' ')
       : 'Reason: ' + (reasons.join(', ') || 'unsafe constraint result');
+  }
+
+  function hypothesisTypeLabel(type) {
+    if (type === 'hidden_hypothesis' || type === 'window') return 'Hidden window';
+    if (type === 'balcony_slab') return 'Balcony slab';
+    return 'Storey hypothesis';
+  }
+
+  function pendingHypothesisCount() {
+    return (state.architecturalHypotheses || []).filter(function (item) {
+      return !state.hypothesisDecisions[item.id];
+    }).length;
+  }
+
+  function hiddenWindowFromHypothesis(item) {
+    if (!item.bbox || item.bbox.length !== 4) return null;
+    const wallLength = Number(els.form.elements.namedItem('wall_length').value) || 10000;
+    const wallHeight = Number(els.form.elements.namedItem('wall_height').value) || 3300;
+    return {
+      offset: Math.round(item.bbox[0] * wallLength),
+      width: Math.round((item.bbox[2] - item.bbox[0]) * wallLength),
+      height: Math.round((item.bbox[3] - item.bbox[1]) * wallHeight),
+      sill_height: Math.round((1 - item.bbox[3]) * wallHeight),
+      confidence: Number(item.confidence) || 0,
+      bbox_norm: item.bbox.slice(),
+      hypothesis_source_id: item.id
+    };
+  }
+
+  function decideHypothesis(index, decision, adjust) {
+    const item = state.architecturalHypotheses[index];
+    if (!item) return;
+    state.hypothesisDecisions[item.id] = decision;
+    if (decision === 'accepted' && item.bbox) {
+      const win = hiddenWindowFromHypothesis(item);
+      const storeyIndex = Math.max(0, Math.min(state.storeyWindows.length - 1, Number(item.storey || 1) - 1));
+      if (win && !(state.storeyWindows[storeyIndex] || []).some(function (existing) { return existing.hypothesis_source_id === item.id; })) {
+        state.storeyWindows[storeyIndex] = state.storeyWindows[storeyIndex] || [];
+        state.storeyWindows[storeyIndex].push(win);
+        if (state.activeStoreyIndex === storeyIndex) {
+          renderWindows(cloneWindows(state.storeyWindows[storeyIndex]));
+          if (adjust) selectWindow(state.windows.length - 1);
+        }
+      }
+    }
+    renderHypothesisReview();
+    renderDetectionOverlay();
+    setStatus('success', hypothesisTypeLabel(item.type) + ' marked ' + decision + '.');
+  }
+
+  function renderHypothesisReview() {
+    if (!els.hypothesisReview) return;
+    const items = state.architecturalHypotheses || [];
+    els.hypothesisReview.hidden = items.length === 0;
+    if (!items.length) return;
+    const pending = pendingHypothesisCount();
+    els.hypothesisReviewSummary.textContent = pending + ' pending · ' + items.length + ' total';
+    els.hypothesisList.innerHTML = items.map(function (item, index) {
+      const decision = state.hypothesisDecisions[item.id] || 'pending';
+      const confidence = Math.round((Number(item.confidence) || 0) * 100);
+      const adjust = item.bbox ? '<button type="button" class="btn-link" data-hypothesis-adjust="' + index + '">Accept &amp; adjust</button>' : '';
+      return '<article class="hypothesis-card ' + decision + '">' +
+        '<div class="hypothesis-card-row"><strong>' + escapeHtml(item.label || hypothesisTypeLabel(item.type)) +
+        '</strong><span class="evidence-badge">' + confidence + '% · ' + decision + '</span></div>' +
+        '<div class="meta">' + escapeHtml(item.status || 'hypothesized') + ' · stays out of geometry until accepted</div>' +
+        '<div class="hypothesis-actions"><button type="button" class="btn-link" data-hypothesis-accept="' + index + '">Accept</button>' +
+        adjust + '<button type="button" class="btn-link" data-hypothesis-reject="' + index + '">Reject</button></div></article>';
+    }).join('');
   }
 
   function applyRoomLayoutSuggestion(layout) {
@@ -2523,6 +2618,10 @@
       setStatus('error', 'Confirm the AI reconstruction result before generating the SketchUp model.');
       return;
     }
+    if (pendingHypothesisCount() > 0) {
+      setStatus('error', 'Review all architectural hypotheses before generating the SketchUp model.');
+      return;
+    }
     if (state.windows.length > REVIEW_WINDOW_LIMIT) {
       setStatus(
         'error',
@@ -2536,6 +2635,17 @@
   document.getElementById('btn-repair-geometry').addEventListener('click', function () {
     sketchupCall('repair_geometry', JSON.stringify(collectParams()));
   });
+
+  if (els.hypothesisList) {
+    els.hypothesisList.addEventListener('click', function (event) {
+      const accept = event.target.closest('[data-hypothesis-accept]');
+      const adjust = event.target.closest('[data-hypothesis-adjust]');
+      const reject = event.target.closest('[data-hypothesis-reject]');
+      if (accept) decideHypothesis(Number(accept.dataset.hypothesisAccept), 'accepted', false);
+      if (adjust) decideHypothesis(Number(adjust.dataset.hypothesisAdjust), 'accepted', true);
+      if (reject) decideHypothesis(Number(reject.dataset.hypothesisReject), 'rejected', false);
+    });
+  }
 
   document.getElementById('btn-suggest-layout').addEventListener('click', function () {
     sketchupCall('suggest_room_layout', JSON.stringify(collectParams()));

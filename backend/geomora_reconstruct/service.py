@@ -63,6 +63,7 @@ def reconstruct_facade(
     facade_bbox = facade_observation.geometry.get("bbox") if facade_observation else None
     storey_cues: list[dict[str, Any]] = []
     line_observations = []
+    balcony_observations = []
     detected_openings = [
         {"id": f"pred_{index:03d}", "type": element.type, "bbox": list(element.bbox_norm), "confidence": element.confidence}
         for index, element in enumerate(detection.elements, start=1)
@@ -144,6 +145,26 @@ def reconstruct_facade(
     uncertainties = list(topology.get("uncertainties") or [])
     solution = prediction.get("constraint_solution") or {}
     safety_status = solution.get("safety_status", "not_run")
+    architectural_hypotheses = []
+    for storey in topology.get("storeys") or []:
+        if storey.get("status") in {"provisional", "hypothesized"}:
+            architectural_hypotheses.append({
+                "id": f"storey_{storey.get('id')}", "type": "storey",
+                "label": f"Storey {storey.get('id')}", "y_range": storey.get("y_range"),
+                "confidence": storey.get("confidence", 0.0), "status": storey.get("status"),
+                "requires_confirmation": True, "evidence": storey.get("evidence") or [],
+            })
+    for balcony in balcony_observations:
+        architectural_hypotheses.append({
+            "id": balcony.id, "type": "balcony_slab", "label": "Balcony slab",
+            "y": balcony.geometry.get("y"), "x_range": balcony.geometry.get("x_range"),
+            "confidence": balcony.confidence, "status": "hypothesized",
+            "requires_confirmation": True, "evidence": [source.to_dict() for source in balcony.sources],
+        })
+    for hidden in topology.get("hidden_opening_hypotheses") or []:
+        architectural_hypotheses.append({
+            **hidden, "label": "Hidden window", "status": "hypothesized",
+        })
     review_required = bool(uncertainties) or safety_status in {
         "accepted_after_soft_weight_retry",
         "fallback_observed_geometry",
@@ -172,6 +193,7 @@ def reconstruct_facade(
             "evidence_coordination": topology.get("evidence_coordination"),
             "hidden_opening_hypotheses": topology.get("hidden_opening_hypotheses") or [],
             "occlusion_awareness": topology.get("occlusion_awareness") or {},
+            "architectural_hypotheses": architectural_hypotheses,
         },
         "constraint_solution": solution or None,
         "prediction": prediction,

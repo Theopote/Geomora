@@ -363,4 +363,19 @@ class IRBuilderTest < Minitest::Test
     assert_equal 'auto_fusion_v1', ir.dig('openings', 0, 'source', 'type')
     assert_equal 0, ir.dig('openings', 0, 'source', 'opening_index')
   end
+
+  def test_preserves_architectural_hypothesis_review
+    params = {
+      'wall_length' => 10_000, 'wall_height' => 3300, 'wall_thickness' => 240,
+      'windows' => [], 'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 },
+      'hypothesis_decisions' => {
+        'hidden_s1_001' => 'accepted', 'balcony_001' => 'rejected', 'invalid' => 'pending'
+      }
+    }
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    review = ir.dig('reconstruction', 'hypothesis_review')
+    assert_equal({ 'hidden_s1_001' => 'accepted', 'balcony_001' => 'rejected' }, review['decisions'])
+    assert_equal 1, review.dig('summary', 'accepted')
+    assert_equal 1, review.dig('summary', 'rejected')
+  end
 end

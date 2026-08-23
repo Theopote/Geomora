@@ -4,6 +4,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from .gt_validator import validate_ground_truth
+
 
 @dataclass(frozen=True)
 class GateThresholds:
@@ -135,6 +137,20 @@ def evaluate_a3_gate(
             if not _gt_reviewed(truth, min_rounds=thresholds.min_gt_review_rounds):
                 report.blockers.append(f"ground_truth_not_reviewed:{row['photo_id']}")
                 report.passed = False
+            audit = validate_ground_truth(truth)
+            if not audit.gate_ready:
+                codes = ",".join(sorted({issue.code for issue in audit.issues}))
+                report.blockers.append(f"ground_truth_inconsistent:{row['photo_id']}:{codes}")
+                report.passed = False
+                report.checks.append(
+                    GateCheck(
+                        id=f"ground_truth_consistency:{row['photo_id']}",
+                        passed=False,
+                        actual={"errors": len(audit.errors), "warnings": len(audit.warnings)},
+                        threshold={"errors": 0, "warnings": 0},
+                        detail="Ground truth must pass structural and spatial consistency audit",
+                    )
+                )
 
     val_rows = [row for row in evaluated if row.get("split") == "val"]
     holdout_rows = [row for row in evaluated if row.get("split") == "holdout"]

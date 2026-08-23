@@ -89,3 +89,15 @@ def test_stage_a_full_requires_constraint_solver_metrics():
     report = evaluate_a3_gate(minimal_set, [{"photo_id": "photo_01", "metrics": metrics}], phase="stage_a_full")
 
     assert "missing_constraint_solver_metrics" in report.blockers
+
+
+def test_a3_gate_blocks_internally_inconsistent_ground_truth():
+    truth = _load("ground_truth/photo_19.json")
+    w291 = next(item for item in truth["openings"] if item["id"] == "w291")
+    w291.update(storey=1, bay=1)
+    truth["pattern_groups"][0]["members"].remove("w291")
+    minimal_set = {"photos": [{"id": "photo_19", "split": "val"}]}
+    metrics = {"rqs": 100.0, "coverage": 1.0, "detection": {"window": {"recall": 1.0}}, "topology": {"storey_accuracy": 1.0}, "geometry": {"normalized_mae": 0.0}, "sketchup": {"pass_rate": 1.0}}
+    report = evaluate_a3_gate(minimal_set, [{"photo_id": "photo_19", "metrics": metrics}], truths={"photo_19": truth})
+    assert report.passed is False
+    assert any(blocker.startswith("ground_truth_inconsistent:photo_19") for blocker in report.blockers)

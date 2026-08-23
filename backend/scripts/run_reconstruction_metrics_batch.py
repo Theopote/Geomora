@@ -11,6 +11,7 @@ REPO_ROOT = BACKEND_ROOT.parent
 sys.path.insert(0, str(BACKEND_ROOT))
 
 from geomora_reconstruct.metrics import evaluate_reconstruction  # noqa: E402
+from geomora_reconstruct.metrics import validate_ground_truth  # noqa: E402
 from geomora_reconstruct.metrics.a3_gate import evaluate_a3_gate  # noqa: E402
 
 MINIMAL_SET = REPO_ROOT / "tests" / "reconstruction" / "minimal_set.json"
@@ -58,6 +59,7 @@ def aggregate(results: list[dict], *, minimal_set: dict | None = None, truths: d
     window_recalls = [row["window"]["recall"] for row in detection_rows if row.get("window")]
     window_precisions = [row["window"]["precision"] for row in detection_rows if row.get("window")]
 
+    gt_gate_ready = all((row.get("ground_truth_audit") or {}).get("gate_ready", False) for row in results)
     gate_report = None
     if minimal_set is not None:
         gate_report = evaluate_a3_gate(minimal_set, results, truths=truths, phase="r0_objective").to_dict()
@@ -70,7 +72,8 @@ def aggregate(results: list[dict], *, minimal_set: dict | None = None, truths: d
         "mean_rqs": round(sum(rqss) / len(rqss), 1) if rqss else None,
         "mean_window_recall": round(sum(window_recalls) / len(window_recalls), 4) if window_recalls else None,
         "mean_window_precision": round(sum(window_precisions) / len(window_precisions), 4) if window_precisions else None,
-        "gate_ready": len(full_coverage) == len(results) and len(results) > 0,
+        "gate_ready": len(full_coverage) == len(results) and len(results) > 0 and gt_gate_ready,
+        "ground_truth_gate_ready": gt_gate_ready,
         "a3_gate_r0": gate_report,
     }
 
@@ -95,6 +98,8 @@ def main() -> int:
             rows.append(row)
             continue
         truth = load_json(truth_path)
+        audit = validate_ground_truth(truth).to_dict()
+        row["ground_truth_audit"] = audit
         truths[photo_id] = truth
         prediction = load_json(pred_path)
         row["prediction"] = str(pred_path)

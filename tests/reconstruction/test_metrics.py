@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from geomora_reconstruct.metrics import evaluate_reconstruction
+from geomora_reconstruct.metrics import validate_ground_truth
 
 
 HERE = Path(__file__).parent
@@ -41,3 +42,7 @@ def test_photo_ids_must_match():
     with pytest.raises(ValueError, match="photo_id"):
         evaluate_reconstruction({"photo_id": "a"}, {"photo_id": "b"})
 
+
+def test_ground_truth_validation_is_available_at_metrics_boundary():
+    report = validate_ground_truth(load("ground_truth"))
+    assert report.valid is True

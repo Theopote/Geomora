@@ -2,7 +2,7 @@
   "schema_version": "reconstruction-metrics-v1",
   "photo_id": "photo_19",
   "annotation_status": "reviewed_v1",
-  "review_rounds": 2,
+  "review_rounds": 3,
   "facade_bbox": [
     0.0295,
     0.02,
@@ -195,8 +195,8 @@
         0.8554,
         0.4076
       ],
-      "storey": 1,
-      "bay": 1
+      "storey": 2,
+      "bay": 9
     }
   ],
   "pattern_groups": [
@@ -210,7 +210,8 @@
         "w25",
         "w26",
         "w27",
-        "w28"
+        "w28",
+        "w291"
       ],
       "constraints": [
         "equal_width",
@@ -233,7 +234,7 @@
         0.94,
         0.94
       ],
-      "distance_mm": 21000.0,
+      "distance_mm": 21000,
       "notes": "user survey facade width and height",
       "surveyed_at": "2026-08-23T10:14:29.583165+00:00"
     },
@@ -249,16 +250,16 @@
         0.05,
         0.95
       ],
-      "distance_mm": 9000.0,
+      "distance_mm": 9000,
       "notes": "user survey facade width and height",
       "surveyed_at": "2026-08-23T10:14:29.583181+00:00"
     }
   ],
   "annotation_notes": "The facade of the two-story commercial building features two large windows, one small window, and three doorways on the ground floor, while the second floor has nine small windows.",
-  "reviewed_at": "2026-08-23T08:50:41.544Z",
+  "reviewed_at": "2026-08-23T14:52:29.857Z",
   "metric": {
-    "facade_width_mm": 21000.0,
-    "facade_height_mm": 9000.0,
-    "storey_height_mm": 4500.0
+    "facade_width_mm": 21000,
+    "facade_height_mm": 9000,
+    "storey_height_mm": 4500
   }
 }

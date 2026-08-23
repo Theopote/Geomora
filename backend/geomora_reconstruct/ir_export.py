@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .metric_anchors import derive_metric_from_anchors
+from .metric_anchors import anchor_axis, anchor_has_distance, derive_metric_from_anchors
 
 DEFAULT_WALL_THICKNESS_MM = 240.0
 
@@ -158,6 +158,38 @@ def prediction_to_ir(prediction: dict[str, Any]) -> dict[str, Any] | None:
             }
         )
 
+    constraints = [
+        dict(item)
+        for item in prediction.get("constraint_suggestions", [])
+        if item.get("status", "proposed") == "proposed"
+    ]
+    for anchor in prediction.get("metric_anchors") or []:
+        if not anchor_has_distance(anchor):
+            continue
+        axis = anchor_axis(anchor)
+        targets = (
+            [f"wall_{index:02d}_01" for index in range(1, storey_count + 1)]
+            if axis == "horizontal"
+            else [f"storey_{index:02d}" for index in range(1, storey_count + 1)]
+        )
+        constraints.append(
+            {
+                "id": f"constraint_{anchor.get('id', axis)}",
+                "type": "fixed_dimension",
+                "targets": targets,
+                "priority": "hard",
+                "confidence": 1.0,
+                "weight": 1.0,
+                "source": "user_anchor",
+                "status": "accepted",
+                "evidence": {
+                    "anchor_id": anchor.get("id"),
+                    "axis": axis,
+                    "distance_mm": float(anchor["distance_mm"]),
+                },
+            }
+        )
+
     return {
         "schema_version": "0.1",
         "project": {
@@ -175,11 +207,7 @@ def prediction_to_ir(prediction: dict[str, Any]) -> dict[str, Any] | None:
             }
         ],
         "openings": ir_openings,
-        "constraints": [
-            dict(item)
-            for item in prediction.get("constraint_suggestions", [])
-            if item.get("status", "proposed") == "proposed"
-        ],
+        "constraints": constraints,
         "metric": metric,
         "metric_source": metric_source,
     }

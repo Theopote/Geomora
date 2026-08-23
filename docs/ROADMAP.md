@@ -43,8 +43,11 @@ geometry, and unresolved conflicts remain explicit instead of becoming IR.
 Measured row/column repetition now produces IR-compatible soft constraint
 proposals with targets, confidence, weight, source, and evidence. VLM can raise
 confidence for a geometrically identified group but cannot create target
-entities. The next step is a Python weighted solver with hard user anchors and
-soft architectural constraints.
+entities. Python weighted projection now applies soft architectural constraints
+to Prediction geometry while preserving observations and residuals. Surveyed
+user dimensions are exported as hard `fixed_dimension` constraints. Next,
+validate solver gains on the five-photo baseline before expanding constraint
+types.
 
 ### A2 — Failure-driven Improvement (completed)
 

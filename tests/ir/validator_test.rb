@@ -62,6 +62,25 @@ class ValidatorTest < Minitest::Test
     assert Geomora::IR::Validator.validate(doc)
   end
 
+  def test_constraint_evidence_survives_ir_parsing
+    data = JSON.parse(File.read(File.join(ROOT, 'examples', 'facade_phase0.json')))
+    constraint = data['constraints'][0]
+    constraint['confidence'] = 0.86
+    constraint['weight'] = 0.72
+    constraint['source'] = 'cv_pattern+vlm'
+    constraint['status'] = 'proposed'
+    constraint['evidence'] = { 'pattern_group_id' => 'row_1' }
+
+    doc = Geomora::IR::Parser.parse(data)
+    parsed = doc.constraints[0]
+
+    assert_in_delta 0.86, parsed.confidence
+    assert_in_delta 0.72, parsed.weight
+    assert_equal 'cv_pattern+vlm', parsed.source
+    assert_equal 'proposed', parsed.status
+    assert_equal 'row_1', parsed.evidence['pattern_group_id']
+  end
+
   def test_zero_length_wall
     data = JSON.parse(File.read(File.join(ROOT, 'examples', 'facade_phase0.json')))
     data['buildings'][0]['storeys'][0]['elements'][0]['geometry']['baseline'] = [[0, 0, 0], [0, 0, 0]]

@@ -97,6 +97,19 @@ def equalize_row(openings: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 def attach_rationalization_metrics(prediction: dict[str, Any]) -> dict[str, float] | None:
     openings = prediction.get("openings") or []
+    if prediction.get("constraint_solution"):
+        observed_openings = []
+        for opening in openings:
+            item = dict(opening)
+            item["bbox"] = list(opening.get("observed_bbox") or opening["bbox"])
+            observed_openings.append(item)
+        before = compute_rationalization_variance(observed_openings)
+        after = compute_rationalization_variance(openings)
+        if before is None or after is None:
+            return None
+        prediction["rationalization_before"] = before
+        prediction["rationalization_after"] = after
+        return after
     before = compute_rationalization_variance(openings)
     if before is None:
         return None

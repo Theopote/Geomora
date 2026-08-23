@@ -6,6 +6,8 @@ from typing import Any
 from geomora_detect.models import DetectionResult
 
 from .ir_export import attach_metric_block, prediction_to_ir
+from .constraints import solve_prediction_constraints
+from .geometry_inference import attach_geometry_to_openings, summarize_geometry
 from .rationalization_variance import attach_rationalization_metrics
 from .sketchup_checks import attach_sketchup_checks
 
@@ -18,6 +20,7 @@ def enrich_prediction(
     attach_rationalization: bool = True,
     attach_sketchup: bool = True,
     export_ir: bool = False,
+    solve_constraints: bool = True,
 ) -> dict[str, Any]:
     if detection is not None:
         pipeline = dict(prediction.get("pipeline") or {})
@@ -25,6 +28,14 @@ def enrich_prediction(
             pipeline["scale_hint"] = detection.scale_hint
         prediction["pipeline"] = pipeline
 
+    if solve_constraints:
+        solution = solve_prediction_constraints(prediction)
+        if solution is not None:
+            openings = prediction.get("openings") or []
+            topology = prediction.get("topology") or {}
+            facade = prediction.get("facade") or {"width": 1.0, "height": 1.0}
+            prediction["openings"] = attach_geometry_to_openings(openings, facade, topology)
+            prediction["geometry"] = summarize_geometry(prediction["openings"])
     if attach_rationalization:
         attach_rationalization_metrics(prediction)
     if attach_metric:

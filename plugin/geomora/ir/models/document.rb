@@ -90,7 +90,8 @@ module Geomora
       )
 
       Constraint = Struct.new(
-        :id, :type, :targets, :priority, keyword_init: true
+        :id, :type, :targets, :priority, :confidence, :weight,
+        :source, :evidence, :status, keyword_init: true
       )
 
       Source = Struct.new(:id, :type, :metadata, keyword_init: true)

@@ -266,7 +266,12 @@ module Geomora
           id: c['id'],
           type: c['type'],
           targets: c['targets'] || [],
-          priority: c['priority']
+          priority: c['priority'],
+          confidence: c['confidence'],
+          weight: c['weight'],
+          source: c['source'],
+          evidence: c['evidence'] || {},
+          status: c['status']
         )
       end
 

@@ -3,10 +3,20 @@
   "status": "topology_geometry_inferred",
   "topology": {
     "storey_count": 1,
-    "bay_count": 5,
-    "method": "cluster_v0.1",
+    "bay_count": 3,
+    "method": "understanding_v0.1",
     "window_row_count": 1,
-    "window_column_count": 5
+    "window_column_count": 3,
+    "facade_bbox": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "pattern_groups": [],
+    "uncertainties": [
+      "filtered_outliers:2"
+    ]
   },
   "geometry": {
     "method": "bbox_ratios_v0.1",
@@ -24,11 +34,13 @@
       ],
       "confidence": 0.662,
       "storey": 1,
-      "bay": 3,
+      "bay": 2,
+      "assignment_confidence": 0.35,
+      "understanding_status": "low_confidence",
       "geometry": {
         "width_facade": 1.0,
         "height_storey": 0.3085,
-        "sill_storey": 0.2297
+        "sill_storey": 0.7703
       }
     },
     {
@@ -43,10 +55,11 @@
       "confidence": 0.7422,
       "storey": 1,
       "bay": 1,
+      "assignment_confidence": 0.63,
       "geometry": {
         "width_facade": 0.0599,
         "height_storey": 0.0532,
-        "sill_storey": 0.452
+        "sill_storey": 0.548
       }
     },
     {
@@ -60,11 +73,13 @@
       ],
       "confidence": 0.7933,
       "storey": 1,
-      "bay": 2,
+      "bay": 1,
+      "assignment_confidence": 0.35,
+      "understanding_status": "low_confidence",
       "geometry": {
         "width_facade": 0.0738,
         "height_storey": 0.0498,
-        "sill_storey": 0.4433
+        "sill_storey": 0.5567
       }
     },
     {
@@ -78,11 +93,12 @@
       ],
       "confidence": 0.8115,
       "storey": 1,
-      "bay": 4,
+      "bay": 2,
+      "assignment_confidence": 0.63,
       "geometry": {
         "width_facade": 0.3715,
         "height_storey": 0.1898,
-        "sill_storey": 0.3478
+        "sill_storey": 0.6522
       }
     },
     {
@@ -96,11 +112,12 @@
       ],
       "confidence": 0.7687,
       "storey": 1,
-      "bay": 5,
+      "bay": 3,
+      "assignment_confidence": 0.63,
       "geometry": {
         "width_facade": 0.1424,
         "height_storey": 0.0654,
-        "sill_storey": 0.4491
+        "sill_storey": 0.5509
       }
     }
   ],

@@ -7,7 +7,7 @@ from geomora_detect.models import DetectedElement, DetectionResult
 
 
 def test_opening_geometry_ratios_use_topology_storeys():
-    opening = {"id": "w11", "type": "window", "bbox": [0.10, 0.58, 0.30, 0.82]}
+    opening = {"id": "w11", "type": "window", "bbox": [0.10, 0.58, 0.30, 0.82], "storey": 1}
     facade = {"width": 1.0, "height": 1.0}
     topology = {"storey_count": 2, "bay_count": 2}
 
@@ -15,7 +15,7 @@ def test_opening_geometry_ratios_use_topology_storeys():
 
     assert ratios["width_facade"] == 0.2
     assert ratios["height_storey"] == 0.48
-    assert ratios["sill_storey"] == 0.36
+    assert ratios["sill_storey"] == 0.64
 
 
 def test_detection_to_prediction_attaches_geometry_block():

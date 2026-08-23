@@ -20,20 +20,20 @@
     }
   },
   "topology": {
-    "storey_count_error": 0.3333,
-    "storey_accuracy": 0.6667,
-    "bay_count_error": 0.5,
-    "bay_accuracy": 0.5,
+    "storey_count_error": 0.6667,
+    "storey_accuracy": 0.3333,
+    "bay_count_error": 0.625,
+    "bay_accuracy": 0.375,
     "window_to_storey_assignment_accuracy": 0.0,
     "window_to_bay_assignment_accuracy": 0.0,
     "door_ground_floor_accuracy": null,
     "matched_openings": 2
   },
   "geometry": {
-    "normalized_mae": 0.2133,
+    "normalized_mae": 0.1335,
     "width_facade_mae": 0.027,
-    "height_storey_mae": 0.1183,
-    "sill_storey_mae": 0.4945,
+    "height_storey_mae": 0.3301,
+    "sill_storey_mae": 0.0433,
     "matched_openings": 2,
     "ground_truth_openings": 6,
     "iou_threshold": 0.5
@@ -41,7 +41,7 @@
   "scale": null,
   "rationalization": null,
   "sketchup": null,
-  "rqs": 40.8,
+  "rqs": 39.0,
   "coverage": 0.7,
   "not_evaluated": [
     "scale",

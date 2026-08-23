@@ -2,11 +2,21 @@
   "photo_id": "photo_16",
   "status": "topology_geometry_inferred",
   "topology": {
-    "storey_count": 2,
-    "bay_count": 4,
-    "method": "cluster_v0.1",
-    "window_row_count": 2,
-    "window_column_count": 4
+    "storey_count": 1,
+    "bay_count": 3,
+    "method": "understanding_v0.1",
+    "window_row_count": 1,
+    "window_column_count": 3,
+    "facade_bbox": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "pattern_groups": [],
+    "uncertainties": [
+      "filtered_outliers:1"
+    ]
   },
   "geometry": {
     "method": "bbox_ratios_v0.1",
@@ -25,10 +35,11 @@
       "confidence": 0.7779,
       "storey": 1,
       "bay": 1,
+      "assignment_confidence": 0.63,
       "geometry": {
         "width_facade": 0.0323,
-        "height_storey": 0.1036,
-        "sill_storey": 0.0678
+        "height_storey": 0.0518,
+        "sill_storey": 0.4661
       }
     },
     {
@@ -43,10 +54,11 @@
       "confidence": 0.7814,
       "storey": 1,
       "bay": 2,
+      "assignment_confidence": 0.63,
       "geometry": {
         "width_facade": 0.2719,
-        "height_storey": 0.3706,
-        "sill_storey": 0.9436
+        "height_storey": 0.1853,
+        "sill_storey": 0.5282
       }
     },
     {
@@ -61,10 +73,11 @@
       "confidence": 0.6752,
       "storey": 1,
       "bay": 3,
+      "assignment_confidence": 0.63,
       "geometry": {
         "width_facade": 0.1709,
-        "height_storey": 0.4764,
-        "sill_storey": 0.8608
+        "height_storey": 0.2382,
+        "sill_storey": 0.5696
       }
     },
     {
@@ -77,12 +90,14 @@
         0.7054
       ],
       "confidence": 0.6536,
-      "storey": 2,
-      "bay": 4,
+      "storey": 1,
+      "bay": 3,
+      "assignment_confidence": 0.35,
+      "understanding_status": "low_confidence",
       "geometry": {
         "width_facade": 0.2651,
-        "height_storey": 1.4108,
-        "sill_storey": 0.5892
+        "height_storey": 0.7054,
+        "sill_storey": 0.7054
       }
     }
   ],

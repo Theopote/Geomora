@@ -4,9 +4,19 @@
   "topology": {
     "storey_count": 2,
     "bay_count": 4,
-    "method": "cluster_v0.1",
+    "method": "understanding_v0.1",
     "window_row_count": 2,
-    "window_column_count": 4
+    "window_column_count": 4,
+    "facade_bbox": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "pattern_groups": [],
+    "uncertainties": [
+      "filtered_outliers:2"
+    ]
   },
   "geometry": {
     "method": "bbox_ratios_v0.1",
@@ -23,12 +33,14 @@
         0.9165
       ],
       "confidence": 0.6957,
-      "storey": 1,
-      "bay": 2,
+      "storey": 2,
+      "bay": 1,
+      "assignment_confidence": 0.35,
+      "understanding_status": "low_confidence",
       "geometry": {
         "width_facade": 0.8943,
         "height_storey": 1.3648,
-        "sill_storey": 0.167
+        "sill_storey": 1.0
       }
     },
     {
@@ -43,10 +55,12 @@
       "confidence": 0.7398,
       "storey": 1,
       "bay": 1,
+      "assignment_confidence": 0.35,
+      "understanding_status": "low_confidence",
       "geometry": {
         "width_facade": 0.1078,
         "height_storey": 0.0908,
-        "sill_storey": 0.4718
+        "sill_storey": 0.5282
       }
     },
     {
@@ -60,11 +74,12 @@
       ],
       "confidence": 0.6996,
       "storey": 1,
-      "bay": 2,
+      "bay": 1,
+      "assignment_confidence": 0.63,
       "geometry": {
         "width_facade": 0.0676,
         "height_storey": 0.1016,
-        "sill_storey": 0.5046
+        "sill_storey": 0.4954
       }
     },
     {
@@ -79,10 +94,11 @@
       "confidence": 0.6428,
       "storey": 1,
       "bay": 2,
+      "assignment_confidence": 0.63,
       "geometry": {
         "width_facade": 0.0317,
         "height_storey": 0.196,
-        "sill_storey": 0.3956
+        "sill_storey": 0.6044
       }
     },
     {
@@ -97,10 +113,11 @@
       "confidence": 0.3426,
       "storey": 2,
       "bay": 3,
+      "assignment_confidence": 0.71,
       "geometry": {
         "width_facade": 0.1577,
         "height_storey": 0.1586,
-        "sill_storey": 0.7428
+        "sill_storey": 1.0
       }
     },
     {
@@ -115,10 +132,11 @@
       "confidence": 0.6603,
       "storey": 1,
       "bay": 3,
+      "assignment_confidence": 0.71,
       "geometry": {
         "width_facade": 0.0613,
         "height_storey": 0.1052,
-        "sill_storey": 0.363
+        "sill_storey": 0.637
       }
     },
     {
@@ -133,10 +151,11 @@
       "confidence": 0.3542,
       "storey": 2,
       "bay": 4,
+      "assignment_confidence": 0.63,
       "geometry": {
         "width_facade": 0.0738,
         "height_storey": 0.152,
-        "sill_storey": 0.7388
+        "sill_storey": 1.0
       }
     }
   ],

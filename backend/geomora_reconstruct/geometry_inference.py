@@ -14,11 +14,19 @@ def opening_geometry_ratios(
     facade_height = float(facade.get("height", 1.0) or 1.0)
     storeys = max(int(topology.get("storey_count", 1)), 1)
     storey_height = facade_height / storeys
-    sill_height = facade_height - y2
+
+    storey_index = int(opening.get("storey") or 1)
+    storey_index = max(1, min(storey_index, storeys))
+    storey_top = facade_height - (storey_index - 1) * storey_height
+    storey_bottom = storey_top - storey_height
+
+    sill_storey = (y2 - storey_bottom) / storey_height if storey_height > 0 else 0.0
+    sill_storey = max(0.0, min(1.0, sill_storey))
+
     return {
         "width_facade": round((x2 - x1) / facade_width, 4),
         "height_storey": round((y2 - y1) / storey_height, 4),
-        "sill_storey": round((sill_height % storey_height) / storey_height, 4),
+        "sill_storey": round(sill_storey, 4),
     }
 
 

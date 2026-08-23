@@ -221,22 +221,45 @@ module Geomora
           ::UI.messagebox("LOD view failed:\n\n#{e.message}")
         end
 
+        TOOLBAR_ICON_DIR = File.join(__dir__, 'toolbar').freeze
+
+        def toolbar_icon(name, size)
+          File.join(TOOLBAR_ICON_DIR, "#{name}_#{size}.png")
+        end
+
+        def configure_toolbar_command(command, icon:, tooltip:, status_bar_text:)
+          command.tooltip = tooltip
+          command.status_bar_text = status_bar_text
+          command.small_icon = toolbar_icon(icon, 'small')
+          command.large_icon = toolbar_icon(icon, 'large')
+          command
+        end
+
         def register_toolbar
           toolbar = ::UI::Toolbar.new('Geomora')
 
-          workspace_cmd = ::UI::Command.new('Workspace') { open_workspace }
-          workspace_cmd.tooltip = 'Open Geomora Workspace'
-          workspace_cmd.status_bar_text = 'Manual facade definition workspace'
+          workspace_cmd = configure_toolbar_command(
+            ::UI::Command.new('工作面板') { open_workspace },
+            icon: 'workspace',
+            tooltip: '打开 Geomora 工作面板',
+            status_bar_text: '打开重建工作区，进行照片导入、AI 分析与模型生成'
+          )
           toolbar.add_item(workspace_cmd)
 
-          generate_cmd = ::UI::Command.new('Generate') { run_generate }
-          generate_cmd.tooltip = 'Generate Phase 0 Fixture'
-          generate_cmd.status_bar_text = 'Build facade model from IR fixture'
+          generate_cmd = configure_toolbar_command(
+            ::UI::Command.new('生成模型') { run_generate },
+            icon: 'generate',
+            tooltip: '生成默认立面模型',
+            status_bar_text: '根据 Phase 0 样例 IR 在场景中生成默认建筑立面'
+          )
           toolbar.add_item(generate_cmd)
 
-          validate_cmd = ::UI::Command.new('Validate') { run_validate }
-          validate_cmd.tooltip = 'Validate Phase 0 Fixture'
-          validate_cmd.status_bar_text = 'Validate IR fixture without generating geometry'
+          validate_cmd = configure_toolbar_command(
+            ::UI::Command.new('验证样例') { run_validate },
+            icon: 'validate',
+            tooltip: '验证 IR 样例',
+            status_bar_text: '校验 Phase 0 样例 IR，不生成几何体'
+          )
           toolbar.add_item(validate_cmd)
 
           toolbar.restore

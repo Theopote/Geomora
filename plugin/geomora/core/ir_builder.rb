@@ -61,6 +61,10 @@ module Geomora
           ir['reconstruction'] ||= {}
           ir['reconstruction']['review'] = @params['reconstruction_review']
         end
+        if @params['evidence_review'].is_a?(Hash)
+          ir['reconstruction'] ||= {}
+          ir['reconstruction']['evidence_review'] = @params['evidence_review']
+        end
         if @params['uncertainty_decisions'].is_a?(Hash) || @params['uncertainty_decisions'].is_a?(Array)
           raw_decisions = @params['uncertainty_decisions']
           decisions = raw_decisions.is_a?(Hash) ? raw_decisions.values : raw_decisions

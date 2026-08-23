@@ -95,6 +95,7 @@ def reconstruct_facade(
                 if item.get("understanding_status") == "low_confidence"
             ],
             "uncertainties": uncertainties,
+            "evidence_coordination": topology.get("evidence_coordination"),
         },
         "constraint_solution": solution or None,
         "prediction": prediction,

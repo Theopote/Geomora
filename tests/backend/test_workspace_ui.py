@@ -104,3 +104,7 @@ def test_workspace_has_safe_ai_settings_center():
     assert "add_action_callback('save_settings')" in dialog
     assert "Continue with this one upload?" in script
     assert "cloud_upload_authorized: state.cloudUploadAuthorized" in script
+    assert 'id="ai-evidence-review"' in html
+    assert "function renderEvidenceReview()" in script
+    assert "evidence_review: state.evidenceReview" in script
+    assert "Review the conflicting local and cloud AI evidence" in script

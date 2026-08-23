@@ -187,6 +187,15 @@
         <input id="inspector-filter" type="search" placeholder="Search dimensions, LOD, rooms…" autocomplete="off">
       </label>
       <div id="opening-evidence" class="opening-evidence" hidden></div>
+      <section id="ai-evidence-review" class="ai-evidence-review" hidden>
+        <div class="evidence-review-head"><div><strong>AI evidence</strong><span id="evidence-provider"></span></div><span id="evidence-verdict" class="evidence-badge"></span></div>
+        <div id="evidence-comparison" class="evidence-comparison"></div>
+        <p id="evidence-note" class="settings-help"></p>
+        <div class="inline-actions">
+          <button id="btn-evidence-accept" class="btn-link" type="button">Accept fused evidence</button>
+          <button id="btn-evidence-review" class="btn-link" type="button">Flag manual review</button>
+        </div>
+      </section>
       <form id="facade-form" class="form">
         <label>Project name<input name="project_name" type="text"></label>
         <label>Wall length (mm)<input name="wall_length" type="number" step="1"></label>

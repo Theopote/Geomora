@@ -328,6 +328,20 @@ class IRBuilderTest < Minitest::Test
     assert_equal 'accepted_observed_geometry', ir.dig('reconstruction', 'review', 'decision')
   end
 
+  def test_preserves_ai_evidence_review_audit
+    params = {
+      'wall_length' => 10_000, 'wall_height' => 3300, 'wall_thickness' => 240,
+      'windows' => [], 'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 },
+      'evidence_review' => {
+        'decision' => 'accepted_fused_evidence',
+        'reviewer' => 'sketchup_user',
+        'reviewed_at' => '2026-08-23T10:00:00Z'
+      }
+    }
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    assert_equal 'accepted_fused_evidence', ir.dig('reconstruction', 'evidence_review', 'decision')
+  end
+
   def test_preserves_uncertainty_decisions_and_summary
     params = {
       'wall_length' => 10_000, 'wall_height' => 3300, 'wall_thickness' => 240,

@@ -38,7 +38,9 @@
     settings: {},
     settingsSnapshot: {},
     capabilities: {},
-    cloudUploadAuthorized: false
+    cloudUploadAuthorized: false,
+    cloudEvidence: null,
+    evidenceReview: null
   };
 
   const els = {
@@ -80,8 +82,56 @@
     storeyWindowBar: document.getElementById('storey-window-bar'),
     settingsPanel: document.getElementById('settings-panel'),
     settingsBackdrop: document.getElementById('settings-backdrop'),
-    settingsForm: document.getElementById('settings-form')
+    settingsForm: document.getElementById('settings-form'),
+    aiEvidenceReview: document.getElementById('ai-evidence-review'),
+    evidenceComparison: document.getElementById('evidence-comparison'),
+    evidenceProvider: document.getElementById('evidence-provider'),
+    evidenceVerdict: document.getElementById('evidence-verdict'),
+    evidenceNote: document.getElementById('evidence-note')
   };
+
+  function percent(value) { return Math.round((Number(value) || 0) * 100) + '%'; }
+  function evidenceLabel(source) {
+    if (source === 'cv+vlm_agreement') return 'Agreed';
+    if (source === 'vlm_high_confidence') return 'Cloud';
+    return 'Local';
+  }
+  function renderEvidenceReview() {
+    const coordination = state.understanding && state.understanding.evidence_coordination;
+    const cloud = state.cloudEvidence || {};
+    els.aiEvidenceReview.hidden = !coordination;
+    if (!coordination) return;
+    els.evidenceProvider.textContent = (coordination.provider || cloud.provider || 'VLM') + (coordination.model ? ' · ' + coordination.model : '');
+    els.evidenceComparison.textContent = '';
+    let conflicts = 0;
+    [['Storeys', coordination.storey_count], ['Bays', coordination.bay_count]].forEach(function (entry) {
+      const item = entry[1];
+      if (!item) return;
+      if (item.conflict) conflicts += 1;
+      const row = document.createElement('div');
+      row.className = 'evidence-row';
+      [entry[0], 'Local ' + item.cv.value + ' · ' + percent(item.cv.confidence), 'Cloud ' + item.vlm.value + ' · ' + percent(item.vlm.confidence), evidenceLabel(item.source) + ' ' + item.value].forEach(function (text, index) {
+        const node = document.createElement(index === 0 ? 'strong' : 'span');
+        node.textContent = text;
+        if (index === 3) node.className = 'chosen';
+        row.appendChild(node);
+      });
+      els.evidenceComparison.appendChild(row);
+    });
+    const reviewed = state.evidenceReview && state.evidenceReview.decision;
+    els.evidenceVerdict.textContent = reviewed ? 'Reviewed' : (conflicts ? conflicts + ' conflict' + (conflicts > 1 ? 's' : '') : 'Sources agree');
+    els.evidenceVerdict.className = 'evidence-badge ' + (reviewed ? 'reviewed' : (conflicts ? 'conflict' : ''));
+    els.evidenceNote.textContent = reviewed ? 'Recorded: ' + reviewed.replace(/_/g, ' ') + '.' : (conflicts ? 'Conflicts keep their uncertainty flag until an architect reviews them.' : 'Independent local and cloud evidence support the same counts.');
+  }
+  function recordEvidenceReview(decision) {
+    state.evidenceReview = { decision: decision, reviewer: 'sketchup_user', reviewed_at: new Date().toISOString() };
+    renderEvidenceReview();
+    setStatus(decision === 'manual_review_required' ? 'warning' : 'success', 'AI evidence review recorded.');
+  }
+  function evidenceReviewRequired() {
+    const coordination = state.understanding && state.understanding.evidence_coordination;
+    return !!coordination && ['storey_count', 'bay_count'].some(function (key) { return coordination[key] && coordination[key].conflict; });
+  }
 
   function setSettings(settings, capabilities) {
     state.settings = Object.assign({}, settings || {});
@@ -1529,6 +1579,7 @@
     return {
       ai_settings: Object.assign({}, state.settings),
       cloud_upload_authorized: state.cloudUploadAuthorized,
+      evidence_review: state.evidenceReview,
       project_name: formData.get('project_name'),
       wall_length: Number(formData.get('wall_length')),
       wall_height: Number(formData.get('wall_height')),
@@ -1697,6 +1748,8 @@
     state.reconstructionReview = null;
     renderReconstructionReview();
     state.reconstructionReview = payload.reconstruction_review || null;
+    state.cloudEvidence = payload.cloud_evidence || null;
+    state.evidenceReview = null;
     state.pattern = null;
     state.overlayImageUrl = null;
     state.doorBbox = null;
@@ -1894,6 +1947,7 @@
     }
     if (payload.ir_preview) setIrPreview(payload.ir_preview);
     renderReconstructionReview();
+    renderEvidenceReview();
     renderTree();
 
     const summary = state.understanding;
@@ -2461,6 +2515,10 @@
   });
 
   document.getElementById('btn-generate').addEventListener('click', function () {
+    if (state.settings.require_review_before_generate && evidenceReviewRequired() && !state.evidenceReview) {
+      setStatus('error', 'Review the conflicting local and cloud AI evidence before generating.');
+      return;
+    }
     if (requiresReconstructionReview() && !reconstructionReviewApproved()) {
       setStatus('error', 'Confirm the AI reconstruction result before generating the SketchUp model.');
       return;
@@ -2535,6 +2593,12 @@
   document.getElementById('btn-uncertainty-edit').addEventListener('click', editSelectedUncertainty);
   document.getElementById('btn-uncertainty-ignore').addEventListener('click', function () {
     decideUncertainty('ignored');
+  });
+  document.getElementById('btn-evidence-accept').addEventListener('click', function () {
+    recordEvidenceReview('accepted_fused_evidence');
+  });
+  document.getElementById('btn-evidence-review').addEventListener('click', function () {
+    recordEvidenceReview('manual_review_required');
   });
 
   els.cornerSvg.addEventListener('mousedown', onCornerMouseDown);

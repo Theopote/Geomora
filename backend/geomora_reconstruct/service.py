@@ -4,11 +4,18 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import cv2
+
 from geomora_detect.pipeline import detect_facade
 
 from .export import detection_to_prediction
 from .observations.adapters import detection_result_to_observations
 from .observations.vlm_adapter import vlm_evidence_to_observations
+from .observations.models import ObservationKind
+from .observations.structural_lines import (
+    detect_horizontal_structure_observations,
+    horizontal_observations_to_storey_cues,
+)
 from .prediction_enrichment import enrich_prediction
 from .vlm_evidence import provider_api_key, request_architectural_evidence
 from geomora_detect.vlm_prelabel import default_model, sanitize_error_message
@@ -37,6 +44,23 @@ def reconstruct_facade(
         detection,
         photo_id=photo_id,
     )
+    facade_observation = next(
+        (item for item in observation_graph.observations if item.kind == ObservationKind.FACADE_CANDIDATE),
+        None,
+    )
+    facade_bbox = facade_observation.geometry.get("bbox") if facade_observation else None
+    storey_cues: list[dict[str, Any]] = []
+    try:
+        line_graph = detect_horizontal_structure_observations(
+            image_path, photo_id=photo_id, facade_bbox=facade_bbox,
+        )
+        observation_graph.observations.extend(line_graph.observations)
+        observation_graph.debug["horizontal_structure"] = line_graph.debug
+        storey_cues = horizontal_observations_to_storey_cues(line_graph.observations)
+    except (ValueError, cv2.error) as error:
+        observation_graph.debug["horizontal_structure"] = {
+            "adapter": "horizontal_structure_v0.1", "status": "failed", "error": str(error),
+        }
     cloud = {"requested": routing_mode == "cloud_enhanced", "used": False, "provider": vlm_provider}
     architectural_evidence = None
     if routing_mode == "cloud_enhanced":
@@ -62,6 +86,7 @@ def reconstruct_facade(
         metric=metric,
         metric_anchors=metric_anchors or [],
         architectural_evidence=architectural_evidence,
+        storey_cues=storey_cues,
     )
     enrich_prediction(prediction, detection, export_ir=True)
 

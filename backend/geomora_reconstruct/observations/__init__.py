@@ -15,6 +15,10 @@ from .adapters import (
 )
 from .fusion import fuse_observation_graphs
 from .vlm_adapter import vlm_evidence_to_observations
+from .structural_lines import (
+    detect_horizontal_structure_observations,
+    horizontal_observations_to_storey_cues,
+)
 
 __all__ = [
     "Observation",
@@ -28,4 +32,6 @@ __all__ = [
     "yolo_to_observations",
     "fuse_observation_graphs",
     "vlm_evidence_to_observations",
+    "detect_horizontal_structure_observations",
+    "horizontal_observations_to_storey_cues",
 ]

@@ -150,6 +150,22 @@ def test_rc_g1_rejects_bootstrap_level_topology_and_geometry():
     assert "geometry_normalized_mae" in failed
 
 
+def test_rc_g1_treats_missing_geometry_as_catastrophic_instead_of_crashing():
+    minimal_set = {"photos": [{"id": "photo_01", "split": "val"}]}
+    metrics = _strong_gate_metrics()
+    metrics["geometry"]["normalized_mae"] = None
+
+    report = evaluate_a3_gate(
+        minimal_set,
+        [{"photo_id": "photo_01", "split": "val", "metrics": metrics}],
+        phase="reconstruction_alpha",
+    )
+
+    catastrophic = next(check for check in report.checks if check.id == "catastrophic_failure_count")
+    assert catastrophic.passed is False
+    assert catastrophic.actual == 1
+
+
 def test_only_rc_g2_can_make_product_beta_claim():
     photos = [{"id": f"photo_{index:02d}", "split": "holdout" if index >= 15 else "val"} for index in range(20)]
     minimal_set = {"photos": photos}

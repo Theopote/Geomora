@@ -1,0 +1,4 @@
+id,split,category,file,sketchup_reviewed,rectify_ok,windows_detected,windows_true,doors_detected,doors_true,overlay_correction,generate_ok,correction_time_sec,failure_classes,rqs_total,notes,rqs_perspective_rectification,rqs_opening_detection,rqs_opening_placement,rqs_scale,rqs_pattern_rationalization,rqs_geometry_validity,rqs_sketchup_editability,rqs_human_correction_cost
+photo_16,holdout,strong_perspective,d5550fb8626cddd9b76789b823a59e8f.jpg,FALSE,TRUE,0,TRUE,1,FALSE,medium,FALSE,,missed_window;false_door,,,12,10,12,1,3,12,10,4
+photo_17,val,low_light_reflection,f6b7c5c2b9bd63cdb2e848c9b59627ff.jpg,FALSE,TRUE,2,TRUE,1,TRUE,medium,FALSE,,opening_detection,,,14,6,7,8,7,12,10,2
+photo_01,train,baseline,sample_train.jpg,FALSE,TRUE,3,TRUE,1,TRUE,low,FALSE,,,,,14,14,14,14,14,14,14,14

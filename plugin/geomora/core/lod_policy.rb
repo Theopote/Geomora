@@ -14,7 +14,7 @@ module Geomora
         'beam' => 200,
         'stair' => 200,
         'parapet' => 200,
-        'cornice' => 300,
+        'cornice' => 200,
         'trim' => 300,
         'railing' => 300,
         'eaves' => 300,

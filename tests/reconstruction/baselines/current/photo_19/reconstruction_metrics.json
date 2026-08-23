@@ -3,12 +3,12 @@
   "detection": {
     "iou_threshold": 0.5,
     "window": {
-      "true_positives": 9,
-      "false_positives": 8,
-      "false_negatives": 3,
-      "precision": 0.5294,
-      "recall": 0.75,
-      "f1": 0.6207
+      "true_positives": 4,
+      "false_positives": 6,
+      "false_negatives": 8,
+      "precision": 0.4,
+      "recall": 0.3333,
+      "f1": 0.3636
     },
     "door": {
       "true_positives": 0,
@@ -22,51 +22,52 @@
   "topology": {
     "storey_count_error": 0.5,
     "storey_accuracy": 0.5,
-    "bay_count_error": 0.1111,
-    "bay_accuracy": 0.8889,
-    "window_to_storey_assignment_accuracy": 0.1111,
-    "window_to_bay_assignment_accuracy": 0.8889,
+    "storey_exact": 0.0,
+    "bay_count_error": 0.4444,
+    "bay_accuracy": 0.5556,
+    "window_to_storey_assignment_accuracy": 0.0,
+    "window_to_bay_assignment_accuracy": 0.25,
     "door_ground_floor_accuracy": null,
-    "matched_openings": 9
+    "matched_openings": 4
   },
   "geometry": {
-    "normalized_mae": 0.1904,
-    "width_facade_mae": 0.0037,
-    "height_storey_mae": 0.1587,
-    "sill_storey_mae": 0.4089,
-    "matched_openings": 9,
+    "normalized_mae": 0.1865,
+    "width_facade_mae": 0.0058,
+    "height_storey_mae": 0.1483,
+    "sill_storey_mae": 0.4053,
+    "matched_openings": 4,
     "ground_truth_openings": 15,
     "iou_threshold": 0.5
   },
   "scale": {
-    "facade_width_mm_error": 0.4238,
-    "facade_height_mm_error": 0.3333,
-    "storey_height_mm_error": 0.3333,
-    "mean_relative_error": 0.3635
+    "facade_width_mm_error": 0.0,
+    "facade_height_mm_error": 0.0,
+    "storey_height_mm_error": 1.0,
+    "mean_relative_error": 0.3333
   },
   "rationalization": {
     "before": {
-      "width_variance": 0.3679,
-      "height_variance": 0.8651,
-      "sill_variance": 0.4293,
-      "spacing_variance": 0.6516,
-      "alignment_deviation": 0.5991
+      "width_variance": 0.3157,
+      "height_variance": 0.6018,
+      "sill_variance": 0.4505,
+      "spacing_variance": 0.7756,
+      "alignment_deviation": 0.5458
     },
     "after": {
-      "width_variance": 0.0,
+      "width_variance": 0.3152,
+      "height_variance": 0.6018,
+      "sill_variance": 0.4505,
+      "spacing_variance": 0.7756,
+      "alignment_deviation": 0.5458
+    },
+    "improvement": {
+      "width_variance": 0.0016,
       "height_variance": 0.0,
       "sill_variance": 0.0,
       "spacing_variance": 0.0,
-      "alignment_deviation": 0.5772
+      "alignment_deviation": 0.0
     },
-    "improvement": {
-      "width_variance": 1.0,
-      "height_variance": 1.0,
-      "sill_variance": 1.0,
-      "spacing_variance": 1.0,
-      "alignment_deviation": 0.0366
-    },
-    "mean_improvement": 0.8073
+    "mean_improvement": 0.0003
   },
   "sketchup": {
     "generate_stable": true,
@@ -75,10 +76,29 @@
     "no_overlapping_openings": true,
     "correct_storey_assignment": true,
     "sane_wall_dimensions": true,
-    "component_reuse": false,
-    "pass_rate": 0.8571
+    "component_reuse": true,
+    "pass_rate": 1.0
   },
-  "rqs": 61.9,
+  "constraint_solver": {
+    "constraint_count": 3,
+    "soft_constraint_count": 1,
+    "hard_constraint_count": 2,
+    "mean_residual_before": 0.00086667,
+    "mean_residual_after": 1.267e-05,
+    "residual_reduction": 0.985381,
+    "hard_satisfaction_rate": 1.0,
+    "hard_violations": 0,
+    "compared_openings": 11,
+    "mean_bbox_drift": 0.000116,
+    "max_bbox_drift": 0.001281,
+    "overlaps_before": 0,
+    "overlaps_after": 0,
+    "introduced_overlaps": 0,
+    "boundary_violations_before": 0,
+    "boundary_violations_after": 0,
+    "introduced_boundary_violations": 0
+  },
+  "rqs": 45.6,
   "coverage": 1.0,
   "not_evaluated": []
 }

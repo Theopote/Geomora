@@ -1,15 +1,193 @@
 {
-  "generated_at": "2026-08-23T17:15:17.045867+00:00",
-  "method": "facade_row_v1",
-  "photos": 5,
+  "minimal_set": "F:\\development\\Geomora\\tests\\reconstruction\\minimal_set.json",
+  "prediction_dir": "tests\\reconstruction\\baselines\\current",
+  "gate": {
+    "phase": "reconstruction_alpha",
+    "gate": "RC-G1",
+    "maturity_claim": "reconstruction_alpha",
+    "passed": false,
+    "product_ready": false,
+    "higher_gates_not_evaluated": [
+      "RC-G2"
+    ],
+    "user_facing_claim_allowed": "No readiness claim allowed",
+    "checks": [
+      {
+        "id": "minimum_sample_count",
+        "passed": true,
+        "actual": 5,
+        "threshold": 5,
+        "detail": "Minimum evaluated photos for this maturity claim"
+      },
+      {
+        "id": "minimum_holdout_count",
+        "passed": false,
+        "actual": 3,
+        "threshold": 5,
+        "detail": "Minimum untouched hold-out photos"
+      },
+      {
+        "id": "val_window_recall",
+        "passed": false,
+        "actual": 0.8333,
+        "threshold": 0.85,
+        "detail": "Validation split window recall"
+      },
+      {
+        "id": "val_window_precision",
+        "passed": false,
+        "actual": 0.4167,
+        "threshold": 0.85,
+        "detail": "Validation split window precision"
+      },
+      {
+        "id": "mean_rqs",
+        "passed": false,
+        "actual": 46.36,
+        "threshold": 70.0,
+        "detail": "Mean RQS over evaluated metric groups"
+      },
+      {
+        "id": "per_photo_rqs_floor",
+        "passed": false,
+        "actual": 36.8,
+        "threshold": 50.0,
+        "detail": "Lowest per-photo RQS"
+      },
+      {
+        "id": "mean_coverage",
+        "passed": true,
+        "actual": 0.9,
+        "threshold": 0.9,
+        "detail": "Mean annotation coverage across metric groups"
+      },
+      {
+        "id": "topology_storey_accuracy",
+        "passed": false,
+        "actual": 0.4667,
+        "threshold": 0.85,
+        "detail": "Mean storey count accuracy"
+      },
+      {
+        "id": "topology_exact_storey",
+        "passed": false,
+        "actual": 0.0,
+        "threshold": 0.8,
+        "detail": "Exact storey-count accuracy"
+      },
+      {
+        "id": "topology_bay_accuracy",
+        "passed": false,
+        "actual": 0.4861,
+        "threshold": 0.75,
+        "detail": "Mean bay-count accuracy"
+      },
+      {
+        "id": "topology_storey_assignment",
+        "passed": false,
+        "actual": 0.25,
+        "threshold": 0.8,
+        "detail": "Window-to-storey assignment accuracy"
+      },
+      {
+        "id": "topology_bay_assignment",
+        "passed": false,
+        "actual": 0.3625,
+        "threshold": 0.75,
+        "detail": "Window-to-bay assignment accuracy"
+      },
+      {
+        "id": "geometry_normalized_mae",
+        "passed": false,
+        "actual": 0.1835,
+        "threshold": 0.12,
+        "detail": "Mean normalized geometry MAE (lower is better)"
+      },
+      {
+        "id": "per_photo_geometry_mae",
+        "passed": false,
+        "actual": 0.2185,
+        "threshold": 0.2,
+        "detail": "Worst per-photo normalized geometry MAE"
+      },
+      {
+        "id": "catastrophic_failure_count",
+        "passed": false,
+        "actual": 3,
+        "threshold": 0,
+        "detail": "Photos with severe topology or geometry failure"
+      },
+      {
+        "id": "sketchup_pass_rate",
+        "passed": false,
+        "actual": 0.8571,
+        "threshold": 0.9,
+        "detail": "Mean heuristic SketchUp readiness pass rate"
+      },
+      {
+        "id": "holdout_generate_stable",
+        "passed": true,
+        "actual": "3/3",
+        "threshold": ">=2/3",
+        "detail": "Hold-out photos with heuristic generate_stable check"
+      },
+      {
+        "id": "solver_residual_reduction",
+        "passed": true,
+        "actual": 0.9599,
+        "threshold": 0.0,
+        "detail": "Mean relative constraint residual reduction"
+      },
+      {
+        "id": "solver_hard_satisfaction",
+        "passed": true,
+        "actual": 1.0,
+        "threshold": 1.0,
+        "detail": "Minimum hard-constraint satisfaction rate"
+      },
+      {
+        "id": "solver_geometry_drift",
+        "passed": true,
+        "actual": {
+          "mean_max": 0.002656,
+          "coordinate_max": 0.02311
+        },
+        "threshold": {
+          "mean_max": 0.03,
+          "coordinate_max": 0.1
+        },
+        "detail": "Maximum drift from observed opening boxes"
+      },
+      {
+        "id": "solver_introduced_violations",
+        "passed": true,
+        "actual": 0,
+        "threshold": 0,
+        "detail": "New overlap or facade-boundary violations"
+      },
+      {
+        "id": "metric_anchors_reviewed",
+        "passed": true,
+        "actual": "ready",
+        "threshold": "all anchors surveyed",
+        "detail": "Measured metric anchors required for scale evaluation"
+      }
+    ],
+    "blockers": [],
+    "summary": {
+      "photos": 5,
+      "evaluated": 5,
+      "mean_rqs": 46.4,
+      "mean_coverage": 0.9,
+      "val_window_recall": 0.8333,
+      "holdout_generate_stable": 3,
+      "solver_evaluated": 3
+    }
+  },
   "results": [
     {
       "photo_id": "photo_01",
       "split": "train",
-      "category": "residential",
-      "detection_method": "facade_row_v1",
-      "window_count": 5,
-      "door_count": 0,
       "metrics": {
         "photo_id": "photo_01",
         "detection": {
@@ -93,15 +271,11 @@
           "scale"
         ]
       },
-      "preview": "tests\\reconstruction\\baselines\\current\\photo_01\\preview.png"
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_01\\prediction.json"
     },
     {
       "photo_id": "photo_11",
       "split": "val",
-      "category": "commercial",
-      "detection_method": "facade_row_v1",
-      "window_count": 12,
-      "door_count": 0,
       "metrics": {
         "photo_id": "photo_11",
         "detection": {
@@ -206,15 +380,11 @@
         "coverage": 1.0,
         "not_evaluated": []
       },
-      "preview": "tests\\reconstruction\\baselines\\current\\photo_11\\preview.png"
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_11\\prediction.json"
     },
     {
       "photo_id": "photo_16",
       "split": "holdout",
-      "category": "strong_perspective",
-      "detection_method": "facade_row_v1",
-      "window_count": 4,
-      "door_count": 0,
       "metrics": {
         "photo_id": "photo_16",
         "detection": {
@@ -316,15 +486,11 @@
           "scale"
         ]
       },
-      "preview": "tests\\reconstruction\\baselines\\current\\photo_16\\preview.png"
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_16\\prediction.json"
     },
     {
       "photo_id": "photo_18",
       "split": "holdout",
-      "category": "tree_occluded",
-      "detection_method": "facade_row_v1",
-      "window_count": 4,
-      "door_count": 1,
       "metrics": {
         "photo_id": "photo_18",
         "detection": {
@@ -408,15 +574,11 @@
           "scale"
         ]
       },
-      "preview": "tests\\reconstruction\\baselines\\current\\photo_18\\preview.png"
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_18\\prediction.json"
     },
     {
       "photo_id": "photo_19",
       "split": "holdout",
-      "category": "old_building",
-      "detection_method": "facade_row_v1",
-      "window_count": 10,
-      "door_count": 1,
       "metrics": {
         "photo_id": "photo_19",
         "detection": {
@@ -521,7 +683,7 @@
         "coverage": 1.0,
         "not_evaluated": []
       },
-      "preview": "tests\\reconstruction\\baselines\\current\\photo_19\\preview.png"
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_19\\prediction.json"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
-  "method": "auto_fusion_v1",
-  "confidence": 0.7278,
+  "method": "facade_row_v1",
+  "confidence": 0.7172,
   "image_width": 1148,
   "image_height": 633,
   "elements": [
@@ -13,16 +13,6 @@
         0.8230647709320695
       ],
       "confidence": 0.8307
-    },
-    {
-      "type": "window",
-      "bbox_norm": [
-        6.30646931065915e-05,
-        0.0016687760044236508,
-        0.029455779736881058,
-        0.6083864329550503
-      ],
-      "confidence": 0.6631
     },
     {
       "type": "window",
@@ -47,16 +37,6 @@
     {
       "type": "window",
       "bbox_norm": [
-        0.17713739481537183,
-        0.2590980469521376,
-        0.22461950322061466,
-        0.40948852731906593
-      ],
-      "confidence": 0.693
-    },
-    {
-      "type": "window",
-      "bbox_norm": [
         0.18554006968641115,
         0.8957345971563981,
         0.2465156794425087,
@@ -67,42 +47,12 @@
     {
       "type": "window",
       "bbox_norm": [
-        0.2629835547470465,
-        0.26091360179545564,
-        0.31096194596240745,
-        0.4125745149585308
-      ],
-      "confidence": 0.623
-    },
-    {
-      "type": "window",
-      "bbox_norm": [
-        0.37532032823728767,
-        0.26056761538247925,
-        0.41916909035074584,
-        0.41555506508873913
-      ],
-      "confidence": 0.552
-    },
-    {
-      "type": "window",
-      "bbox_norm": [
         0.3876306620209059,
         0.6793048973143759,
         0.44947735191637633,
         0.7488151658767772
       ],
       "confidence": 0.7402
-    },
-    {
-      "type": "window",
-      "bbox_norm": [
-        0.4545522018592117,
-        0.2619272385728303,
-        0.5000490726909571,
-        0.4074227813672492
-      ],
-      "confidence": 0.8841
     },
     {
       "type": "window",
@@ -127,42 +77,32 @@
     {
       "type": "window",
       "bbox_norm": [
-        0.5358244998945176,
-        0.26112409112577756,
-        0.5797363706582099,
-        0.4055709477284508
+        0.5296167247386759,
+        0.25118483412322273,
+        0.5836236933797909,
+        0.4107424960505529
       ],
-      "confidence": 0.7779
+      "confidence": 0.692
     },
     {
       "type": "window",
       "bbox_norm": [
-        0.6486787696333297,
-        0.26065656472156395,
-        0.6926683166716572,
-        0.4089371378387885
+        0.730836236933798,
+        0.24960505529225907,
+        0.7839721254355401,
+        0.4107424960505529
       ],
-      "confidence": 0.7633
+      "confidence": 0.8104
     },
     {
       "type": "window",
       "bbox_norm": [
-        0.7348322320067509,
-        0.2604205235485782,
-        0.7787844029868521,
-        0.4039915063746544
+        0.8066202090592335,
+        0.2480252764612954,
+        0.8588850174216028,
+        0.40916271721958924
       ],
-      "confidence": 0.8328
-    },
-    {
-      "type": "window",
-      "bbox_norm": [
-        0.8088950977923562,
-        0.2549053993646944,
-        0.854235818577145,
-        0.4084350200249309
-      ],
-      "confidence": 0.718
+      "confidence": 0.7431
     },
     {
       "type": "window",
@@ -173,47 +113,31 @@
         1.0
       ],
       "confidence": 0.7308
-    },
-    {
-      "type": "window",
-      "bbox_norm": [
-        0.9251489938343859,
-        0.0028849235643142773,
-        0.9998476247754247,
-        0.3094817247435945
-      ],
-      "confidence": 0.9491
     }
   ],
   "overlay_base64": null,
   "debug": {
-    "fusion": "yolo_facade_row_v1",
-    "yolo_element_count": 10,
-    "row_element_count": 11,
-    "fused_element_count": 18,
-    "yolo_window_count": 10,
-    "row_window_count": 10,
-    "fused_window_count": 17,
+    "candidate_count": 12,
+    "element_count": 11,
     "facade_bounds": [
       12,
       6,
       1114,
       633
     ],
-    "yolo_model_path": "F:\\development\\Geomora\\backend\\models\\facade_yolo_v1.onnx",
     "scale_hint": {
-      "wall_length_mm": 12100,
+      "wall_length_mm": 11100,
       "wall_height_mm": 6000,
       "method": "door_height",
       "confidence": 0.831,
-      "opening_span_norm": 0.98
+      "opening_span_norm": 0.8946
     }
   },
   "scale_hint": {
-    "wall_length_mm": 12100,
+    "wall_length_mm": 11100,
     "wall_height_mm": 6000,
     "method": "door_height",
     "confidence": 0.831,
-    "opening_span_norm": 0.98
+    "opening_span_norm": 0.8946
   }
 }

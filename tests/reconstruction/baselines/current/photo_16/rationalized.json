@@ -13,10 +13,78 @@
       1.0,
       1.0
     ],
-    "pattern_groups": [],
+    "storeys": [
+      {
+        "id": 1,
+        "y_range": [
+          0.3314,
+          0.5696
+        ],
+        "confidence": 0.79,
+        "status": "observed",
+        "evidence": [
+          {
+            "type": "window_row",
+            "members": [
+              "pred_002",
+              "pred_001",
+              "pred_003"
+            ],
+            "confidence": 0.79
+          }
+        ]
+      }
+    ],
+    "bays": [
+      {
+        "id": 1,
+        "x_center": 0.027,
+        "confidence": 0.63
+      },
+      {
+        "id": 2,
+        "x_center": 0.2881,
+        "confidence": 0.63
+      },
+      {
+        "id": 3,
+        "x_center": 0.5686,
+        "confidence": 0.63
+      }
+    ],
+    "pattern_groups": [
+      {
+        "id": "storey_1_row_pattern",
+        "members": [
+          "pred_001",
+          "pred_002",
+          "pred_003",
+          "pred_004"
+        ],
+        "constraints": [
+          "equal_spacing"
+        ],
+        "confidence": 0.9234,
+        "evidence": {
+          "width_spread": 1.0991,
+          "height_spread": 3.0867,
+          "sill_spread": 1.1301
+        }
+      }
+    ],
     "uncertainties": [
       "filtered_outliers:1"
-    ]
+    ],
+    "storey_hypothesis": {
+      "model": "architectural_storey_hypothesis_v0.1",
+      "cue_count": 0,
+      "boundary_cue_count": 0,
+      "used_cue_ids": [],
+      "unused_cue_ids": []
+    },
+    "hidden_opening_hypotheses": [],
+    "occlusion_awareness": {},
+    "door_hypotheses": []
   },
   "geometry": {
     "method": "bbox_ratios_v0.1",
@@ -40,15 +108,21 @@
         "width_facade": 0.0323,
         "height_storey": 0.0518,
         "sill_storey": 0.4661
-      }
+      },
+      "observed_bbox": [
+        0.0108,
+        0.4143,
+        0.0431,
+        0.4661
+      ]
     },
     {
       "id": "pred_002",
       "type": "window",
       "bbox": [
-        0.1521,
+        0.165606,
         0.3429,
-        0.424,
+        0.437506,
         0.5282
       ],
       "confidence": 0.7814,
@@ -59,15 +133,21 @@
         "width_facade": 0.2719,
         "height_storey": 0.1853,
         "sill_storey": 0.5282
-      }
+      },
+      "observed_bbox": [
+        0.1521,
+        0.3429,
+        0.424,
+        0.5282
+      ]
     },
     {
       "id": "pred_003",
       "type": "window",
       "bbox": [
-        0.4832,
+        0.490941,
         0.3314,
-        0.6541,
+        0.661841,
         0.5696
       ],
       "confidence": 0.6752,
@@ -78,7 +158,13 @@
         "width_facade": 0.1709,
         "height_storey": 0.2382,
         "sill_storey": 0.5696
-      }
+      },
+      "observed_bbox": [
+        0.4832,
+        0.3314,
+        0.6541,
+        0.5696
+      ]
     },
     {
       "id": "pred_004",
@@ -98,7 +184,13 @@
         "width_facade": 0.2651,
         "height_storey": 0.7054,
         "sill_storey": 0.7054
-      }
+      },
+      "observed_bbox": [
+        0.7187,
+        0.0,
+        0.9838,
+        0.7054
+      ]
     }
   ],
   "rationalization_before": {
@@ -109,11 +201,11 @@
     "alignment_deviation": 0.7099
   },
   "rationalization_after": {
-    "width_variance": 0.0003,
-    "height_variance": 0.0,
-    "sill_variance": 0.0,
-    "spacing_variance": 0.0,
-    "alignment_deviation": 0.5905
+    "width_variance": 0.5231,
+    "height_variance": 0.8347,
+    "sill_variance": 0.1548,
+    "spacing_variance": 0.0004,
+    "alignment_deviation": 0.6997
   },
   "sketchup": {
     "generate_stable": true,
@@ -122,7 +214,7 @@
     "no_overlapping_openings": true,
     "correct_storey_assignment": true,
     "sane_wall_dimensions": true,
-    "component_reuse": false
+    "component_reuse": true
   },
   "notes": "Understanding v0.1 + heuristic rationalization/sketchup checks"
 }

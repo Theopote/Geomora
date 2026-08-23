@@ -63,7 +63,7 @@
         "offset": 43.2,
         "width": 129.2,
         "height": 124.3,
-        "sill_height": 0.5,
+        "sill_height": 1281.4,
         "depth": 240.0
       },
       "confidence": 0.7779
@@ -73,10 +73,10 @@
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 608.4,
+        "offset": 662.4,
         "width": 1087.6,
         "height": 444.7,
-        "sill_height": 0.5,
+        "sill_height": 1132.3,
         "depth": 240.0
       },
       "confidence": 0.7814
@@ -86,10 +86,10 @@
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 1932.8,
+        "offset": 1963.8,
         "width": 683.6,
         "height": 571.7,
-        "sill_height": 0.6,
+        "sill_height": 1033.0,
         "depth": 240.0
       },
       "confidence": 0.6752
@@ -102,16 +102,48 @@
         "offset": 2874.8,
         "width": 1060.4,
         "height": 1693.0,
-        "sill_height": 0.7,
+        "sill_height": 707.0,
         "depth": 240.0
       },
       "confidence": 0.6536
     }
   ],
-  "constraints": [],
+  "constraints": [
+    {
+      "id": "constraint_001",
+      "type": "equal_spacing",
+      "targets": [
+        "pred_001",
+        "pred_002",
+        "pred_003",
+        "pred_004"
+      ],
+      "priority": "soft",
+      "confidence": 0.9234,
+      "weight": 0.9234,
+      "source": "cv_pattern",
+      "evidence": {
+        "pattern_group_id": "storey_1_row_pattern",
+        "cv_confidence": 0.9234
+      },
+      "status": "proposed"
+    }
+  ],
   "metric": {
     "facade_width_mm": 4000.0,
     "facade_height_mm": 2400.0,
-    "storey_height_mm": 2400.0
+    "storey_height_mm": 2400.0,
+    "window_width_mm": 1087.6,
+    "window_height_mm": 444.7
+  },
+  "metric_source": "constraint_solver",
+  "reconstruction": {
+    "constraint_solver": {
+      "safety_status": "accepted",
+      "soft_weight_scale": 1.0,
+      "attempt_count": 1,
+      "fallback_reasons": [],
+      "human_review_required": false
+    }
   }
 }

@@ -4,7 +4,7 @@
     "iou_threshold": 0.5,
     "window": {
       "true_positives": 0,
-      "false_positives": 6,
+      "false_positives": 4,
       "false_negatives": 6,
       "precision": 0.0,
       "recall": 0.0,
@@ -20,10 +20,11 @@
     }
   },
   "topology": {
-    "storey_count_error": 0.0,
-    "storey_accuracy": 1.0,
-    "bay_count_error": 0.5,
-    "bay_accuracy": 0.5,
+    "storey_count_error": 0.5,
+    "storey_accuracy": 0.5,
+    "storey_exact": 0.0,
+    "bay_count_error": 0.625,
+    "bay_accuracy": 0.375,
     "window_to_storey_assignment_accuracy": null,
     "window_to_bay_assignment_accuracy": null,
     "door_ground_floor_accuracy": null,
@@ -41,27 +42,27 @@
   "scale": null,
   "rationalization": {
     "before": {
-      "width_variance": 0.3833,
-      "height_variance": 0.1818,
-      "sill_variance": 0.0189,
-      "spacing_variance": 0.1896,
-      "alignment_deviation": 0.2064
+      "width_variance": 0.4043,
+      "height_variance": 0.3424,
+      "sill_variance": 0.0363,
+      "spacing_variance": 0.3792,
+      "alignment_deviation": 0.3084
     },
     "after": {
-      "width_variance": 0.0002,
+      "width_variance": 0.0,
       "height_variance": 0.0,
       "sill_variance": 0.0,
-      "spacing_variance": 0.0002,
-      "alignment_deviation": 0.2298
+      "spacing_variance": 0.0003,
+      "alignment_deviation": 0.3522
     },
     "improvement": {
-      "width_variance": 0.9995,
+      "width_variance": 1.0,
       "height_variance": 1.0,
       "sill_variance": 1.0,
-      "spacing_variance": 0.9989,
-      "alignment_deviation": -0.1134
+      "spacing_variance": 0.9992,
+      "alignment_deviation": -0.142
     },
-    "mean_improvement": 0.777
+    "mean_improvement": 0.7714
   },
   "sketchup": {
     "generate_stable": true,
@@ -73,7 +74,8 @@
     "component_reuse": false,
     "pass_rate": 0.7143
   },
-  "rqs": 48.1,
+  "constraint_solver": null,
+  "rqs": 36.8,
   "coverage": 0.7,
   "not_evaluated": [
     "scale"

@@ -23,36 +23,38 @@
       ],
       "confidence": 0.8307,
       "storey": 1,
-      "bay": 8,
-      "assignment_confidence": 0.65,
+      "bay": 4,
+      "assignment_confidence": 0.6281,
+      "storey_hypothesis": {
+        "hypothesis": "ground_floor_door",
+        "candidate_storey": 1,
+        "confidence": 0.6281,
+        "status": "hypothesized",
+        "evidence": [
+          "door_detector",
+          "nearest_storey_band",
+          "legacy_low_image_position"
+        ],
+        "measurements": {
+          "facade_bottom_gap_ratio": 0.1769
+        },
+        "requires_confirmation": true
+      },
+      "understanding_status": "hypothesized",
       "geometry": {
         "width_facade": 0.0984,
         "height_storey": 0.218,
         "sill_storey": 0.8231
-      }
+      },
+      "observed_bbox": [
+        0.7291,
+        0.6051,
+        0.8275,
+        0.8231
+      ]
     },
     {
       "id": "pred_002",
-      "type": "window",
-      "bbox": [
-        0.0001,
-        0.0017,
-        0.0295,
-        0.6084
-      ],
-      "confidence": 0.6631,
-      "storey": 1,
-      "bay": 1,
-      "assignment_confidence": 0.35,
-      "understanding_status": "low_confidence",
-      "geometry": {
-        "width_facade": 0.0294,
-        "height_storey": 0.6067,
-        "sill_storey": 0.6084
-      }
-    },
-    {
-      "id": "pred_003",
       "type": "window",
       "bbox": [
         0.0758,
@@ -69,10 +71,16 @@
         "width_facade": 0.0853,
         "height_storey": 0.0443,
         "sill_storey": 0.7046
-      }
+      },
+      "observed_bbox": [
+        0.0758,
+        0.6603,
+        0.1611,
+        0.7046
+      ]
     },
     {
-      "id": "pred_004",
+      "id": "pred_003",
       "type": "window",
       "bbox": [
         0.0958,
@@ -88,29 +96,16 @@
         "width_facade": 0.054,
         "height_storey": 0.1817,
         "sill_storey": 0.4329
-      }
+      },
+      "observed_bbox": [
+        0.0958,
+        0.2512,
+        0.1498,
+        0.4329
+      ]
     },
     {
-      "id": "pred_005",
-      "type": "window",
-      "bbox": [
-        0.1771,
-        0.2591,
-        0.2246,
-        0.4095
-      ],
-      "confidence": 0.693,
-      "storey": 1,
-      "bay": 2,
-      "assignment_confidence": 0.63,
-      "geometry": {
-        "width_facade": 0.0475,
-        "height_storey": 0.1504,
-        "sill_storey": 0.4095
-      }
-    },
-    {
-      "id": "pred_006",
+      "id": "pred_004",
       "type": "window",
       "bbox": [
         0.1855,
@@ -120,55 +115,23 @@
       ],
       "confidence": 0.6639,
       "storey": 1,
-      "bay": 2,
+      "bay": 1,
       "assignment_confidence": 0.35,
       "understanding_status": "low_confidence",
       "geometry": {
         "width_facade": 0.061,
         "height_storey": 0.0427,
         "sill_storey": 0.9384
-      }
+      },
+      "observed_bbox": [
+        0.1855,
+        0.8957,
+        0.2465,
+        0.9384
+      ]
     },
     {
-      "id": "pred_007",
-      "type": "window",
-      "bbox": [
-        0.263,
-        0.2609,
-        0.311,
-        0.4126
-      ],
-      "confidence": 0.623,
-      "storey": 1,
-      "bay": 3,
-      "assignment_confidence": 0.63,
-      "geometry": {
-        "width_facade": 0.048,
-        "height_storey": 0.1517,
-        "sill_storey": 0.4126
-      }
-    },
-    {
-      "id": "pred_008",
-      "type": "window",
-      "bbox": [
-        0.3753,
-        0.2606,
-        0.4192,
-        0.4156
-      ],
-      "confidence": 0.552,
-      "storey": 1,
-      "bay": 4,
-      "assignment_confidence": 0.71,
-      "geometry": {
-        "width_facade": 0.0439,
-        "height_storey": 0.155,
-        "sill_storey": 0.4156
-      }
-    },
-    {
-      "id": "pred_009",
+      "id": "pred_005",
       "type": "window",
       "bbox": [
         0.3876,
@@ -178,35 +141,22 @@
       ],
       "confidence": 0.7402,
       "storey": 1,
-      "bay": 4,
-      "assignment_confidence": 0.71,
+      "bay": 2,
+      "assignment_confidence": 0.63,
       "geometry": {
         "width_facade": 0.0619,
         "height_storey": 0.0695,
         "sill_storey": 0.7488
-      }
+      },
+      "observed_bbox": [
+        0.3876,
+        0.6793,
+        0.4495,
+        0.7488
+      ]
     },
     {
-      "id": "pred_010",
-      "type": "window",
-      "bbox": [
-        0.4546,
-        0.2619,
-        0.5,
-        0.4074
-      ],
-      "confidence": 0.8841,
-      "storey": 1,
-      "bay": 5,
-      "assignment_confidence": 0.63,
-      "geometry": {
-        "width_facade": 0.0454,
-        "height_storey": 0.1455,
-        "sill_storey": 0.4074
-      }
-    },
-    {
-      "id": "pred_011",
+      "id": "pred_006",
       "type": "window",
       "bbox": [
         0.4678,
@@ -216,16 +166,22 @@
       ],
       "confidence": 0.6697,
       "storey": 1,
-      "bay": 6,
+      "bay": 3,
       "assignment_confidence": 0.71,
       "geometry": {
         "width_facade": 0.1237,
         "height_storey": 0.0726,
         "sill_storey": 0.6303
-      }
+      },
+      "observed_bbox": [
+        0.4678,
+        0.5577,
+        0.5915,
+        0.6303
+      ]
     },
     {
-      "id": "pred_012",
+      "id": "pred_007",
       "type": "window",
       "bbox": [
         0.4983,
@@ -235,183 +191,379 @@
       ],
       "confidence": 0.6681,
       "storey": 1,
-      "bay": 6,
+      "bay": 3,
       "assignment_confidence": 0.35,
       "understanding_status": "low_confidence",
       "geometry": {
         "width_facade": 0.0653,
         "height_storey": 0.0379,
         "sill_storey": 0.109
-      }
+      },
+      "observed_bbox": [
+        0.4983,
+        0.0711,
+        0.5636,
+        0.109
+      ]
     },
     {
-      "id": "pred_013",
+      "id": "pred_008",
       "type": "window",
       "bbox": [
-        0.5358,
-        0.2611,
-        0.5797,
-        0.4056
+        0.5296,
+        0.2512,
+        0.5836,
+        0.4107
       ],
-      "confidence": 0.7779,
+      "confidence": 0.692,
       "storey": 1,
-      "bay": 6,
+      "bay": 3,
       "assignment_confidence": 0.71,
       "geometry": {
-        "width_facade": 0.0439,
-        "height_storey": 0.1445,
-        "sill_storey": 0.4056
-      }
+        "width_facade": 0.054,
+        "height_storey": 0.1595,
+        "sill_storey": 0.4107
+      },
+      "observed_bbox": [
+        0.5296,
+        0.2512,
+        0.5836,
+        0.4107
+      ]
     },
     {
-      "id": "pred_014",
+      "id": "pred_009",
       "type": "window",
       "bbox": [
-        0.6487,
-        0.2607,
-        0.6927,
-        0.4089
+        0.7308,
+        0.2496,
+        0.784,
+        0.4107
       ],
-      "confidence": 0.7633,
+      "confidence": 0.8104,
       "storey": 1,
-      "bay": 7,
+      "bay": 4,
       "assignment_confidence": 0.63,
       "geometry": {
-        "width_facade": 0.044,
-        "height_storey": 0.1482,
-        "sill_storey": 0.4089
-      }
+        "width_facade": 0.0532,
+        "height_storey": 0.1611,
+        "sill_storey": 0.4107
+      },
+      "observed_bbox": [
+        0.7308,
+        0.2496,
+        0.784,
+        0.4107
+      ]
     },
     {
-      "id": "pred_015",
+      "id": "pred_010",
       "type": "window",
       "bbox": [
-        0.7348,
-        0.2604,
-        0.7788,
-        0.404
+        0.805319,
+        0.248,
+        0.860181,
+        0.4092
       ],
-      "confidence": 0.8328,
+      "confidence": 0.7431,
       "storey": 1,
-      "bay": 8,
+      "bay": 5,
       "assignment_confidence": 0.63,
       "geometry": {
-        "width_facade": 0.044,
-        "height_storey": 0.1436,
-        "sill_storey": 0.404
-      }
+        "width_facade": 0.0549,
+        "height_storey": 0.1612,
+        "sill_storey": 0.4092
+      },
+      "observed_bbox": [
+        0.8066,
+        0.248,
+        0.8589,
+        0.4092
+      ]
     },
     {
-      "id": "pred_016",
+      "id": "pred_011",
       "type": "window",
       "bbox": [
-        0.8089,
-        0.2549,
-        0.8542,
-        0.4084
-      ],
-      "confidence": 0.718,
-      "storey": 1,
-      "bay": 9,
-      "assignment_confidence": 0.63,
-      "geometry": {
-        "width_facade": 0.0453,
-        "height_storey": 0.1535,
-        "sill_storey": 0.4084
-      }
-    },
-    {
-      "id": "pred_017",
-      "type": "window",
-      "bbox": [
-        0.9129,
+        0.914181,
         0.9652,
-        0.9704,
+        0.969119,
         1.0
       ],
       "confidence": 0.7308,
       "storey": 1,
-      "bay": 10,
+      "bay": 5,
       "assignment_confidence": 0.35,
       "understanding_status": "low_confidence",
       "geometry": {
-        "width_facade": 0.0575,
+        "width_facade": 0.0549,
         "height_storey": 0.0348,
         "sill_storey": 1.0
-      }
-    },
-    {
-      "id": "pred_018",
-      "type": "window",
-      "bbox": [
-        0.9251,
-        0.0029,
-        0.9998,
-        0.3095
-      ],
-      "confidence": 0.9491,
-      "storey": 1,
-      "bay": 10,
-      "assignment_confidence": 0.63,
-      "geometry": {
-        "width_facade": 0.0747,
-        "height_storey": 0.3066,
-        "sill_storey": 0.3095
-      }
+      },
+      "observed_bbox": [
+        0.9129,
+        0.9652,
+        0.9704,
+        1.0
+      ]
     }
   ],
   "pipeline": {
-    "detection_method": "auto_fusion_v1",
-    "detection_confidence": 0.7278,
+    "detection_method": "facade_row_v1",
+    "detection_confidence": 0.7172,
     "scale_hint": {
-      "wall_length_mm": 12100,
+      "wall_length_mm": 11100,
       "wall_height_mm": 6000,
       "method": "door_height",
       "confidence": 0.831,
-      "opening_span_norm": 0.98
+      "opening_span_norm": 0.8946
     }
   },
   "topology": {
     "storey_count": 1,
-    "bay_count": 10,
+    "bay_count": 5,
     "method": "understanding_v0.1",
     "window_row_count": 1,
-    "window_column_count": 10,
+    "window_column_count": 5,
     "facade_bbox": [
       0.0,
       0.0,
       0.9904000000000001,
       1.0
     ],
-    "pattern_groups": [],
+    "storeys": [
+      {
+        "id": 1,
+        "y_range": [
+          0.248,
+          0.4329
+        ],
+        "confidence": 0.87,
+        "status": "observed",
+        "evidence": [
+          {
+            "type": "window_row",
+            "members": [
+              "pred_010",
+              "pred_009",
+              "pred_008",
+              "pred_003"
+            ],
+            "confidence": 0.87
+          }
+        ]
+      }
+    ],
+    "bays": [
+      {
+        "id": 1,
+        "x_center": 0.1228,
+        "confidence": 0.63
+      },
+      {
+        "id": 2,
+        "x_center": 0.4185,
+        "confidence": 0.63
+      },
+      {
+        "id": 3,
+        "x_center": 0.5431,
+        "confidence": 0.71
+      },
+      {
+        "id": 4,
+        "x_center": 0.7574,
+        "confidence": 0.63
+      },
+      {
+        "id": 5,
+        "x_center": 0.8327,
+        "confidence": 0.63
+      }
+    ],
+    "pattern_groups": [
+      {
+        "id": "bay_5_column_pattern",
+        "members": [
+          "pred_010",
+          "pred_011"
+        ],
+        "constraints": [
+          "equal_width"
+        ],
+        "confidence": 0.9053,
+        "evidence": {
+          "width_spread": 0.0947,
+          "center_spread": 1.9836
+        }
+      }
+    ],
     "uncertainties": [
-      "filtered_outliers:5"
+      "filtered_outliers:4"
+    ],
+    "storey_hypothesis": {
+      "model": "architectural_storey_hypothesis_v0.1",
+      "cue_count": 0,
+      "boundary_cue_count": 0,
+      "used_cue_ids": [],
+      "unused_cue_ids": []
+    },
+    "hidden_opening_hypotheses": [],
+    "occlusion_awareness": {},
+    "door_hypotheses": [
+      {
+        "door_id": "pred_001",
+        "hypothesis": "ground_floor_door",
+        "candidate_storey": 1,
+        "confidence": 0.6281,
+        "status": "hypothesized",
+        "evidence": [
+          "door_detector",
+          "nearest_storey_band",
+          "legacy_low_image_position"
+        ],
+        "measurements": {
+          "facade_bottom_gap_ratio": 0.1769
+        },
+        "requires_confirmation": true
+      }
     ]
   },
   "geometry": {
     "method": "bbox_ratios_v0.1",
-    "opening_count": 18
+    "opening_count": 11
+  },
+  "constraint_suggestions": [
+    {
+      "id": "constraint_001",
+      "type": "equal_width",
+      "targets": [
+        "pred_010",
+        "pred_011"
+      ],
+      "priority": "soft",
+      "confidence": 0.9053,
+      "weight": 0.9053,
+      "source": "cv_pattern",
+      "evidence": {
+        "pattern_group_id": "bay_5_column_pattern",
+        "cv_confidence": 0.9053
+      },
+      "status": "proposed"
+    }
+  ],
+  "metric_anchors": [
+    {
+      "id": "anchor_facade_width",
+      "type": "facade_width",
+      "target": "facade",
+      "property": "width",
+      "priority": "hard",
+      "status": "surveyed",
+      "start": [
+        0.06,
+        0.94
+      ],
+      "end": [
+        0.94,
+        0.94
+      ],
+      "distance_mm": 21000,
+      "notes": "user survey facade width and height",
+      "surveyed_at": "2026-08-23T10:14:29.583165+00:00"
+    },
+    {
+      "id": "anchor_facade_height",
+      "type": "facade_height",
+      "target": "facade",
+      "property": "height",
+      "priority": "hard",
+      "status": "surveyed",
+      "start": [
+        0.05,
+        0.05
+      ],
+      "end": [
+        0.05,
+        0.95
+      ],
+      "distance_mm": 9000,
+      "notes": "user survey facade width and height",
+      "surveyed_at": "2026-08-23T10:14:29.583181+00:00"
+    }
+  ],
+  "metric": {
+    "facade_width_mm": 21000.0,
+    "facade_height_mm": 9000.0,
+    "storey_height_mm": 9000.0,
+    "window_width_mm": 1117.2,
+    "window_height_mm": 1449.9
+  },
+  "metric_source": "metric_anchor",
+  "constraint_solution": {
+    "method": "weighted_projection_v0.2",
+    "iterations": 8,
+    "constraints": [
+      {
+        "id": "constraint_001",
+        "type": "equal_width",
+        "priority": "soft",
+        "residual_before": 0.0026,
+        "residual_after": 3.8e-05,
+        "satisfied": true
+      },
+      {
+        "id": "fixed_anchor_facade_width",
+        "type": "fixed_dimension",
+        "priority": "hard",
+        "residual_before": 0.0,
+        "residual_after": 0.0,
+        "satisfied": true,
+        "property": "facade_width",
+        "distance_mm": 21000.0
+      },
+      {
+        "id": "fixed_anchor_facade_height",
+        "type": "fixed_dimension",
+        "priority": "hard",
+        "residual_before": 0.0,
+        "residual_after": 0.0,
+        "satisfied": true,
+        "property": "facade_height",
+        "distance_mm": 9000.0
+      }
+    ],
+    "mean_residual_before": 0.00086667,
+    "mean_residual_after": 1.267e-05,
+    "hard_violations": [],
+    "soft_weight_scale": 1.0,
+    "safety_status": "accepted",
+    "constraint_status": "satisfied",
+    "safety_attempts": [
+      {
+        "soft_weight_scale": 1.0,
+        "safe": true,
+        "reasons": [],
+        "mean_bbox_drift": 0.000116,
+        "max_bbox_drift": 0.001281,
+        "introduced_overlaps": 0,
+        "introduced_boundary_violations": 0
+      }
+    ]
   },
   "rationalization_before": {
-    "width_variance": 0.3679,
-    "height_variance": 0.8651,
-    "sill_variance": 0.4293,
-    "spacing_variance": 0.6516,
-    "alignment_deviation": 0.5991
+    "width_variance": 0.3157,
+    "height_variance": 0.6018,
+    "sill_variance": 0.4505,
+    "spacing_variance": 0.7756,
+    "alignment_deviation": 0.5458
   },
   "rationalization_after": {
-    "width_variance": 0.0,
-    "height_variance": 0.0,
-    "sill_variance": 0.0,
-    "spacing_variance": 0.0,
-    "alignment_deviation": 0.5772
-  },
-  "metric": {
-    "facade_width_mm": 12100.0,
-    "facade_height_mm": 6000.0,
-    "storey_height_mm": 6000.0,
-    "window_width_mm": 903.9,
-    "window_height_mm": 1839.6
+    "width_variance": 0.3152,
+    "height_variance": 0.6018,
+    "sill_variance": 0.4505,
+    "spacing_variance": 0.7756,
+    "alignment_deviation": 0.5458
   },
   "sketchup": {
     "generate_stable": true,
@@ -420,7 +572,7 @@
     "no_overlapping_openings": true,
     "correct_storey_assignment": true,
     "sane_wall_dimensions": true,
-    "component_reuse": false
+    "component_reuse": true
   },
   "architectural_ir": {
     "schema_version": "0.1",
@@ -440,7 +592,7 @@
             "id": "storey_01",
             "name": "Storey 1",
             "elevation": 0.0,
-            "height": 6000.0,
+            "height": 9000.0,
             "elements": [
               {
                 "id": "wall_01_01",
@@ -454,12 +606,12 @@
                       0.0
                     ],
                     [
-                      12100.0,
+                      21000.0,
                       0,
                       0.0
                     ]
                   ],
-                  "height": 6000.0,
+                  "height": 9000.0,
                   "thickness": 240.0
                 },
                 "semantic": {
@@ -476,14 +628,7 @@
                   "pred_008",
                   "pred_009",
                   "pred_010",
-                  "pred_011",
-                  "pred_012",
-                  "pred_013",
-                  "pred_014",
-                  "pred_015",
-                  "pred_016",
-                  "pred_017",
-                  "pred_018"
+                  "pred_011"
                 ],
                 "confidence": 0.8
               }
@@ -498,10 +643,10 @@
         "type": "door",
         "parent_id": "wall_01_01",
         "geometry": {
-          "offset": 8822.1,
-          "width": 1190.6,
-          "height": 1308.0,
-          "sill_height": 0.8,
+          "offset": 15459.5,
+          "width": 2086.4,
+          "height": 1962.0,
+          "sill_height": 1592.1,
           "depth": 240.0
         },
         "confidence": 0.8307
@@ -511,228 +656,205 @@
         "type": "window",
         "parent_id": "wall_01_01",
         "geometry": {
-          "offset": 1.2,
-          "width": 355.7,
-          "height": 3640.2,
-          "sill_height": 0.6,
+          "offset": 1607.2,
+          "width": 1808.7,
+          "height": 398.7,
+          "sill_height": 2658.6,
           "depth": 240.0
         },
-        "confidence": 0.6631
+        "confidence": 0.6457
       },
       {
         "id": "pred_003",
         "type": "window",
         "parent_id": "wall_01_01",
         "geometry": {
-          "offset": 917.2,
-          "width": 1032.1,
-          "height": 265.8,
-          "sill_height": 0.7,
+          "offset": 2031.3,
+          "width": 1145.0,
+          "height": 1635.3,
+          "sill_height": 5103.9,
           "depth": 240.0
         },
-        "confidence": 0.6457
+        "confidence": 0.695
       },
       {
         "id": "pred_004",
         "type": "window",
         "parent_id": "wall_01_01",
         "geometry": {
-          "offset": 1159.2,
-          "width": 653.4,
-          "height": 1090.2,
-          "sill_height": 0.4,
+          "offset": 3933.3,
+          "width": 1293.4,
+          "height": 384.3,
+          "sill_height": 554.4,
           "depth": 240.0
         },
-        "confidence": 0.695
+        "confidence": 0.6639
       },
       {
         "id": "pred_005",
         "type": "window",
         "parent_id": "wall_01_01",
         "geometry": {
-          "offset": 2142.9,
-          "width": 574.7,
-          "height": 902.4,
-          "sill_height": 0.4,
+          "offset": 8218.5,
+          "width": 1312.5,
+          "height": 625.5,
+          "sill_height": 2260.8,
           "depth": 240.0
         },
-        "confidence": 0.693
+        "confidence": 0.7402
       },
       {
         "id": "pred_006",
         "type": "window",
         "parent_id": "wall_01_01",
         "geometry": {
-          "offset": 2244.6,
-          "width": 738.1,
-          "height": 256.2,
-          "sill_height": 0.9,
+          "offset": 9919.0,
+          "width": 2622.9,
+          "height": 653.4,
+          "sill_height": 3327.3,
           "depth": 240.0
         },
-        "confidence": 0.6639
+        "confidence": 0.6697
       },
       {
         "id": "pred_007",
         "type": "window",
         "parent_id": "wall_01_01",
         "geometry": {
-          "offset": 3182.3,
-          "width": 580.8,
-          "height": 910.2,
-          "sill_height": 0.4,
+          "offset": 10565.7,
+          "width": 1384.6,
+          "height": 341.1,
+          "sill_height": 8019.0,
           "depth": 240.0
         },
-        "confidence": 0.623
+        "confidence": 0.6681
       },
       {
         "id": "pred_008",
         "type": "window",
         "parent_id": "wall_01_01",
         "geometry": {
-          "offset": 4541.1,
-          "width": 531.2,
-          "height": 930.0,
-          "sill_height": 0.4,
+          "offset": 11229.4,
+          "width": 1145.0,
+          "height": 1435.5,
+          "sill_height": 5303.7,
           "depth": 240.0
         },
-        "confidence": 0.552
+        "confidence": 0.692
       },
       {
         "id": "pred_009",
         "type": "window",
         "parent_id": "wall_01_01",
         "geometry": {
-          "offset": 4690.0,
-          "width": 749.0,
-          "height": 417.0,
-          "sill_height": 0.7,
+          "offset": 15495.6,
+          "width": 1128.0,
+          "height": 1449.9,
+          "sill_height": 5303.7,
           "depth": 240.0
         },
-        "confidence": 0.7402
+        "confidence": 0.8104
       },
       {
         "id": "pred_010",
         "type": "window",
         "parent_id": "wall_01_01",
         "geometry": {
-          "offset": 5500.7,
-          "width": 549.3,
-          "height": 873.0,
-          "sill_height": 0.4,
+          "offset": 17075.6,
+          "width": 1163.3,
+          "height": 1450.8,
+          "sill_height": 5317.2,
           "depth": 240.0
         },
-        "confidence": 0.8841
+        "confidence": 0.7431
       },
       {
         "id": "pred_011",
         "type": "window",
         "parent_id": "wall_01_01",
         "geometry": {
-          "offset": 5660.4,
-          "width": 1496.8,
-          "height": 435.6,
-          "sill_height": 0.6,
-          "depth": 240.0
-        },
-        "confidence": 0.6697
-      },
-      {
-        "id": "pred_012",
-        "type": "window",
-        "parent_id": "wall_01_01",
-        "geometry": {
-          "offset": 6029.4,
-          "width": 790.1,
-          "height": 227.4,
-          "sill_height": 0.1,
-          "depth": 240.0
-        },
-        "confidence": 0.6681
-      },
-      {
-        "id": "pred_013",
-        "type": "window",
-        "parent_id": "wall_01_01",
-        "geometry": {
-          "offset": 6483.2,
-          "width": 531.2,
-          "height": 867.0,
-          "sill_height": 0.4,
-          "depth": 240.0
-        },
-        "confidence": 0.7779
-      },
-      {
-        "id": "pred_014",
-        "type": "window",
-        "parent_id": "wall_01_01",
-        "geometry": {
-          "offset": 7849.3,
-          "width": 532.4,
-          "height": 889.2,
-          "sill_height": 0.4,
-          "depth": 240.0
-        },
-        "confidence": 0.7633
-      },
-      {
-        "id": "pred_015",
-        "type": "window",
-        "parent_id": "wall_01_01",
-        "geometry": {
-          "offset": 8891.1,
-          "width": 532.4,
-          "height": 861.6,
-          "sill_height": 0.4,
-          "depth": 240.0
-        },
-        "confidence": 0.8328
-      },
-      {
-        "id": "pred_016",
-        "type": "window",
-        "parent_id": "wall_01_01",
-        "geometry": {
-          "offset": 9787.7,
-          "width": 548.1,
-          "height": 921.0,
-          "sill_height": 0.4,
-          "depth": 240.0
-        },
-        "confidence": 0.718
-      },
-      {
-        "id": "pred_017",
-        "type": "window",
-        "parent_id": "wall_01_01",
-        "geometry": {
-          "offset": 11046.1,
-          "width": 695.8,
-          "height": 208.8,
-          "sill_height": 1.0,
+          "offset": 19383.9,
+          "width": 1164.9,
+          "height": 313.2,
+          "sill_height": 0.0,
           "depth": 240.0
         },
         "confidence": 0.7308
-      },
-      {
-        "id": "pred_018",
-        "type": "window",
-        "parent_id": "wall_01_01",
-        "geometry": {
-          "offset": 11193.7,
-          "width": 903.9,
-          "height": 1839.6,
-          "sill_height": 0.3,
-          "depth": 240.0
-        },
-        "confidence": 0.9491
       }
     ],
-    "constraints": [],
+    "constraints": [
+      {
+        "id": "constraint_001",
+        "type": "equal_width",
+        "targets": [
+          "pred_010",
+          "pred_011"
+        ],
+        "priority": "soft",
+        "confidence": 0.9053,
+        "weight": 0.9053,
+        "source": "cv_pattern",
+        "evidence": {
+          "pattern_group_id": "bay_5_column_pattern",
+          "cv_confidence": 0.9053
+        },
+        "status": "proposed"
+      },
+      {
+        "id": "constraint_anchor_facade_width",
+        "type": "fixed_dimension",
+        "targets": [
+          "wall_01_01"
+        ],
+        "priority": "hard",
+        "confidence": 1.0,
+        "weight": 1.0,
+        "source": "user_anchor",
+        "status": "accepted",
+        "evidence": {
+          "anchor_id": "anchor_facade_width",
+          "axis": "horizontal",
+          "property": "facade_width",
+          "target": "facade",
+          "distance_mm": 21000.0
+        }
+      },
+      {
+        "id": "constraint_anchor_facade_height",
+        "type": "fixed_dimension",
+        "targets": [
+          "storey_01"
+        ],
+        "priority": "hard",
+        "confidence": 1.0,
+        "weight": 1.0,
+        "source": "user_anchor",
+        "status": "accepted",
+        "evidence": {
+          "anchor_id": "anchor_facade_height",
+          "axis": "vertical",
+          "property": "facade_height",
+          "target": "facade",
+          "distance_mm": 9000.0
+        }
+      }
+    ],
     "metric": {
-      "facade_width_mm": 12100.0,
-      "facade_height_mm": 6000.0,
-      "storey_height_mm": 6000.0
+      "facade_width_mm": 21000.0,
+      "facade_height_mm": 9000.0,
+      "storey_height_mm": 9000.0,
+      "window_width_mm": 1117.2,
+      "window_height_mm": 1449.9
+    },
+    "metric_source": "metric_anchor",
+    "reconstruction": {
+      "constraint_solver": {
+        "safety_status": "accepted",
+        "soft_weight_scale": 1.0,
+        "attempt_count": 1,
+        "fallback_reasons": [],
+        "human_review_required": false
+      }
     }
   }
 }

@@ -1,0 +1,54 @@
+{
+  "rqs_rubric": {
+    "perspective_rectification": 20,
+    "opening_detection": 20,
+    "opening_placement": 20,
+    "scale": 20,
+    "pattern_rationalization": 20,
+    "geometry_validity": 20,
+    "sketchup_editability": 20,
+    "human_correction_cost": 20
+  },
+  "results": [
+    {
+      "id": "photo_16",
+      "file": "d5550fb8626cddd9b76789b823a59e8f.jpg",
+      "split": "holdout",
+      "category": "strong_perspective",
+      "detection": {
+        "window_count": 0,
+        "door_count": 1,
+        "confidence": 0.348,
+        "passed_smoke": false
+      },
+      "rectify": { "method": "auto_full_frame" },
+      "automated_failure_hints": ["missed_window", "false_door"]
+    },
+    {
+      "id": "photo_17",
+      "file": "f6b7c5c2b9bd63cdb2e848c9b59627ff.jpg",
+      "split": "val",
+      "category": "low_light_reflection",
+      "detection": {
+        "window_count": 2,
+        "door_count": 1,
+        "confidence": 0.6766,
+        "passed_smoke": true
+      },
+      "automated_failure_hints": ["opening_detection"]
+    },
+    {
+      "id": "photo_01",
+      "file": "sample_train.jpg",
+      "split": "train",
+      "category": "baseline",
+      "detection": {
+        "window_count": 3,
+        "door_count": 1,
+        "confidence": 0.9,
+        "passed_smoke": true
+      },
+      "automated_failure_hints": ["none"]
+    }
+  ]
+}

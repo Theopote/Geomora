@@ -16,7 +16,7 @@
           "id": "storey_01",
           "name": "Storey 1",
           "elevation": 0.0,
-          "height": 6000.0,
+          "height": 9000.0,
           "elements": [
             {
               "id": "wall_01_01",
@@ -30,12 +30,12 @@
                     0.0
                   ],
                   [
-                    12100.0,
+                    21000.0,
                     0,
                     0.0
                   ]
                 ],
-                "height": 6000.0,
+                "height": 9000.0,
                 "thickness": 240.0
               },
               "semantic": {
@@ -52,14 +52,7 @@
                 "pred_008",
                 "pred_009",
                 "pred_010",
-                "pred_011",
-                "pred_012",
-                "pred_013",
-                "pred_014",
-                "pred_015",
-                "pred_016",
-                "pred_017",
-                "pred_018"
+                "pred_011"
               ],
               "confidence": 0.8
             }
@@ -74,10 +67,10 @@
       "type": "door",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 8822.1,
-        "width": 1190.6,
-        "height": 1308.0,
-        "sill_height": 0.8,
+        "offset": 15459.5,
+        "width": 2086.4,
+        "height": 1962.0,
+        "sill_height": 1592.1,
         "depth": 240.0
       },
       "confidence": 0.8307
@@ -87,227 +80,204 @@
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 1.2,
-        "width": 355.7,
-        "height": 3640.2,
-        "sill_height": 0.6,
+        "offset": 1607.2,
+        "width": 1808.7,
+        "height": 398.7,
+        "sill_height": 2658.6,
         "depth": 240.0
       },
-      "confidence": 0.6631
+      "confidence": 0.6457
     },
     {
       "id": "pred_003",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 917.2,
-        "width": 1032.1,
-        "height": 265.8,
-        "sill_height": 0.7,
+        "offset": 2031.3,
+        "width": 1145.0,
+        "height": 1635.3,
+        "sill_height": 5103.9,
         "depth": 240.0
       },
-      "confidence": 0.6457
+      "confidence": 0.695
     },
     {
       "id": "pred_004",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 1159.2,
-        "width": 653.4,
-        "height": 1090.2,
-        "sill_height": 0.4,
+        "offset": 3933.3,
+        "width": 1293.4,
+        "height": 384.3,
+        "sill_height": 554.4,
         "depth": 240.0
       },
-      "confidence": 0.695
+      "confidence": 0.6639
     },
     {
       "id": "pred_005",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 2142.9,
-        "width": 574.7,
-        "height": 902.4,
-        "sill_height": 0.4,
+        "offset": 8218.5,
+        "width": 1312.5,
+        "height": 625.5,
+        "sill_height": 2260.8,
         "depth": 240.0
       },
-      "confidence": 0.693
+      "confidence": 0.7402
     },
     {
       "id": "pred_006",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 2244.6,
-        "width": 738.1,
-        "height": 256.2,
-        "sill_height": 0.9,
+        "offset": 9919.0,
+        "width": 2622.9,
+        "height": 653.4,
+        "sill_height": 3327.3,
         "depth": 240.0
       },
-      "confidence": 0.6639
+      "confidence": 0.6697
     },
     {
       "id": "pred_007",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 3182.3,
-        "width": 580.8,
-        "height": 910.2,
-        "sill_height": 0.4,
+        "offset": 10565.7,
+        "width": 1384.6,
+        "height": 341.1,
+        "sill_height": 8019.0,
         "depth": 240.0
       },
-      "confidence": 0.623
+      "confidence": 0.6681
     },
     {
       "id": "pred_008",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 4541.1,
-        "width": 531.2,
-        "height": 930.0,
-        "sill_height": 0.4,
+        "offset": 11229.4,
+        "width": 1145.0,
+        "height": 1435.5,
+        "sill_height": 5303.7,
         "depth": 240.0
       },
-      "confidence": 0.552
+      "confidence": 0.692
     },
     {
       "id": "pred_009",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 4690.0,
-        "width": 749.0,
-        "height": 417.0,
-        "sill_height": 0.7,
+        "offset": 15495.6,
+        "width": 1128.0,
+        "height": 1449.9,
+        "sill_height": 5303.7,
         "depth": 240.0
       },
-      "confidence": 0.7402
+      "confidence": 0.8104
     },
     {
       "id": "pred_010",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 5500.7,
-        "width": 549.3,
-        "height": 873.0,
-        "sill_height": 0.4,
+        "offset": 17075.6,
+        "width": 1163.3,
+        "height": 1450.8,
+        "sill_height": 5317.2,
         "depth": 240.0
       },
-      "confidence": 0.8841
+      "confidence": 0.7431
     },
     {
       "id": "pred_011",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 5660.4,
-        "width": 1496.8,
-        "height": 435.6,
-        "sill_height": 0.6,
-        "depth": 240.0
-      },
-      "confidence": 0.6697
-    },
-    {
-      "id": "pred_012",
-      "type": "window",
-      "parent_id": "wall_01_01",
-      "geometry": {
-        "offset": 6029.4,
-        "width": 790.1,
-        "height": 227.4,
-        "sill_height": 0.1,
-        "depth": 240.0
-      },
-      "confidence": 0.6681
-    },
-    {
-      "id": "pred_013",
-      "type": "window",
-      "parent_id": "wall_01_01",
-      "geometry": {
-        "offset": 6483.2,
-        "width": 531.2,
-        "height": 867.0,
-        "sill_height": 0.4,
-        "depth": 240.0
-      },
-      "confidence": 0.7779
-    },
-    {
-      "id": "pred_014",
-      "type": "window",
-      "parent_id": "wall_01_01",
-      "geometry": {
-        "offset": 7849.3,
-        "width": 532.4,
-        "height": 889.2,
-        "sill_height": 0.4,
-        "depth": 240.0
-      },
-      "confidence": 0.7633
-    },
-    {
-      "id": "pred_015",
-      "type": "window",
-      "parent_id": "wall_01_01",
-      "geometry": {
-        "offset": 8891.1,
-        "width": 532.4,
-        "height": 861.6,
-        "sill_height": 0.4,
-        "depth": 240.0
-      },
-      "confidence": 0.8328
-    },
-    {
-      "id": "pred_016",
-      "type": "window",
-      "parent_id": "wall_01_01",
-      "geometry": {
-        "offset": 9787.7,
-        "width": 548.1,
-        "height": 921.0,
-        "sill_height": 0.4,
-        "depth": 240.0
-      },
-      "confidence": 0.718
-    },
-    {
-      "id": "pred_017",
-      "type": "window",
-      "parent_id": "wall_01_01",
-      "geometry": {
-        "offset": 11046.1,
-        "width": 695.8,
-        "height": 208.8,
-        "sill_height": 1.0,
+        "offset": 19383.9,
+        "width": 1164.9,
+        "height": 313.2,
+        "sill_height": 0.0,
         "depth": 240.0
       },
       "confidence": 0.7308
-    },
-    {
-      "id": "pred_018",
-      "type": "window",
-      "parent_id": "wall_01_01",
-      "geometry": {
-        "offset": 11193.7,
-        "width": 903.9,
-        "height": 1839.6,
-        "sill_height": 0.3,
-        "depth": 240.0
-      },
-      "confidence": 0.9491
     }
   ],
-  "constraints": [],
+  "constraints": [
+    {
+      "id": "constraint_001",
+      "type": "equal_width",
+      "targets": [
+        "pred_010",
+        "pred_011"
+      ],
+      "priority": "soft",
+      "confidence": 0.9053,
+      "weight": 0.9053,
+      "source": "cv_pattern",
+      "evidence": {
+        "pattern_group_id": "bay_5_column_pattern",
+        "cv_confidence": 0.9053
+      },
+      "status": "proposed"
+    },
+    {
+      "id": "constraint_anchor_facade_width",
+      "type": "fixed_dimension",
+      "targets": [
+        "wall_01_01"
+      ],
+      "priority": "hard",
+      "confidence": 1.0,
+      "weight": 1.0,
+      "source": "user_anchor",
+      "status": "accepted",
+      "evidence": {
+        "anchor_id": "anchor_facade_width",
+        "axis": "horizontal",
+        "property": "facade_width",
+        "target": "facade",
+        "distance_mm": 21000.0
+      }
+    },
+    {
+      "id": "constraint_anchor_facade_height",
+      "type": "fixed_dimension",
+      "targets": [
+        "storey_01"
+      ],
+      "priority": "hard",
+      "confidence": 1.0,
+      "weight": 1.0,
+      "source": "user_anchor",
+      "status": "accepted",
+      "evidence": {
+        "anchor_id": "anchor_facade_height",
+        "axis": "vertical",
+        "property": "facade_height",
+        "target": "facade",
+        "distance_mm": 9000.0
+      }
+    }
+  ],
   "metric": {
-    "facade_width_mm": 12100.0,
-    "facade_height_mm": 6000.0,
-    "storey_height_mm": 6000.0
+    "facade_width_mm": 21000.0,
+    "facade_height_mm": 9000.0,
+    "storey_height_mm": 9000.0,
+    "window_width_mm": 1117.2,
+    "window_height_mm": 1449.9
+  },
+  "metric_source": "metric_anchor",
+  "reconstruction": {
+    "constraint_solver": {
+      "safety_status": "accepted",
+      "soft_weight_scale": 1.0,
+      "attempt_count": 1,
+      "fallback_reasons": [],
+      "human_review_required": false
+    }
   }
 }

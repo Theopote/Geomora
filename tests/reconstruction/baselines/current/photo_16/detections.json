@@ -1,5 +1,5 @@
 {
-  "method": "auto_fusion_v1",
+  "method": "facade_row_v1",
   "confidence": 0.722,
   "image_width": 743,
   "image_height": 869,
@@ -47,20 +47,14 @@
   ],
   "overlay_base64": null,
   "debug": {
-    "fusion": "yolo_facade_row_v1",
-    "yolo_element_count": 0,
-    "row_element_count": 4,
-    "fused_element_count": 4,
-    "yolo_window_count": 0,
-    "row_window_count": 4,
-    "fused_window_count": 4,
+    "candidate_count": 14,
+    "element_count": 4,
     "facade_bounds": [
       0,
       0,
       743,
       869
     ],
-    "yolo_model_path": "F:\\development\\Geomora\\backend\\models\\facade_yolo_v1.onnx",
     "scale_hint": {
       "wall_length_mm": 4000,
       "wall_height_mm": 2400,

@@ -61,11 +61,11 @@ module Geomora
       end
 
       def self.full_box(type, version, flags, body)
-        box(type, [version].pack('C') + [flags].pack('N3') + body)
+        box(type, [version].pack('C') + [flags, 0, 0].pack('N*') + body)
       end
 
       def self.box(type, body)
-        type.ljust(4, "\0")[0, 4] + [body.bytesize + 8].pack('N') + body
+        [body.bytesize + 8].pack('N') + type.ljust(4, "\0")[0, 4] + body
       end
     end
   end

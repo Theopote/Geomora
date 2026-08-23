@@ -1,6 +1,6 @@
 {
-  "method": "auto_fusion_v1",
-  "confidence": 0.5907,
+  "method": "facade_row_v1",
+  "confidence": 0.6876,
   "image_width": 473,
   "image_height": 551,
   "elements": [
@@ -47,50 +47,24 @@
     {
       "type": "window",
       "bbox_norm": [
-        0.5879470147743789,
-        0.5493028367279662,
-        0.745640825267574,
-        0.6285921017184665
-      ],
-      "confidence": 0.3426
-    },
-    {
-      "type": "window",
-      "bbox_norm": [
         0.638477801268499,
         0.7658802177858439,
         0.6997885835095138,
         0.8185117967332124
       ],
       "confidence": 0.6603
-    },
-    {
-      "type": "window",
-      "bbox_norm": [
-        0.7851993488206924,
-        0.5546407543812386,
-        0.8590403389477075,
-        0.6305646671357475
-      ],
-      "confidence": 0.3542
     }
   ],
   "overlay_base64": null,
   "debug": {
-    "fusion": "yolo_facade_row_v1",
-    "yolo_element_count": 2,
-    "row_element_count": 5,
-    "fused_element_count": 7,
-    "yolo_window_count": 2,
-    "row_window_count": 4,
-    "fused_window_count": 6,
+    "candidate_count": 23,
+    "element_count": 5,
     "facade_bounds": [
       0,
       5,
       473,
       540
     ],
-    "yolo_model_path": "F:\\development\\Geomora\\backend\\models\\facade_yolo_v1.onnx",
     "scale_hint": {
       "wall_length_mm": 4000,
       "wall_height_mm": 3100,

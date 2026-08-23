@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import subprocess
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -49,6 +51,39 @@ def parse_args() -> argparse.Namespace:
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def git_text(*args: str) -> str | None:
+    try:
+        return subprocess.run(
+            ["git", *args], cwd=REPO_ROOT, check=True, capture_output=True, text=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def source_changes(out_dir: Path) -> list[str]:
+    """Return dirty source inputs while excluding generated benchmark artifacts/caches."""
+    rows = (git_text("status", "--porcelain") or "").splitlines()
+    try:
+        out_prefix = out_dir.resolve().relative_to(REPO_ROOT).as_posix().rstrip("/") + "/"
+    except ValueError:
+        out_prefix = ""
+    kept = []
+    for row in rows:
+        path = row[3:].replace("\\", "/") if len(row) > 3 else row
+        if " -> " in path:
+            path = path.split(" -> ", 1)[1]
+        if (out_prefix and path.startswith(out_prefix)) or "/__pycache__/" in f"/{path}/":
+            continue
+        if path.startswith("tests/reconstruction/baselines/archive/"):
+            continue
+        kept.append(row)
+    return kept
 
 
 def resolve_image_path(manifest: dict, file_name: str) -> Path:
@@ -231,14 +266,38 @@ def main() -> int:
             )
         )
 
+    generated_at = datetime.now(UTC).isoformat()
     summary = {
-        "generated_at": datetime.now(UTC).isoformat(),
+        "generated_at": generated_at,
         "method": args.method,
         "photos": len(results),
         "results": results,
     }
     (args.out / "summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    gt_hashes = {
+        photo_id: sha256(GT_DIR / f"{photo_id}.json")
+        for photo_id in photo_ids
+    }
+    dirty_paths = source_changes(args.out)
+    freeze_manifest = {
+        "schema_version": "reconstruction-baseline-freeze-v1",
+        "generated_at": generated_at,
+        "source_commit": git_text("rev-parse", "HEAD"),
+        "source_worktree_clean": not dirty_paths,
+        "source_worktree_changes": dirty_paths,
+        "generated_artifact_changes_omitted": True,
+        "method": args.method,
+        "minimal_set": str(args.minimal_set.relative_to(REPO_ROOT)),
+        "minimal_set_sha256": sha256(args.minimal_set),
+        "photo_ids": photo_ids,
+        "ground_truth_sha256": gt_hashes,
+        "vlm_cache": str(args.vlm_cache_dir) if args.vlm_cache_dir else None,
+    }
+    (args.out / "freeze_manifest.json").write_text(
+        json.dumps(freeze_manifest, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
 

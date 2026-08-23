@@ -66,17 +66,19 @@ module Geomora
       end
 
       def self.avc1_sample_entry(width, height, sps, pps)
-        avcc = [1, H264FrameEncoder::PROFILE_BASELINE, 0, H264FrameEncoder::LEVEL_3, 0xFF,
-                0xE1, sps.bytesize].pack('CCCCCCn') + sps + [1, pps.bytesize].pack('Cn') + pps
+        sps = sps.b
+        pps = pps.b
+        avcc = ([1, H264FrameEncoder::PROFILE_BASELINE, 0, H264FrameEncoder::LEVEL_3, 0xFF,
+                 0xE1, sps.bytesize].pack('CCCCCCn') + sps + [1, pps.bytesize].pack('Cn') + pps).b
         entry = [
           [0, 0, 0, 0, 1].pack('NNnN'),
           'avc1',
           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].pack('C*'),
           width, height,
           [0x00_48_00_00, 0x00_48_00_00, 0, 1].pack('NNnN'),
-          [0x18].pack('C') + "\xFF\xFF",
+          [0x18].pack('C') + "\xFF\xFF".b,
           box('avcC', avcc)
-        ].join
+        ].join.b
         full_box('stsd', 0, 0, [1].pack('N') + entry)
       end
 
@@ -84,11 +86,11 @@ module Geomora
       LEVEL_3 = H264FrameEncoder::LEVEL_3
 
       def self.full_box(type, version, flags, body)
-        box(type, [version].pack('C') + [flags].pack('N3') + body)
+        box(type, [version].pack('C') + [flags, 0, 0].pack('N*') + body)
       end
 
       def self.box(type, body)
-        type.ljust(4, "\0")[0, 4] + [body.bytesize + 8].pack('N') + body
+        [body.bytesize + 8].pack('N') + type.ljust(4, "\0")[0, 4] + body
       end
     end
   end

@@ -41,7 +41,7 @@ module Geomora
         return false unless FurniturePlanner.enabled?(params)
 
         value = config['fixture_sets'] || config[:fixture_sets]
-        return true if value.nil?
+        return false if value.nil?
 
         value == true || value.to_s == 'true'
       end

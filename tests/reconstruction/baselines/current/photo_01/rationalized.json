@@ -13,10 +13,59 @@
       1.0,
       1.0
     ],
+    "storeys": [
+      {
+        "id": 1,
+        "y_range": [
+          0.4624,
+          0.6522
+        ],
+        "confidence": 0.79,
+        "status": "observed",
+        "evidence": [
+          {
+            "type": "window_row",
+            "members": [
+              "pred_005",
+              "pred_002",
+              "pred_004"
+            ],
+            "confidence": 0.79
+          }
+        ]
+      }
+    ],
+    "bays": [
+      {
+        "id": 1,
+        "x_center": 0.1567,
+        "confidence": 0.63
+      },
+      {
+        "id": 2,
+        "x_center": 0.6641,
+        "confidence": 0.63
+      },
+      {
+        "id": 3,
+        "x_center": 0.9288,
+        "confidence": 0.63
+      }
+    ],
     "pattern_groups": [],
     "uncertainties": [
       "filtered_outliers:2"
-    ]
+    ],
+    "storey_hypothesis": {
+      "model": "architectural_storey_hypothesis_v0.1",
+      "cue_count": 0,
+      "boundary_cue_count": 0,
+      "used_cue_ids": [],
+      "unused_cue_ids": []
+    },
+    "hidden_opening_hypotheses": [],
+    "occlusion_awareness": {},
+    "door_hypotheses": []
   },
   "geometry": {
     "method": "bbox_ratios_v0.1",

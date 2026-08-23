@@ -49,7 +49,15 @@ module Geomora
       def self.candidate_positions(start, bounds, width, depth, inset)
         x0 = start[0].to_f
         y0 = start[1].to_f
-        shifts = [0, STEP_MM, -STEP_MM, STEP_MM * 2, -STEP_MM * 2, STEP_MM * 3]
+        max_dx = bounds[:x_max] - inset - width - x0
+        max_dy = bounds[:y_max] - inset - depth - y0
+        shifts = [0]
+        step = STEP_MM
+        offset = step
+        while offset <= [max_dx, max_dy, STEP_MM * 6].max
+          shifts << offset << -offset
+          offset += step
+        end
         positions = [[x0, y0, 0]]
         shifts.each do |dx|
           shifts.each do |dy|

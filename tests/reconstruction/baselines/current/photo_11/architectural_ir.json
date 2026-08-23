@@ -16,7 +16,7 @@
           "id": "storey_01",
           "name": "Storey 1",
           "elevation": 0.0,
-          "height": 2400.0,
+          "height": 7800.0,
           "elements": [
             {
               "id": "wall_01_01",
@@ -30,12 +30,12 @@
                     0.0
                   ],
                   [
-                    4200.0,
+                    14500.0,
                     0,
                     0.0
                   ]
                 ],
-                "height": 2400.0,
+                "height": 7800.0,
                 "thickness": 240.0
               },
               "semantic": {
@@ -53,8 +53,7 @@
                 "pred_009",
                 "pred_010",
                 "pred_011",
-                "pred_012",
-                "pred_013"
+                "pred_012"
               ],
               "confidence": 0.8
             }
@@ -70,9 +69,9 @@
       "parent_id": "wall_01_01",
       "geometry": {
         "offset": 0.0,
-        "width": 155.8,
-        "height": 541.9,
-        "sill_height": 0.8,
+        "width": 538.0,
+        "height": 1761.2,
+        "sill_height": 1793.2,
         "depth": 240.0
       },
       "confidence": 0.7309
@@ -83,9 +82,9 @@
       "parent_id": "wall_01_01",
       "geometry": {
         "offset": 0.0,
-        "width": 4200.0,
-        "height": 1565.5,
-        "sill_height": 0.9,
+        "width": 14500.0,
+        "height": 5087.9,
+        "sill_height": 680.9,
         "depth": 240.0
       },
       "confidence": 0.658
@@ -96,9 +95,9 @@
       "parent_id": "wall_01_01",
       "geometry": {
         "offset": 0.0,
-        "width": 189.4,
-        "height": 176.2,
-        "sill_height": 0.9,
+        "width": 654.0,
+        "height": 572.5,
+        "sill_height": 572.5,
         "depth": 240.0
       },
       "confidence": 0.6411
@@ -108,136 +107,225 @@
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 0.0,
-        "width": 220.5,
-        "height": 669.1,
-        "sill_height": 0.3,
+        "offset": 665.6,
+        "width": 2895.7,
+        "height": 1317.4,
+        "sill_height": 670.0,
         "depth": 240.0
       },
-      "confidence": 0.4657
+      "confidence": 0.6739
     },
     {
       "id": "pred_005",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 192.8,
-        "width": 838.7,
-        "height": 405.4,
-        "sill_height": 0.9,
+        "offset": 1319.5,
+        "width": 1934.3,
+        "height": 1900.9,
+        "sill_height": 4202.6,
         "depth": 240.0
       },
-      "confidence": 0.6739
+      "confidence": 0.7639
     },
     {
       "id": "pred_006",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 484.3,
-        "width": 333.5,
-        "height": 501.6,
-        "sill_height": 0.4,
+        "offset": 3201.6,
+        "width": 577.1,
+        "height": 593.6,
+        "sill_height": 1901.6,
         "depth": 240.0
       },
-      "confidence": 0.3524
+      "confidence": 0.6396
     },
     {
       "id": "pred_007",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 927.4,
-        "width": 167.2,
-        "height": 182.6,
-        "sill_height": 0.8,
+        "offset": 3714.5,
+        "width": 1639.9,
+        "height": 1847.0,
+        "sill_height": 4267.4,
         "depth": 240.0
       },
-      "confidence": 0.6396
+      "confidence": 0.8225
     },
     {
       "id": "pred_008",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 1072.3,
-        "width": 475.0,
-        "height": 568.3,
-        "sill_height": 0.5,
+        "offset": 3970.5,
+        "width": 1128.1,
+        "height": 302.6,
+        "sill_height": 3122.3,
         "depth": 240.0
       },
-      "confidence": 0.8225
+      "confidence": 0.7043
     },
     {
       "id": "pred_009",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 1153.7,
-        "width": 326.8,
-        "height": 93.1,
-        "sill_height": 0.6,
+        "offset": 6406.2,
+        "width": 1589.2,
+        "height": 1847.0,
+        "sill_height": 4256.5,
         "depth": 240.0
       },
-      "confidence": 0.7043
+      "confidence": 0.8301
     },
     {
       "id": "pred_010",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 1758.5,
-        "width": 460.3,
-        "height": 568.3,
-        "sill_height": 0.5,
+        "offset": 8441.9,
+        "width": 1587.7,
+        "height": 1900.9,
+        "sill_height": 4202.6,
         "depth": 240.0
       },
-      "confidence": 0.8301
+      "confidence": 0.8135
     },
     {
       "id": "pred_011",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 2445.2,
-        "width": 459.9,
-        "height": 584.9,
-        "sill_height": 0.5,
+        "offset": 10681.2,
+        "width": 1959.0,
+        "height": 1836.1,
+        "sill_height": 4267.4,
         "depth": 240.0
       },
-      "confidence": 0.8135
+      "confidence": 0.7643
     },
     {
       "id": "pred_012",
       "type": "window",
       "parent_id": "wall_01_01",
       "geometry": {
-        "offset": 3179.8,
-        "width": 356.2,
-        "height": 76.3,
-        "sill_height": 0.2,
+        "offset": 11044.1,
+        "width": 1229.6,
+        "height": 248.0,
+        "sill_height": 5855.5,
         "depth": 240.0
       },
       "confidence": 0.6954
-    },
-    {
-      "id": "pred_013",
-      "type": "window",
-      "parent_id": "wall_01_01",
-      "geometry": {
-        "offset": 3182.3,
-        "width": 352.4,
-        "height": 513.4,
-        "sill_height": 0.4,
-        "depth": 240.0
-      },
-      "confidence": 0.5939
     }
   ],
-  "constraints": [],
+  "constraints": [
+    {
+      "id": "constraint_001",
+      "type": "vertical",
+      "targets": [
+        "pred_007",
+        "pred_008"
+      ],
+      "priority": "soft",
+      "confidence": 0.9817,
+      "weight": 0.9817,
+      "source": "cv_pattern",
+      "evidence": {
+        "pattern_group_id": "bay_3_column_pattern",
+        "cv_confidence": 0.9817
+      },
+      "status": "proposed"
+    },
+    {
+      "id": "constraint_002",
+      "type": "vertical",
+      "targets": [
+        "pred_002",
+        "pred_009"
+      ],
+      "priority": "soft",
+      "confidence": 0.9522,
+      "weight": 0.9522,
+      "source": "cv_pattern",
+      "evidence": {
+        "pattern_group_id": "bay_4_column_pattern",
+        "cv_confidence": 0.9522
+      },
+      "status": "proposed"
+    },
+    {
+      "id": "constraint_003",
+      "type": "vertical",
+      "targets": [
+        "pred_011",
+        "pred_012"
+      ],
+      "priority": "soft",
+      "confidence": 0.9159,
+      "weight": 0.9159,
+      "source": "cv_pattern",
+      "evidence": {
+        "pattern_group_id": "bay_6_column_pattern",
+        "cv_confidence": 0.9159
+      },
+      "status": "proposed"
+    },
+    {
+      "id": "constraint_anchor_facade_width",
+      "type": "fixed_dimension",
+      "targets": [
+        "wall_01_01"
+      ],
+      "priority": "hard",
+      "confidence": 1.0,
+      "weight": 1.0,
+      "source": "user_anchor",
+      "status": "accepted",
+      "evidence": {
+        "anchor_id": "anchor_facade_width",
+        "axis": "horizontal",
+        "property": "facade_width",
+        "target": "facade",
+        "distance_mm": 14500.0
+      }
+    },
+    {
+      "id": "constraint_anchor_facade_height",
+      "type": "fixed_dimension",
+      "targets": [
+        "storey_01"
+      ],
+      "priority": "hard",
+      "confidence": 1.0,
+      "weight": 1.0,
+      "source": "user_anchor",
+      "status": "accepted",
+      "evidence": {
+        "anchor_id": "anchor_facade_height",
+        "axis": "vertical",
+        "property": "facade_height",
+        "target": "facade",
+        "distance_mm": 7800.0
+      }
+    }
+  ],
   "metric": {
-    "facade_width_mm": 4200.0,
-    "facade_height_mm": 2400.0,
-    "storey_height_mm": 2400.0
+    "facade_width_mm": 14500.0,
+    "facade_height_mm": 7800.0,
+    "storey_height_mm": 7800.0,
+    "window_width_mm": 1589.2,
+    "window_height_mm": 1847.0
+  },
+  "metric_source": "metric_anchor",
+  "reconstruction": {
+    "constraint_solver": {
+      "safety_status": "accepted",
+      "soft_weight_scale": 1.0,
+      "attempt_count": 1,
+      "fallback_reasons": [],
+      "human_review_required": false
+    }
   }
 }

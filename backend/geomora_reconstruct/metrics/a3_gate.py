@@ -342,7 +342,11 @@ def evaluate_a3_gate(
         catastrophic = sum(
             1 for row in evaluated
             if (row["metrics"].get("topology") or {}).get("storey_accuracy", 0.0) < 0.50
-            or (row["metrics"].get("geometry") or {}).get("normalized_mae", 1.0) > profile.per_photo_geometry_mae_max
+            or (
+                (row["metrics"].get("geometry") or {}).get("normalized_mae")
+                if (row["metrics"].get("geometry") or {}).get("normalized_mae") is not None
+                else 1.0
+            ) > profile.per_photo_geometry_mae_max
         )
         report.checks.append(GateCheck("catastrophic_failure_count", catastrophic == 0, catastrophic, 0, "Photos with severe topology or geometry failure"))
         if not per_photo_geometry_passed or catastrophic:

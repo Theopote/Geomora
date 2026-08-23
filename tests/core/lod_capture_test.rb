@@ -5,8 +5,10 @@ require_relative '../test_helper'
 class LodCaptureTest < Minitest::Test
   def test_capture_pages_writes_frame_files
     page = Struct.new(:name).new('Geomora LOD 100')
+    pages = Object.new
+    pages.define_singleton_method(:selected_page=) { |_page| nil }
     model = Object.new
-    model.define_singleton_method(:pages) { [page] }
+    model.define_singleton_method(:pages) { pages }
     model.define_singleton_method(:active_view) { nil }
 
     original_pages = Geomora::Core::LodPresentation.method(:geomora_pages)

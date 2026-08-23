@@ -300,7 +300,11 @@ module Geomora
       end
 
       def lod_level
-        LodPolicy.normalize(@params['lod_level'])
+        raw = @params['lod_level'] || @params[:lod_level]
+        normalized = LodPolicy.normalize(raw)
+        return raw if raw.is_a?(String) && raw.start_with?('lod_')
+
+        "lod_#{normalized}"
       end
 
       def repeat_openings_for_storey?(index)

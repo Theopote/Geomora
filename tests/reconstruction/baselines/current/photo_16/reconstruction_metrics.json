@@ -22,6 +22,7 @@
   "topology": {
     "storey_count_error": 0.6667,
     "storey_accuracy": 0.3333,
+    "storey_exact": 0.0,
     "bay_count_error": 0.625,
     "bay_accuracy": 0.375,
     "window_to_storey_assignment_accuracy": 0.0,
@@ -48,20 +49,20 @@
       "alignment_deviation": 0.7099
     },
     "after": {
-      "width_variance": 0.0003,
-      "height_variance": 0.0,
-      "sill_variance": 0.0,
-      "spacing_variance": 0.0,
-      "alignment_deviation": 0.5905
+      "width_variance": 0.5231,
+      "height_variance": 0.8347,
+      "sill_variance": 0.1548,
+      "spacing_variance": 0.0004,
+      "alignment_deviation": 0.6997
     },
     "improvement": {
-      "width_variance": 0.9994,
-      "height_variance": 1.0,
-      "sill_variance": 1.0,
-      "spacing_variance": 1.0,
-      "alignment_deviation": 0.1682
+      "width_variance": 0.0,
+      "height_variance": 0.0,
+      "sill_variance": 0.0,
+      "spacing_variance": 0.9887,
+      "alignment_deviation": 0.0144
     },
-    "mean_improvement": 0.8335
+    "mean_improvement": 0.2006
   },
   "sketchup": {
     "generate_stable": true,
@@ -70,10 +71,29 @@
     "no_overlapping_openings": true,
     "correct_storey_assignment": true,
     "sane_wall_dimensions": true,
-    "component_reuse": false,
-    "pass_rate": 0.8571
+    "component_reuse": true,
+    "pass_rate": 1.0
   },
-  "rqs": 49.1,
+  "constraint_solver": {
+    "constraint_count": 1,
+    "soft_constraint_count": 1,
+    "hard_constraint_count": 0,
+    "mean_residual_before": 0.005375,
+    "mean_residual_after": 6.325e-05,
+    "residual_reduction": 0.988233,
+    "hard_satisfaction_rate": 1.0,
+    "hard_violations": 0,
+    "compared_openings": 4,
+    "mean_bbox_drift": 0.002656,
+    "max_bbox_drift": 0.013506,
+    "overlaps_before": 0,
+    "overlaps_after": 0,
+    "introduced_overlaps": 0,
+    "boundary_violations_before": 0,
+    "boundary_violations_after": 0,
+    "introduced_boundary_violations": 0
+  },
+  "rqs": 43.7,
   "coverage": 0.9,
   "not_evaluated": [
     "scale"

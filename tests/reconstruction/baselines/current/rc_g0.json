@@ -1,15 +1,90 @@
 {
-  "generated_at": "2026-08-23T17:15:17.045867+00:00",
-  "method": "facade_row_v1",
-  "photos": 5,
+  "minimal_set": "F:\\development\\Geomora\\tests\\reconstruction\\minimal_set.json",
+  "prediction_dir": "tests\\reconstruction\\baselines\\current",
+  "gate": {
+    "phase": "prototype_bootstrap",
+    "gate": "RC-G0",
+    "maturity_claim": "prototype_bootstrap",
+    "passed": false,
+    "product_ready": false,
+    "higher_gates_not_evaluated": [
+      "RC-G1",
+      "RC-G2"
+    ],
+    "user_facing_claim_allowed": "No readiness claim allowed",
+    "checks": [
+      {
+        "id": "minimum_sample_count",
+        "passed": true,
+        "actual": 5,
+        "threshold": 1,
+        "detail": "Minimum evaluated photos for this maturity claim"
+      },
+      {
+        "id": "minimum_holdout_count",
+        "passed": true,
+        "actual": 3,
+        "threshold": 0,
+        "detail": "Minimum untouched hold-out photos"
+      },
+      {
+        "id": "val_window_recall",
+        "passed": true,
+        "actual": 0.8333,
+        "threshold": 0.8,
+        "detail": "Validation split window recall"
+      },
+      {
+        "id": "mean_rqs",
+        "passed": true,
+        "actual": 46.36,
+        "threshold": 45.0,
+        "detail": "Mean RQS over evaluated metric groups"
+      },
+      {
+        "id": "mean_coverage",
+        "passed": true,
+        "actual": 0.9,
+        "threshold": 0.7,
+        "detail": "Mean annotation coverage across metric groups"
+      },
+      {
+        "id": "topology_storey_accuracy",
+        "passed": false,
+        "actual": 0.4667,
+        "threshold": 0.5,
+        "detail": "Mean storey count accuracy"
+      },
+      {
+        "id": "geometry_normalized_mae",
+        "passed": true,
+        "actual": 0.1835,
+        "threshold": 0.25,
+        "detail": "Mean normalized geometry MAE (lower is better)"
+      },
+      {
+        "id": "holdout_generate_stable",
+        "passed": true,
+        "actual": "3/3",
+        "threshold": ">=2/3",
+        "detail": "Hold-out photos with heuristic generate_stable check"
+      }
+    ],
+    "blockers": [],
+    "summary": {
+      "photos": 5,
+      "evaluated": 5,
+      "mean_rqs": 46.4,
+      "mean_coverage": 0.9,
+      "val_window_recall": 0.8333,
+      "holdout_generate_stable": 3,
+      "solver_evaluated": 3
+    }
+  },
   "results": [
     {
       "photo_id": "photo_01",
       "split": "train",
-      "category": "residential",
-      "detection_method": "facade_row_v1",
-      "window_count": 5,
-      "door_count": 0,
       "metrics": {
         "photo_id": "photo_01",
         "detection": {
@@ -93,15 +168,11 @@
           "scale"
         ]
       },
-      "preview": "tests\\reconstruction\\baselines\\current\\photo_01\\preview.png"
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_01\\prediction.json"
     },
     {
       "photo_id": "photo_11",
       "split": "val",
-      "category": "commercial",
-      "detection_method": "facade_row_v1",
-      "window_count": 12,
-      "door_count": 0,
       "metrics": {
         "photo_id": "photo_11",
         "detection": {
@@ -206,15 +277,11 @@
         "coverage": 1.0,
         "not_evaluated": []
       },
-      "preview": "tests\\reconstruction\\baselines\\current\\photo_11\\preview.png"
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_11\\prediction.json"
     },
     {
       "photo_id": "photo_16",
       "split": "holdout",
-      "category": "strong_perspective",
-      "detection_method": "facade_row_v1",
-      "window_count": 4,
-      "door_count": 0,
       "metrics": {
         "photo_id": "photo_16",
         "detection": {
@@ -316,15 +383,11 @@
           "scale"
         ]
       },
-      "preview": "tests\\reconstruction\\baselines\\current\\photo_16\\preview.png"
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_16\\prediction.json"
     },
     {
       "photo_id": "photo_18",
       "split": "holdout",
-      "category": "tree_occluded",
-      "detection_method": "facade_row_v1",
-      "window_count": 4,
-      "door_count": 1,
       "metrics": {
         "photo_id": "photo_18",
         "detection": {
@@ -408,15 +471,11 @@
           "scale"
         ]
       },
-      "preview": "tests\\reconstruction\\baselines\\current\\photo_18\\preview.png"
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_18\\prediction.json"
     },
     {
       "photo_id": "photo_19",
       "split": "holdout",
-      "category": "old_building",
-      "detection_method": "facade_row_v1",
-      "window_count": 10,
-      "door_count": 1,
       "metrics": {
         "photo_id": "photo_19",
         "detection": {
@@ -521,7 +580,7 @@
         "coverage": 1.0,
         "not_evaluated": []
       },
-      "preview": "tests\\reconstruction\\baselines\\current\\photo_19\\preview.png"
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_19\\prediction.json"
     }
   ]
 }

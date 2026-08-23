@@ -5,14 +5,37 @@
     "evaluated": 5,
     "full_coverage_count": 2,
     "mean_coverage": 0.9,
-    "mean_rqs": 53.7,
-    "mean_window_recall": 0.4967,
-    "mean_window_precision": 0.3228,
+    "mean_rqs": 46.4,
+    "mean_window_recall": 0.4133,
+    "mean_window_precision": 0.3033,
     "gate_ready": false,
+    "ground_truth_gate_ready": true,
     "a3_gate_r0": {
       "phase": "r0_objective",
-      "passed": true,
+      "gate": "RC-G0",
+      "maturity_claim": "prototype_bootstrap",
+      "passed": false,
+      "product_ready": false,
+      "higher_gates_not_evaluated": [
+        "RC-G1",
+        "RC-G2"
+      ],
+      "user_facing_claim_allowed": "No readiness claim allowed",
       "checks": [
+        {
+          "id": "minimum_sample_count",
+          "passed": true,
+          "actual": 5,
+          "threshold": 1,
+          "detail": "Minimum evaluated photos for this maturity claim"
+        },
+        {
+          "id": "minimum_holdout_count",
+          "passed": true,
+          "actual": 3,
+          "threshold": 0,
+          "detail": "Minimum untouched hold-out photos"
+        },
         {
           "id": "val_window_recall",
           "passed": true,
@@ -23,7 +46,7 @@
         {
           "id": "mean_rqs",
           "passed": true,
-          "actual": 53.7,
+          "actual": 46.36,
           "threshold": 45.0,
           "detail": "Mean RQS over evaluated metric groups"
         },
@@ -36,15 +59,15 @@
         },
         {
           "id": "topology_storey_accuracy",
-          "passed": true,
-          "actual": 0.5667,
+          "passed": false,
+          "actual": 0.4667,
           "threshold": 0.5,
           "detail": "Mean storey count accuracy"
         },
         {
           "id": "geometry_normalized_mae",
           "passed": true,
-          "actual": 0.1846,
+          "actual": 0.1835,
           "threshold": 0.25,
           "detail": "Mean normalized geometry MAE (lower is better)"
         },
@@ -60,10 +83,11 @@
       "summary": {
         "photos": 5,
         "evaluated": 5,
-        "mean_rqs": 53.7,
+        "mean_rqs": 46.4,
         "mean_coverage": 0.9,
         "val_window_recall": 0.8333,
-        "holdout_generate_stable": 3
+        "holdout_generate_stable": 3,
+        "solver_evaluated": 3
       }
     }
   },
@@ -71,7 +95,7 @@
     {
       "photo_id": "photo_01",
       "ground_truth": "F:\\development\\Geomora\\tests\\reconstruction\\ground_truth\\photo_01.json",
-      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_01\\prediction.json",
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_01\\prediction.json",
       "metrics": {
         "photo_id": "photo_01",
         "detection": {
@@ -96,6 +120,7 @@
         "topology": {
           "storey_count_error": 0.5,
           "storey_accuracy": 0.5,
+          "storey_exact": 0.0,
           "bay_count_error": 0.625,
           "bay_accuracy": 0.375,
           "window_to_storey_assignment_accuracy": 1.0,
@@ -147,28 +172,37 @@
           "component_reuse": false,
           "pass_rate": 0.7143
         },
+        "constraint_solver": null,
         "rqs": 58.8,
         "coverage": 0.9,
         "not_evaluated": [
           "scale"
         ]
+      },
+      "ground_truth_audit": {
+        "photo_id": "photo_01",
+        "valid": true,
+        "gate_ready": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "issues": []
       }
     },
     {
       "photo_id": "photo_11",
       "ground_truth": "F:\\development\\Geomora\\tests\\reconstruction\\ground_truth\\photo_11.json",
-      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_11\\prediction.json",
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_11\\prediction.json",
       "metrics": {
         "photo_id": "photo_11",
         "detection": {
           "iou_threshold": 0.5,
           "window": {
             "true_positives": 5,
-            "false_positives": 8,
+            "false_positives": 7,
             "false_negatives": 1,
-            "precision": 0.3846,
+            "precision": 0.4167,
             "recall": 0.8333,
-            "f1": 0.5263
+            "f1": 0.5556
           },
           "door": {
             "true_positives": 0,
@@ -182,51 +216,52 @@
         "topology": {
           "storey_count_error": 0.5,
           "storey_accuracy": 0.5,
-          "bay_count_error": 0.125,
-          "bay_accuracy": 0.875,
+          "storey_exact": 0.0,
+          "bay_count_error": 0.25,
+          "bay_accuracy": 0.75,
           "window_to_storey_assignment_accuracy": 0.0,
-          "window_to_bay_assignment_accuracy": 0.0,
+          "window_to_bay_assignment_accuracy": 0.2,
           "door_ground_floor_accuracy": null,
           "matched_openings": 5
         },
         "geometry": {
-          "normalized_mae": 0.2189,
-          "width_facade_mae": 0.0171,
-          "height_storey_mae": 0.2104,
-          "sill_storey_mae": 0.4293,
+          "normalized_mae": 0.2185,
+          "width_facade_mae": 0.0378,
+          "height_storey_mae": 0.1992,
+          "sill_storey_mae": 0.4185,
           "matched_openings": 5,
           "ground_truth_openings": 8,
           "iou_threshold": 0.5
         },
         "scale": {
-          "facade_width_mm_error": 0.7103,
-          "facade_height_mm_error": 0.6923,
-          "storey_height_mm_error": 0.3846,
-          "mean_relative_error": 0.5958
+          "facade_width_mm_error": 0.0,
+          "facade_height_mm_error": 0.0,
+          "storey_height_mm_error": 1.0,
+          "mean_relative_error": 0.3333
         },
         "rationalization": {
           "before": {
-            "width_variance": 1.5802,
-            "height_variance": 0.7381,
-            "sill_variance": 0.3946,
-            "spacing_variance": 3.1808,
-            "alignment_deviation": 0.7866
+            "width_variance": 1.4567,
+            "height_variance": 0.7693,
+            "sill_variance": 0.3556,
+            "spacing_variance": 3.0432,
+            "alignment_deviation": 0.7162
           },
           "after": {
-            "width_variance": 0.0003,
-            "height_variance": 0.0,
-            "sill_variance": 0.0,
-            "spacing_variance": 0.0003,
-            "alignment_deviation": 0.5262
+            "width_variance": 1.4567,
+            "height_variance": 0.7693,
+            "sill_variance": 0.3556,
+            "spacing_variance": 3.0227,
+            "alignment_deviation": 0.7147
           },
           "improvement": {
-            "width_variance": 0.9998,
-            "height_variance": 1.0,
-            "sill_variance": 1.0,
-            "spacing_variance": 0.9999,
-            "alignment_deviation": 0.331
+            "width_variance": 0.0,
+            "height_variance": 0.0,
+            "sill_variance": 0.0,
+            "spacing_variance": 0.0067,
+            "alignment_deviation": 0.0021
           },
-          "mean_improvement": 0.8662
+          "mean_improvement": 0.0018
         },
         "sketchup": {
           "generate_stable": true,
@@ -235,18 +270,45 @@
           "no_overlapping_openings": false,
           "correct_storey_assignment": true,
           "sane_wall_dimensions": true,
-          "component_reuse": false,
-          "pass_rate": 0.7143
+          "component_reuse": true,
+          "pass_rate": 0.8571
         },
-        "rqs": 50.6,
+        "constraint_solver": {
+          "constraint_count": 5,
+          "soft_constraint_count": 3,
+          "hard_constraint_count": 2,
+          "mean_residual_before": 0.00375,
+          "mean_residual_after": 0.000352,
+          "residual_reduction": 0.906133,
+          "hard_satisfaction_rate": 1.0,
+          "hard_violations": 0,
+          "compared_openings": 12,
+          "mean_bbox_drift": 0.001416,
+          "max_bbox_drift": 0.02311,
+          "overlaps_before": 12,
+          "overlaps_after": 12,
+          "introduced_overlaps": 0,
+          "boundary_violations_before": 0,
+          "boundary_violations_after": 0,
+          "introduced_boundary_violations": 0
+        },
+        "rqs": 46.9,
         "coverage": 1.0,
         "not_evaluated": []
+      },
+      "ground_truth_audit": {
+        "photo_id": "photo_11",
+        "valid": true,
+        "gate_ready": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "issues": []
       }
     },
     {
       "photo_id": "photo_16",
       "ground_truth": "F:\\development\\Geomora\\tests\\reconstruction\\ground_truth\\photo_16.json",
-      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_16\\prediction.json",
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_16\\prediction.json",
       "metrics": {
         "photo_id": "photo_16",
         "detection": {
@@ -271,6 +333,7 @@
         "topology": {
           "storey_count_error": 0.6667,
           "storey_accuracy": 0.3333,
+          "storey_exact": 0.0,
           "bay_count_error": 0.625,
           "bay_accuracy": 0.375,
           "window_to_storey_assignment_accuracy": 0.0,
@@ -297,20 +360,20 @@
             "alignment_deviation": 0.7099
           },
           "after": {
-            "width_variance": 0.0003,
-            "height_variance": 0.0,
-            "sill_variance": 0.0,
-            "spacing_variance": 0.0,
-            "alignment_deviation": 0.5905
+            "width_variance": 0.5231,
+            "height_variance": 0.8347,
+            "sill_variance": 0.1548,
+            "spacing_variance": 0.0004,
+            "alignment_deviation": 0.6997
           },
           "improvement": {
-            "width_variance": 0.9994,
-            "height_variance": 1.0,
-            "sill_variance": 1.0,
-            "spacing_variance": 1.0,
-            "alignment_deviation": 0.1682
+            "width_variance": 0.0,
+            "height_variance": 0.0,
+            "sill_variance": 0.0,
+            "spacing_variance": 0.9887,
+            "alignment_deviation": 0.0144
           },
-          "mean_improvement": 0.8335
+          "mean_improvement": 0.2006
         },
         "sketchup": {
           "generate_stable": true,
@@ -319,27 +382,54 @@
           "no_overlapping_openings": true,
           "correct_storey_assignment": true,
           "sane_wall_dimensions": true,
-          "component_reuse": false,
-          "pass_rate": 0.8571
+          "component_reuse": true,
+          "pass_rate": 1.0
         },
-        "rqs": 49.1,
+        "constraint_solver": {
+          "constraint_count": 1,
+          "soft_constraint_count": 1,
+          "hard_constraint_count": 0,
+          "mean_residual_before": 0.005375,
+          "mean_residual_after": 6.325e-05,
+          "residual_reduction": 0.988233,
+          "hard_satisfaction_rate": 1.0,
+          "hard_violations": 0,
+          "compared_openings": 4,
+          "mean_bbox_drift": 0.002656,
+          "max_bbox_drift": 0.013506,
+          "overlaps_before": 0,
+          "overlaps_after": 0,
+          "introduced_overlaps": 0,
+          "boundary_violations_before": 0,
+          "boundary_violations_after": 0,
+          "introduced_boundary_violations": 0
+        },
+        "rqs": 43.7,
         "coverage": 0.9,
         "not_evaluated": [
           "scale"
         ]
+      },
+      "ground_truth_audit": {
+        "photo_id": "photo_16",
+        "valid": true,
+        "gate_ready": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "issues": []
       }
     },
     {
       "photo_id": "photo_18",
       "ground_truth": "F:\\development\\Geomora\\tests\\reconstruction\\ground_truth\\photo_18.json",
-      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_18\\prediction.json",
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_18\\prediction.json",
       "metrics": {
         "photo_id": "photo_18",
         "detection": {
           "iou_threshold": 0.5,
           "window": {
             "true_positives": 0,
-            "false_positives": 6,
+            "false_positives": 4,
             "false_negatives": 6,
             "precision": 0.0,
             "recall": 0.0,
@@ -355,10 +445,11 @@
           }
         },
         "topology": {
-          "storey_count_error": 0.0,
-          "storey_accuracy": 1.0,
-          "bay_count_error": 0.5,
-          "bay_accuracy": 0.5,
+          "storey_count_error": 0.5,
+          "storey_accuracy": 0.5,
+          "storey_exact": 0.0,
+          "bay_count_error": 0.625,
+          "bay_accuracy": 0.375,
           "window_to_storey_assignment_accuracy": null,
           "window_to_bay_assignment_accuracy": null,
           "door_ground_floor_accuracy": null,
@@ -376,27 +467,27 @@
         "scale": null,
         "rationalization": {
           "before": {
-            "width_variance": 0.3833,
-            "height_variance": 0.1818,
-            "sill_variance": 0.0189,
-            "spacing_variance": 0.1896,
-            "alignment_deviation": 0.2064
+            "width_variance": 0.4043,
+            "height_variance": 0.3424,
+            "sill_variance": 0.0363,
+            "spacing_variance": 0.3792,
+            "alignment_deviation": 0.3084
           },
           "after": {
-            "width_variance": 0.0002,
+            "width_variance": 0.0,
             "height_variance": 0.0,
             "sill_variance": 0.0,
-            "spacing_variance": 0.0002,
-            "alignment_deviation": 0.2298
+            "spacing_variance": 0.0003,
+            "alignment_deviation": 0.3522
           },
           "improvement": {
-            "width_variance": 0.9995,
+            "width_variance": 1.0,
             "height_variance": 1.0,
             "sill_variance": 1.0,
-            "spacing_variance": 0.9989,
-            "alignment_deviation": -0.1134
+            "spacing_variance": 0.9992,
+            "alignment_deviation": -0.142
           },
-          "mean_improvement": 0.777
+          "mean_improvement": 0.7714
         },
         "sketchup": {
           "generate_stable": true,
@@ -408,28 +499,37 @@
           "component_reuse": false,
           "pass_rate": 0.7143
         },
-        "rqs": 48.1,
+        "constraint_solver": null,
+        "rqs": 36.8,
         "coverage": 0.7,
         "not_evaluated": [
           "scale"
         ]
+      },
+      "ground_truth_audit": {
+        "photo_id": "photo_18",
+        "valid": true,
+        "gate_ready": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "issues": []
       }
     },
     {
       "photo_id": "photo_19",
       "ground_truth": "F:\\development\\Geomora\\tests\\reconstruction\\ground_truth\\photo_19.json",
-      "prediction": "F:\\development\\Geomora\\tests\\reconstruction\\baselines\\current\\photo_19\\prediction.json",
+      "prediction": "tests\\reconstruction\\baselines\\current\\photo_19\\prediction.json",
       "metrics": {
         "photo_id": "photo_19",
         "detection": {
           "iou_threshold": 0.5,
           "window": {
-            "true_positives": 9,
-            "false_positives": 8,
-            "false_negatives": 3,
-            "precision": 0.5294,
-            "recall": 0.75,
-            "f1": 0.6207
+            "true_positives": 4,
+            "false_positives": 6,
+            "false_negatives": 8,
+            "precision": 0.4,
+            "recall": 0.3333,
+            "f1": 0.3636
           },
           "door": {
             "true_positives": 0,
@@ -443,51 +543,52 @@
         "topology": {
           "storey_count_error": 0.5,
           "storey_accuracy": 0.5,
-          "bay_count_error": 0.1111,
-          "bay_accuracy": 0.8889,
-          "window_to_storey_assignment_accuracy": 0.1111,
-          "window_to_bay_assignment_accuracy": 0.8889,
+          "storey_exact": 0.0,
+          "bay_count_error": 0.4444,
+          "bay_accuracy": 0.5556,
+          "window_to_storey_assignment_accuracy": 0.0,
+          "window_to_bay_assignment_accuracy": 0.25,
           "door_ground_floor_accuracy": null,
-          "matched_openings": 9
+          "matched_openings": 4
         },
         "geometry": {
-          "normalized_mae": 0.1904,
-          "width_facade_mae": 0.0037,
-          "height_storey_mae": 0.1587,
-          "sill_storey_mae": 0.4089,
-          "matched_openings": 9,
+          "normalized_mae": 0.1865,
+          "width_facade_mae": 0.0058,
+          "height_storey_mae": 0.1483,
+          "sill_storey_mae": 0.4053,
+          "matched_openings": 4,
           "ground_truth_openings": 15,
           "iou_threshold": 0.5
         },
         "scale": {
-          "facade_width_mm_error": 0.4238,
-          "facade_height_mm_error": 0.3333,
-          "storey_height_mm_error": 0.3333,
-          "mean_relative_error": 0.3635
+          "facade_width_mm_error": 0.0,
+          "facade_height_mm_error": 0.0,
+          "storey_height_mm_error": 1.0,
+          "mean_relative_error": 0.3333
         },
         "rationalization": {
           "before": {
-            "width_variance": 0.3679,
-            "height_variance": 0.8651,
-            "sill_variance": 0.4293,
-            "spacing_variance": 0.6516,
-            "alignment_deviation": 0.5991
+            "width_variance": 0.3157,
+            "height_variance": 0.6018,
+            "sill_variance": 0.4505,
+            "spacing_variance": 0.7756,
+            "alignment_deviation": 0.5458
           },
           "after": {
-            "width_variance": 0.0,
+            "width_variance": 0.3152,
+            "height_variance": 0.6018,
+            "sill_variance": 0.4505,
+            "spacing_variance": 0.7756,
+            "alignment_deviation": 0.5458
+          },
+          "improvement": {
+            "width_variance": 0.0016,
             "height_variance": 0.0,
             "sill_variance": 0.0,
             "spacing_variance": 0.0,
-            "alignment_deviation": 0.5772
+            "alignment_deviation": 0.0
           },
-          "improvement": {
-            "width_variance": 1.0,
-            "height_variance": 1.0,
-            "sill_variance": 1.0,
-            "spacing_variance": 1.0,
-            "alignment_deviation": 0.0366
-          },
-          "mean_improvement": 0.8073
+          "mean_improvement": 0.0003
         },
         "sketchup": {
           "generate_stable": true,
@@ -496,12 +597,39 @@
           "no_overlapping_openings": true,
           "correct_storey_assignment": true,
           "sane_wall_dimensions": true,
-          "component_reuse": false,
-          "pass_rate": 0.8571
+          "component_reuse": true,
+          "pass_rate": 1.0
         },
-        "rqs": 61.9,
+        "constraint_solver": {
+          "constraint_count": 3,
+          "soft_constraint_count": 1,
+          "hard_constraint_count": 2,
+          "mean_residual_before": 0.00086667,
+          "mean_residual_after": 1.267e-05,
+          "residual_reduction": 0.985381,
+          "hard_satisfaction_rate": 1.0,
+          "hard_violations": 0,
+          "compared_openings": 11,
+          "mean_bbox_drift": 0.000116,
+          "max_bbox_drift": 0.001281,
+          "overlaps_before": 0,
+          "overlaps_after": 0,
+          "introduced_overlaps": 0,
+          "boundary_violations_before": 0,
+          "boundary_violations_after": 0,
+          "introduced_boundary_violations": 0
+        },
+        "rqs": 45.6,
         "coverage": 1.0,
         "not_evaluated": []
+      },
+      "ground_truth_audit": {
+        "photo_id": "photo_19",
+        "valid": true,
+        "gate_ready": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "issues": []
       }
     }
   ]

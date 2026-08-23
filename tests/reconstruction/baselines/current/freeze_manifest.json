@@ -1,0 +1,39 @@
+{
+  "schema_version": "reconstruction-baseline-freeze-v1",
+  "generated_at": "2026-08-23T17:15:17.045867+00:00",
+  "source_commit": "541450c2c7910f2f06434d0d7d3415133ed209d2",
+  "source_worktree_clean": false,
+  "source_worktree_changes": [
+    "M backend/geomora_reconstruct/metrics/a3_gate.py",
+    " M backend/scripts/run_reconstruction_baseline.py",
+    " M plugin/geomora/core/fixture_library.rb",
+    " M plugin/geomora/core/furniture_collision.rb",
+    " M plugin/geomora/core/h264_cavlc.rb",
+    " M plugin/geomora/core/ir_builder.rb",
+    " M plugin/geomora/core/lod_capture.rb",
+    " M plugin/geomora/core/lod_policy.rb",
+    " M plugin/geomora/core/mp4_encoder.rb",
+    " M tests/core/jpeg_frame_encoder_test.rb",
+    " M tests/reconstruction/test_a3_gate.py",
+    " M tests/test_helper.rb"
+  ],
+  "generated_artifact_changes_omitted": true,
+  "method": "facade_row_v1",
+  "minimal_set": "tests\\reconstruction\\minimal_set.json",
+  "minimal_set_sha256": "944fdc3ddf2fb233a92f442fbcaa54c66fb98797f18c3ce241cd5a4c540d6eb6",
+  "photo_ids": [
+    "photo_01",
+    "photo_11",
+    "photo_16",
+    "photo_18",
+    "photo_19"
+  ],
+  "ground_truth_sha256": {
+    "photo_01": "ec843569fe622221fe5899d3ab5c5ba7b37b6d4822b251fb6483cf1222c1a1c5",
+    "photo_11": "5cb7c17fad6b5c13e58969de354aab99a35d7048bd54157918b165438a69923f",
+    "photo_16": "e57ad697823fa4eb38cb9d0a76b9c53b88c2f81c3ce8436cd98d3c3995c5bde2",
+    "photo_18": "0aec6f89bd99276439b3a5e6025b891895065c584b43698c279805d58b13fe62",
+    "photo_19": "0c4986eae4d8ab1b3a5ee09d0935769c9ce22c2907cfc46f66dd5cba0380bff6"
+  },
+  "vlm_cache": null
+}

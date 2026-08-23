@@ -4,6 +4,8 @@ require 'fileutils'
 require 'base64'
 require 'zlib'
 
+require_relative 'project'
+
 module Geomora
   module Core
     class LodCapture
@@ -99,7 +101,7 @@ module Geomora
       end
 
       def self.capture_cache_dir
-        dir = File.join(Project.plugin_root, 'cache', 'lod_capture')
+        dir = File.join(Geomora::Core::Project.plugin_root, 'cache', 'lod_capture')
         FileUtils.mkdir_p(dir)
         dir
       end

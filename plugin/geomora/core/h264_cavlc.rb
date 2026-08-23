@@ -86,7 +86,9 @@ module Geomora
       end
 
       def self.hadamard4x4(values)
-        matrix = values.each_slice(4).map(&:dup)
+        padded = values.take(16)
+        padded += [0] * (16 - padded.length)
+        matrix = padded.each_slice(4).map(&:dup)
         4.times do |row|
           a, b, c, d = matrix[row]
           matrix[row] = [a + d, b + c, b - c, a - d]

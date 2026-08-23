@@ -5,7 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from geomora_reconstruct.metric_anchors import apply_metric_anchors_to_gt, derive_metric_from_anchors
+from geomora_reconstruct.metric_anchors import anchor_axis, apply_metric_anchors_to_gt, derive_metric_from_anchors
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BACKEND = REPO_ROOT / "backend"
@@ -29,6 +29,36 @@ def test_derive_metric_from_horizontal_anchor():
     ]
     metric = derive_metric_from_anchors(anchors, topology={"storey_count": 2})
     assert metric == {"facade_width_mm": 12400.0}
+
+
+def test_anchor_axis_does_not_infer_semantics_from_id():
+    anchor = {"id": "misleading_height_name", "type": "segment_distance", "property": "width", "start": [0.1, 0.2], "end": [0.3, 0.2]}
+    assert anchor_axis(anchor) == "horizontal"
+
+
+def test_segment_anchor_derives_scale_then_facade_dimension():
+    anchors = [{
+        "id": "anchor_001", "type": "segment_distance", "target": "window_03",
+        "property": "width", "start": [0.2, 0.3], "end": [0.3, 0.3],
+        "distance_mm": 1500, "priority": "hard",
+    }]
+    metric = derive_metric_from_anchors(
+        anchors,
+        topology={"storey_count": 2},
+        facade_bbox=[0.1, 0.1, 0.9, 0.8],
+    )
+    assert metric["facade_width_mm"] == 12000.0
+    assert "facade_height_mm" not in metric
+
+
+def test_storey_height_anchor_derives_vertical_scale_and_direct_storey_height():
+    anchors = [{
+        "id": "storey", "type": "storey_height", "target": "storey_1",
+        "property": "storey_height", "start": [0.2, 0.5], "end": [0.2, 0.7],
+        "distance_mm": 3200, "priority": "hard",
+    }]
+    metric = derive_metric_from_anchors(anchors, topology={"storey_count": 2}, facade_bbox=[0.1, 0.3, 0.9, 0.7])
+    assert metric == {"facade_height_mm": 6400.0, "storey_height_mm": 3200.0}
 
 
 def test_apply_metric_anchors_to_gt_writes_metric_block():

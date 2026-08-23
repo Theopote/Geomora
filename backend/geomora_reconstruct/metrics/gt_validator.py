@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from math import hypot
 from typing import Any
 
+from ..metric_anchors import anchor_axis, validate_anchor
+
 
 @dataclass(frozen=True)
 class GTIssue:
@@ -148,9 +150,12 @@ def _validate_metric(truth, report):
         path=f"metric_anchors[{index}]"; aid=str(anchor.get("id") or "")
         if not aid or aid in seen: report.add("error","duplicate_or_missing_anchor_id",f"{path}.id","metric anchor id must be present and unique")
         seen.add(aid); start,end=anchor.get("start"),anchor.get("end")
+        for message in validate_anchor(anchor):
+            report.add("error", "invalid_anchor_model", path, message)
         if not (isinstance(start,list) and isinstance(end,list) and len(start)==2 and len(end)==2 and all(isinstance(v,(int,float)) and 0<=v<=1 for v in start+end)): report.add("error","invalid_anchor_coordinates",path,"anchor endpoints must be normalized 2D coordinates"); continue
         if hypot(end[0]-start[0],end[1]-start[1])<1e-6: report.add("error","zero_length_anchor",path,"anchor endpoints must differ")
         distance=anchor.get("distance_mm")
         if anchor.get("status")=="surveyed" and (not isinstance(distance,(int,float)) or distance<=0): report.add("error","surveyed_anchor_missing_distance",f"{path}.distance_mm","surveyed anchor requires a positive distance")
-        if "width" in aid and abs(end[0]-start[0])<abs(end[1]-start[1]): report.add("warning","anchor_axis_mismatch",path,"width anchor is predominantly vertical")
-        if "height" in aid and abs(end[1]-start[1])<abs(end[0]-start[0]): report.add("warning","anchor_axis_mismatch",path,"height anchor is predominantly horizontal")
+        axis = anchor_axis(anchor)
+        if axis == "horizontal" and abs(end[0]-start[0])<abs(end[1]-start[1]): report.add("warning","anchor_axis_mismatch",path,"horizontal anchor is predominantly vertical")
+        if axis == "vertical" and abs(end[1]-start[1])<abs(end[0]-start[0]): report.add("warning","anchor_axis_mismatch",path,"vertical anchor is predominantly horizontal")

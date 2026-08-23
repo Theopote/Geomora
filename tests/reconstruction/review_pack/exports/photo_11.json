@@ -137,7 +137,10 @@
   "metric_anchors": [
     {
       "id": "anchor_facade_width",
-      "type": "user_distance",
+      "type": "facade_width",
+      "target": "facade",
+      "property": "width",
+      "priority": "hard",
       "status": "pending_survey",
       "start": [
         0.05,

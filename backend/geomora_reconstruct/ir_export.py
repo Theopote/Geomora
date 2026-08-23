@@ -72,6 +72,7 @@ def resolve_prediction_metric(prediction: dict[str, Any]) -> tuple[dict[str, flo
     anchored = derive_metric_from_anchors(
         prediction.get("metric_anchors") or [],
         topology=topology,
+        facade_bbox=(prediction.get("facade") or {}).get("bbox"),
     ) or {}
     fallback.update(anchored)
     if not fallback:

@@ -102,9 +102,13 @@ def main() -> int:
     print(f"  photos: {len(pack['photos'])}")
     print(f"  images: {args.out / 'images'}")
     print(f"  exports: {args.out / 'exports'} (save downloaded JSON here)")
+    print(f"  anchors: {args.out / 'anchors'} (metric anchor survey templates)")
     print("")
     print("Open index.html in a browser, edit boxes, Export All, then:")
     print("  .venv\\Scripts\\python scripts/import_gt_review_pack.py")
+    print("Metric anchors only:")
+    print("  .venv\\Scripts\\python scripts/import_metric_anchors.py --export-templates")
+    print("  .venv\\Scripts\\python scripts/import_metric_anchors.py ..\\tests\\reconstruction\\review_pack\\anchors\\photo_11.json")
     return 0
 
 

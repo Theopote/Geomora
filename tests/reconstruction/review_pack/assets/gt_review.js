@@ -192,7 +192,7 @@
     }
 
     const anchor = (gt.metric_anchors || [])[0];
-    if (anchor && state.selectedKind === "anchor") {
+    if (anchor) {
       const distance = els.fieldAnchorDistance.value.trim();
       anchor.distance_mm = distance === "" ? null : parseFloat(distance);
       const start = els.fieldAnchorStart.value.split(",").map(parseFloat);
@@ -200,6 +200,7 @@
       if (start.length === 2) anchor.start = [round4(start[0]), round4(start[1])];
       if (end.length === 2) anchor.end = [round4(end[0]), round4(end[1])];
       if (anchor.distance_mm) anchor.status = "surveyed";
+      else anchor.status = "pending_survey";
     }
 
     render();

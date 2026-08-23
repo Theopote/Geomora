@@ -1,0 +1,24 @@
+{
+  "version": "metric-anchors-v1",
+  "photo_id": "photo_19",
+  "anchor_id": "anchor_facade_width",
+  "distance_mm": null,
+  "notes": "Replace distance_mm with on-site tape/survey measurement.",
+  "anchors": [
+    {
+      "id": "anchor_facade_width",
+      "type": "user_distance",
+      "status": "pending_survey",
+      "start": [
+        0.06,
+        0.94
+      ],
+      "end": [
+        0.94,
+        0.94
+      ],
+      "distance_mm": null,
+      "notes": "Requires on-site measurement across full brick facade."
+    }
+  ]
+}

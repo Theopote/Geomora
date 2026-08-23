@@ -108,7 +108,10 @@
     <span id="status">Ready</span>
     <span class="hint" style="margin-left:12px">
       After export, save JSON files to <code>tests/reconstruction/review_pack/exports/</code>
-      then run <code>python backend/scripts/import_gt_review_pack.py</code>
+      then run <code>python backend/scripts/import_gt_review_pack.py</code>.
+      For anchor-only survey updates, use
+      <code>python backend/scripts/import_metric_anchors.py --export-templates</code>
+      and <code>python backend/scripts/import_metric_anchors.py anchors/*.json</code>
     </span>
   </footer>
 

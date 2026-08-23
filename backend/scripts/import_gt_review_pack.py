@@ -14,6 +14,9 @@ from pathlib import Path
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = BACKEND_ROOT.parent
+sys.path.insert(0, str(BACKEND_ROOT))
+
+from geomora_reconstruct.metric_anchors import apply_metric_anchors_to_gt, validate_anchor
 
 DEFAULT_EXPORTS = REPO_ROOT / "tests" / "reconstruction" / "review_pack" / "exports"
 DEFAULT_GT_DIR = REPO_ROOT / "tests" / "reconstruction" / "ground_truth"
@@ -59,10 +62,7 @@ def validate_gt(payload: dict) -> list[str]:
     if len(facade_bbox) == 4 and (facade_bbox[2] <= facade_bbox[0] or facade_bbox[3] <= facade_bbox[1]):
         errors.append("invalid facade_bbox")
     for anchor in payload.get("metric_anchors") or []:
-        if anchor.get("distance_mm") in (None, ""):
-            continue
-        if float(anchor["distance_mm"]) <= 0:
-            errors.append(f"{anchor.get('id')}: distance_mm must be positive")
+        errors.extend(validate_anchor(anchor))
     return errors
 
 
@@ -76,7 +76,7 @@ def normalize_gt(payload: dict) -> dict:
         opening["bbox"] = [round(float(v), 4) for v in opening["bbox"]]
     if payload.get("facade_bbox"):
         payload["facade_bbox"] = [round(float(v), 4) for v in payload["facade_bbox"]]
-    return payload
+    return apply_metric_anchors_to_gt(payload)
 
 
 def main() -> int:
@@ -101,10 +101,15 @@ def main() -> int:
         normalized = normalize_gt(payload)
         out_path = args.ground_truth_dir / f"{normalized['photo_id']}.json"
         if args.dry_run:
-            print(f"DRY-RUN would write {out_path.name} (review_rounds={normalized['review_rounds']})")
+            metric = normalized.get("metric")
+            print(
+                f"DRY-RUN would write {out_path.name} "
+                f"(review_rounds={normalized['review_rounds']}, metric={metric})"
+            )
         else:
             out_path.write_text(json.dumps(normalized, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-            print(f"Merged {path.name} -> {out_path}")
+            metric = normalized.get("metric")
+            print(f"Merged {path.name} -> {out_path} metric={metric}")
         merged += 1
 
     if merged == 0:
@@ -118,10 +123,8 @@ def main() -> int:
             if not gt_path.exists():
                 continue
             gt = load_json(gt_path)
-            anchors = gt.get("metric_anchors") or []
-            surveyed = [a for a in anchors if a.get("distance_mm") not in (None, "")]
-            if not surveyed:
-                print(f"WARN {photo_id}: metric anchor still pending survey")
+            if not gt.get("metric"):
+                print(f"WARN {photo_id}: metric anchor still pending survey (no metric block)")
 
     print(f"Done: {merged}/{len(files)} files imported")
     return 0

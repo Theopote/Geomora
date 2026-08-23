@@ -66,6 +66,8 @@ def _gt_reviewed(truth: dict[str, Any], *, min_rounds: int) -> bool:
 
 
 def _metric_anchor_ready(truth: dict[str, Any]) -> bool:
+    if truth.get("metric"):
+        return True
     anchors = truth.get("metric_anchors") or []
     if not anchors:
         return True

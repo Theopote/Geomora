@@ -1259,11 +1259,12 @@
         needsReview: uncertaintyCount > 0
       });
       (state.understanding.uncertain_openings || []).forEach(function (_uncertainty, index) {
+        const decisionRecord = state.uncertaintyDecisions[index];
         items.push({
           type: 'review',
           title: 'Uncertain opening ' + (index + 1),
-          detail: state.uncertaintyDecisions[index] || 'Click to inspect',
-          needsReview: !state.uncertaintyDecisions[index],
+          detail: decisionRecord ? decisionRecord.decision.replace(/_/g, ' ') : 'Click to inspect',
+          needsReview: !decisionRecord,
           uncertaintyIndex: index
         });
       });
@@ -1317,7 +1318,14 @@
 
   function decideUncertainty(decision) {
     if (state.selectedUncertaintyIndex == null) return;
-    state.uncertaintyDecisions[state.selectedUncertaintyIndex] = decision;
+    const items = (state.understanding && state.understanding.uncertain_openings) || [];
+    const item = items[state.selectedUncertaintyIndex] || {};
+    state.uncertaintyDecisions[state.selectedUncertaintyIndex] = {
+      decision: decision,
+      opening_id: item.id || ('uncertain_' + (state.selectedUncertaintyIndex + 1)),
+      reviewer: 'sketchup_user',
+      reviewed_at: new Date().toISOString()
+    };
     setStatus('success', 'Uncertainty recorded: ' + decision.replace(/_/g, ' ') + '.');
     renderTree();
     scheduleOverlayRender();

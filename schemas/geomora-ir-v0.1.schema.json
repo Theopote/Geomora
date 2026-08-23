@@ -68,6 +68,29 @@
             "reviewed_at": { "type": "string" },
             "solver_status": { "type": ["string", "null"] }
           }
+        },
+        "uncertainty_review": {
+          "type": "object",
+          "required": ["decisions", "summary"],
+          "properties": {
+            "decisions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["decision", "opening_id", "reviewed_at"],
+                "properties": {
+                  "decision": { "type": "string", "enum": ["accepted_ai", "manual_edit", "ignored"] },
+                  "opening_id": { "type": "string" },
+                  "reviewer": { "type": "string" },
+                  "reviewed_at": { "type": "string" }
+                }
+              }
+            },
+            "summary": {
+              "type": "object",
+              "additionalProperties": { "type": "integer", "minimum": 0 }
+            }
+          }
         }
       }
     },

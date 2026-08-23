@@ -327,4 +327,22 @@ class IRBuilderTest < Minitest::Test
 
     assert_equal 'accepted_observed_geometry', ir.dig('reconstruction', 'review', 'decision')
   end
+
+  def test_preserves_uncertainty_decisions_and_summary
+    params = {
+      'wall_length' => 10_000, 'wall_height' => 3300, 'wall_thickness' => 240,
+      'windows' => [], 'door' => { 'offset' => 0, 'width' => 0, 'height' => 0 },
+      'uncertainty_decisions' => {
+        '0' => { 'decision' => 'accepted_ai', 'opening_id' => 'pred_001', 'reviewed_at' => '2026-08-23T12:00:00Z' },
+        '1' => { 'decision' => 'manual_edit', 'opening_id' => 'pred_002', 'reviewed_at' => '2026-08-23T12:01:00Z' }
+      }
+    }
+
+    ir = Geomora::Core::IRBuilder.build_manual_facade(params)
+    review = ir.dig('reconstruction', 'uncertainty_review')
+
+    assert_equal 2, review['decisions'].length
+    assert_equal 1, review.dig('summary', 'accepted_ai')
+    assert_equal 1, review.dig('summary', 'manual_edit')
+  end
 end

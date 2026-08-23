@@ -226,6 +226,18 @@ def prediction_to_ir(prediction: dict[str, Any]) -> dict[str, Any] | None:
     review = prediction.get("reconstruction_review")
     if isinstance(review, dict):
         ir.setdefault("reconstruction", {})["review"] = dict(review)
+    uncertainty_decisions = prediction.get("uncertainty_decisions")
+    if isinstance(uncertainty_decisions, dict):
+        decisions = [item for item in uncertainty_decisions.values() if isinstance(item, dict) and item.get("decision")]
+        if decisions:
+            summary: dict[str, int] = {}
+            for item in decisions:
+                decision = str(item["decision"])
+                summary[decision] = summary.get(decision, 0) + 1
+            ir.setdefault("reconstruction", {})["uncertainty_review"] = {
+                "decisions": decisions,
+                "summary": summary,
+            }
     return ir
 
 

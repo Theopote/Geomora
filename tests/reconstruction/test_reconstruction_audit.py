@@ -26,3 +26,19 @@ def test_summary_seals_holdout_from_tuning_statistics():
     assert summary["tuning_eligible"]["solver_events"] == 2
     assert summary["tuning_eligible"]["fallback_rate"] == 0.0
     assert summary["holdout_sealed"] == {"solver_events": 1, "details_exposed": False, "use": "gate_only_not_for_tuning"}
+
+
+def test_audit_counts_uncertainty_decisions_without_geometry():
+    document = _ir("accepted")
+    document["reconstruction"]["uncertainty_review"] = {
+        "decisions": [
+            {"decision": "accepted_ai", "opening_id": "pred_001"},
+            {"decision": "manual_edit", "opening_id": "pred_002"},
+        ],
+        "summary": {"accepted_ai": 1, "manual_edit": 1},
+    }
+
+    event = extract_audit_event(document, artifact_id="photo_2", split="val")
+    assert event["uncertainty_decision_count"] == 2
+    assert event["uncertainty_manual_edit_count"] == 1
+    assert "decisions" not in event

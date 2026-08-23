@@ -14,6 +14,8 @@ def extract_audit_event(document: dict[str, Any], *, artifact_id: str, split: st
     if not isinstance(solver, dict):
         return None
     review = reconstruction.get("review") or {}
+    uncertainty_review = reconstruction.get("uncertainty_review") or {}
+    uncertainty_summary = uncertainty_review.get("summary") or {}
     status = solver.get("safety_status", "unknown")
     decision = review.get("decision")
     return {
@@ -29,6 +31,10 @@ def extract_audit_event(document: dict[str, Any], *, artifact_id: str, split: st
         "soft_weight_scale": solver.get("soft_weight_scale"),
         "fallback_reasons": list(solver.get("fallback_reasons") or []),
         "reviewed_at": review.get("reviewed_at"),
+        "uncertainty_decision_count": sum(int(value or 0) for value in uncertainty_summary.values()),
+        "uncertainty_accept_count": int(uncertainty_summary.get("accepted_ai", 0) or 0),
+        "uncertainty_manual_edit_count": int(uncertainty_summary.get("manual_edit", 0) or 0),
+        "uncertainty_ignore_count": int(uncertainty_summary.get("ignored", 0) or 0),
     }
 
 
@@ -52,6 +58,8 @@ def _summary(events: list[dict[str, Any]]) -> dict[str, Any]:
         "review_completion_rate": _rate(review_completed, review_required),
         "manual_adjustment_rate": _rate(sum(event["manual_adjustment"] for event in events), review_completed),
         "retry_request_rate": _rate(sum(event["retry_requested"] for event in events), review_required),
+        "uncertainty_decisions": sum(event.get("uncertainty_decision_count", 0) for event in events),
+        "uncertainty_manual_edits": sum(event.get("uncertainty_manual_edit_count", 0) for event in events),
     }
 
 

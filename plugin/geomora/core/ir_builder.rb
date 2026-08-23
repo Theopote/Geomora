@@ -61,6 +61,20 @@ module Geomora
           ir['reconstruction'] ||= {}
           ir['reconstruction']['review'] = @params['reconstruction_review']
         end
+        if @params['uncertainty_decisions'].is_a?(Hash) || @params['uncertainty_decisions'].is_a?(Array)
+          raw_decisions = @params['uncertainty_decisions']
+          decisions = raw_decisions.is_a?(Hash) ? raw_decisions.values : raw_decisions
+          decisions = decisions.select { |item| item.is_a?(Hash) && item['decision'] }
+          unless decisions.empty?
+            ir['reconstruction'] ||= {}
+            ir['reconstruction']['uncertainty_review'] = {
+              'decisions' => decisions,
+              'summary' => decisions.each_with_object(Hash.new(0)) do |item, counts|
+                counts[item['decision']] += 1
+              end
+            }
+          end
+        end
         ir
       end
 

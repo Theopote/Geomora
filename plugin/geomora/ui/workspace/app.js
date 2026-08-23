@@ -28,6 +28,7 @@
     fusion: null,
     doorConfidence: null,
     constraintSolution: null,
+    reconstructionReadiness: null,
     reconstructionReview: null,
     understanding: null,
     selectedUncertaintyIndex: null,
@@ -2038,6 +2039,12 @@
     state.selectedUncertaintyIndex = null;
     state.uncertaintyDecisions = {};
     state.constraintSolution = payload.constraint_solution || null;
+    state.reconstructionReadiness = {
+      status: payload.reconstruction_status,
+      pipelineStage: payload.pipeline_stage,
+      readyToGenerate: payload.ready_to_generate === true,
+      blockers: payload.readiness_blockers || []
+    };
     state.reconstructionReview = payload.reconstruction_review || null;
     state.architecturalHypotheses = (state.understanding && state.understanding.architectural_hypotheses) || [];
     state.hypothesisDecisions = {};
@@ -2280,6 +2287,28 @@
     return (state.architecturalHypotheses || []).filter(function (item) {
       return !state.hypothesisDecisions[item.id];
     }).length;
+  }
+
+  function unresolvedReadinessBlockers() {
+    const readiness = state.reconstructionReadiness;
+    if (!readiness) return [];
+    return (readiness.blockers || []).filter(function (blocker) {
+      if (blocker.code === 'architectural_hypothesis_pending') return pendingHypothesisCount() > 0;
+      if (blocker.code === 'vlm_cv_conflict') return !state.evidenceReview;
+      if (blocker.code === 'solver_fallback' || blocker.code === 'solver_soft_retry') {
+        return !reconstructionReviewApproved();
+      }
+      if (blocker.code === 'uncertain_reconstruction') {
+        const items = (state.understanding && state.understanding.uncertain_openings) || [];
+        return items.some(function (_item, index) { return !state.uncertaintyDecisions[index]; });
+      }
+      return blocker.severity === 'blocking';
+    });
+  }
+
+  function readinessBlockerMessage(blockers) {
+    const labels = blockers.map(function (item) { return item.message || item.code; });
+    return 'Cannot generate yet: ' + labels.join(' ');
   }
 
   function hiddenWindowFromHypothesis(item) {
@@ -2733,6 +2762,11 @@
   });
 
   document.getElementById('btn-generate').addEventListener('click', function () {
+    const readinessBlockers = unresolvedReadinessBlockers();
+    if (readinessBlockers.length > 0) {
+      setStatus('error', readinessBlockerMessage(readinessBlockers));
+      return;
+    }
     if (state.settings.require_review_before_generate && evidenceReviewRequired() && !state.evidenceReview) {
       setStatus('error', 'Review the conflicting local and cloud AI evidence before generating.');
       return;

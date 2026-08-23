@@ -29,6 +29,7 @@ from .observations.balconies import (
     balcony_observations_to_storey_cues,
 )
 from .prediction_enrichment import enrich_prediction
+from .readiness import derive_reconstruction_readiness
 from .vlm_evidence import request_architectural_evidence
 from .runtime_settings import provider_api_key, provider_base_url
 from geomora_detect.vlm_prelabel import default_model, sanitize_error_message
@@ -156,7 +157,6 @@ def reconstruct_facade(
     openings = prediction.get("openings") or []
     uncertainties = list(topology.get("uncertainties") or [])
     solution = prediction.get("constraint_solution") or {}
-    safety_status = solution.get("safety_status", "not_run")
     architectural_hypotheses = []
     for storey in topology.get("storeys") or []:
         if storey.get("status") in {"provisional", "hypothesized"}:
@@ -185,15 +185,19 @@ def reconstruct_facade(
             "label": f"Door on storey {door.get('candidate_storey')}",
             "bbox": observed_door.get("bbox"), "status": "hypothesized",
         })
-    review_required = bool(uncertainties) or safety_status in {
-        "accepted_after_soft_weight_retry",
-        "fallback_observed_geometry",
-    }
+    readiness = derive_reconstruction_readiness(
+        prediction,
+        uncertainties=uncertainties,
+        architectural_hypotheses=architectural_hypotheses,
+    )
+    review_required = readiness["readiness"] == "needs_review"
 
     return {
         "schema_version": "geomora-reconstruction-v0.1",
         "photo_id": photo_id,
-        "status": "ready" if prediction.get("architectural_ir") else "needs_metric_scale",
+        "status": readiness["readiness"],
+        "legacy_status": "ready" if prediction.get("architectural_ir") else "needs_metric_scale",
+        **readiness,
         "detection": detection.to_dict(),
         "observation_graph": observation_graph.to_dict(),
         "understanding": {

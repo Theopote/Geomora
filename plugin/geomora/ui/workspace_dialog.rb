@@ -469,6 +469,9 @@ module Geomora
               'ir_preview' => response['architectural_ir'],
               'review_required' => response['review_required'],
               'reconstruction_status' => response['status'],
+              'pipeline_stage' => response['pipeline_stage'],
+              'ready_to_generate' => response['ready_to_generate'],
+              'readiness_blockers' => response['blockers'] || [],
               'cloud_evidence' => response['cloud_evidence']
             )
             dialog.execute_script(

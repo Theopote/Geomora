@@ -68,7 +68,11 @@ def test_reconstruct_endpoint_returns_evidence_understanding_and_ir(client: Test
     assert payload["understanding"]["bays"]
     assert payload["understanding"]["facade_bbox"]
     assert payload["architectural_ir"]["metric"]["facade_width_mm"] == 12000
-    assert payload["status"] == "ready"
+    assert payload["status"] in {"needs_review", "ready_to_generate"}
+    assert payload["pipeline_stage"] == "ir_ready"
+    assert payload["ready_to_generate"] == (payload["status"] == "ready_to_generate")
+    assert payload["readiness_version"] == "reconstruction-readiness-v1"
+    assert payload["legacy_status"] == "ready"
     assert payload["depth_evidence"]["used"] is True
     assert payload["depth_evidence"]["method"] == "gradient_laplacian_v1"
     assert payload["depth_evidence"]["metric_depth_evidence"] is False

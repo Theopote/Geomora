@@ -14,6 +14,7 @@ def estimate_scale(
     elements: list[DetectedElement],
     image_width: int,
     image_height: int,
+    facade_bounds: list[int] | None = None,
 ) -> dict[str, Any] | None:
     if not elements or image_width <= 0 or image_height <= 0:
         return None
@@ -57,6 +58,13 @@ def estimate_scale(
     x_min = min(element.bbox_norm[0] for element in elements)
     x_max = max(element.bbox_norm[2] for element in elements)
     span_norm = max(x_max - x_min, 0.25)
+    span_norm = _extrapolate_span_norm(
+        span_norm,
+        window_count=len(windows),
+        facade_bounds=facade_bounds,
+        image_width=image_width,
+    )
+
     aspect = image_width / image_height
     wall_length_mm = (span_norm * wall_height_mm * aspect) / FACADE_MARGIN_FACTOR
     wall_length_mm = _snap_mm(wall_length_mm, 100.0)
@@ -69,6 +77,27 @@ def estimate_scale(
         "confidence": round(height_confidence or 0.6, 3),
         "opening_span_norm": round(span_norm, 4),
     }
+
+
+def _extrapolate_span_norm(
+    span_norm: float,
+    *,
+    window_count: int,
+    facade_bounds: list[int] | None,
+    image_width: int,
+) -> float:
+    adjusted = span_norm
+
+    if facade_bounds and len(facade_bounds) >= 4 and image_width > 0:
+        facade_span = (facade_bounds[2] - facade_bounds[0]) / image_width
+        adjusted = max(adjusted, facade_span * 0.85)
+
+    if window_count <= 2:
+        adjusted = max(adjusted, 0.72)
+    elif window_count <= 4:
+        adjusted = max(adjusted, 0.58)
+
+    return min(adjusted, 0.98)
 
 
 def _snap_mm(value: float, grid: float) -> float:

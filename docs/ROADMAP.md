@@ -10,20 +10,32 @@ Phase design docs (`docs/PHASE_*.md`) explain *what* each layer does. They do **
 
 ## Current milestone
 
-### A1 — Real Photo Benchmark (in progress)
+### A2 — Failure-driven Improvement (in progress)
+
+**Goal:** Fix only documented A1 failure classes — no new lateral features.
+
+| Priority | Failure class | A2 fix |
+|----------|---------------|--------|
+| P0 | `missed_window` (20/20) | YOLO + facade_row fusion (`auto_fusion_v1`) |
+| P1 | `wrong_scale` (14/20) | Span extrapolation from facade bounds + window count |
+| P2 | `false_door` / `missed_door` (15/20) | Door geometry + confidence filter |
+
+**Exit:** Hold-out smoke ≥4/5; val window recall ≥0.80 (A3 gate).
+
+### A1 — Real Photo Benchmark (completed)
 
 **Goal:** Establish an honest baseline before any further feature work.
 
 | Item | Target | Status |
 |------|--------|--------|
-| 20 real building photos curated | 5 res / 3 office / 3 old / 3 commercial / 2 occluded / 2 perspective / 2 low-light | ⚠️ 28 local, manifest selecting 20 |
-| Split: train / val / hold-out | 10 / 5 / 5 (hold-out never in training) | ⚠️ manifest created |
-| Run full Photo → SketchUp workflow | All 20 | ☐ SketchUp manual pass pending |
-| Export checklist pack | `cache/benchmark_a1/index.html` | ✅ ready |
-| Record failures (no code fixes yet) | `cache/benchmark_a1_e2e.json` | ✅ detection baseline done |
+| 20 real building photos curated | 5 res / 3 office / 3 old / 3 commercial / 2 occluded / 2 perspective / 2 low-light | ✅ manifest 20 |
+| Split: train / val / hold-out | 10 / 5 / 5 (hold-out never in training) | ✅ |
+| Run full Photo → SketchUp workflow | All 20 | ✅ 20/20 reviewed |
+| Export checklist pack | `cache/benchmark_a1/index.html` | ✅ |
+| Record failures (no code fixes yet) | `cache/benchmark_a1_e2e.json` | ✅ RQS avg 69.3 |
 | Detection CLI baseline | 18/20 smoke pass (hold-out 3/5) | ✅ see `docs/A1_BASELINE_REPORT.md` |
 
-**Exit:** Failure taxonomy populated; RQS scores recorded per image; hold-out untouched.
+**Exit:** ✅ Failure taxonomy populated; RQS scores recorded; hold-out untouched for training.
 
 ---
 
@@ -31,8 +43,8 @@ Phase design docs (`docs/PHASE_*.md`) explain *what* each layer does. They do **
 
 | ID | Name | Gate | Status |
 |----|------|------|--------|
-| **A1** | Real Photo Benchmark | 20 photos, baseline recorded | **In progress** |
-| **A2** | Failure-driven Improvement | Fix only documented failure classes | Frozen until A1 done |
+| **A1** | Real Photo Benchmark | 20 photos, baseline recorded | **Completed** |
+| **A2** | Failure-driven Improvement | Fix only documented failure classes | **In progress** |
 | **A3** | Reconstruction Gate | hold-out ≥4/5 usable SketchUp after ~1 min overlay; window recall ≥0.80 on val; Generate stable | Frozen until A2 done |
 | **B0** | Constraint Graph Solver | Equal-width / equal-sill / equal-spacing after A3 | P0 after Stage A |
 | B1 | Multi-view production path | Fuse + depth on real photos | P1 |

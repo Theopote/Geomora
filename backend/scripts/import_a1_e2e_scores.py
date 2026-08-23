@@ -75,7 +75,8 @@ def apply_row(result: dict, csv_row: dict, rqs_keys: list[str]) -> None:
 
     failure = csv_row.get("failure_classes", "").strip()
     if failure:
-        e2e["failure_classes"] = [part.strip() for part in failure.replace(",", ";").split(";") if part.strip()]
+        normalized = failure.replace(",", ";").replace("；", ";").replace("，", ";")
+        e2e["failure_classes"] = [part.strip() for part in normalized.split(";") if part.strip()]
 
     rqs: dict[str, int | None] = e2e.setdefault("rqs", {})
     for key in rqs_keys:

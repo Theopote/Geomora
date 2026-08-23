@@ -5,7 +5,7 @@ import numpy as np
 
 from .contour_detector import _build_binary_masks, _classify_element, _refine_binary
 from .models import DetectedElement, DetectionResult
-from .nms import dedupe_doors, suppress_overlaps
+from .nms import dedupe_doors, filter_doors, suppress_overlaps
 from .overlays import draw_overlay, encode_overlay_jpeg
 
 
@@ -132,13 +132,11 @@ def detect_facade_row_elements(image: np.ndarray, return_overlay: bool = True) -
         )
 
     elements = suppress_overlaps(candidates, iou_threshold=0.35)
-    windows = [element for element in elements if element.type == "window"]
-    doors = [element for element in elements if element.type == "door"]
-    windows = _filter_main_window_row(windows)
+    windows = _filter_main_window_row([element for element in elements if element.type == "window"])
+    doors = filter_doors([element for element in elements if element.type == "door"], windows)
     windows.sort(key=lambda element: element.bbox_norm[0])
     doors = sorted(doors, key=lambda element: -element.confidence)[:1]
-    elements = windows + doors
-    elements = dedupe_doors(elements)
+    elements = dedupe_doors(windows + doors)
 
     confidence = (
         sum(element.confidence for element in elements) / len(elements) if elements else 0.4

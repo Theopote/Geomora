@@ -30,6 +30,54 @@ def suppress_overlaps(
     return sorted(kept, key=lambda item: item.bbox_norm[0])
 
 
+DOOR_MIN_CONFIDENCE = 0.42
+DOOR_FLOOR_Y_MIN = 0.72
+DOOR_MAX_ASPECT = 1.45
+DOOR_MIN_HEIGHT_NORM = 0.12
+
+
+def _door_geometry_ok(element: DetectedElement) -> bool:
+    x1, y1, x2, y2 = element.bbox_norm
+    width_norm = x2 - x1
+    height_norm = y2 - y1
+    if height_norm < DOOR_MIN_HEIGHT_NORM or width_norm <= 0:
+        return False
+    if y2 < DOOR_FLOOR_Y_MIN:
+        return False
+    aspect = width_norm / height_norm
+    if aspect > DOOR_MAX_ASPECT:
+        return False
+    return True
+
+
+def filter_doors(
+    doors: list[DetectedElement],
+    windows: list[DetectedElement],
+    *,
+    min_confidence: float = DOOR_MIN_CONFIDENCE,
+) -> list[DetectedElement]:
+    candidates: list[DetectedElement] = []
+    for door in doors:
+        if door.confidence < min_confidence:
+            continue
+        if not _door_geometry_ok(door):
+            continue
+        candidates.append(door)
+
+    if not candidates:
+        return []
+
+    if windows and len(candidates) == 1:
+        lone_door = candidates[0]
+        if lone_door.confidence < 0.55 and not any(
+            iou(lone_door.bbox_norm, window.bbox_norm) > 0.15 for window in windows
+        ):
+            return []
+
+    best = max(candidates, key=lambda item: item.confidence)
+    return [best]
+
+
 def dedupe_doors(elements: list[DetectedElement]) -> list[DetectedElement]:
     doors = [element for element in elements if element.type == "door"]
     windows = [element for element in elements if element.type == "window"]

@@ -57,7 +57,7 @@ def test_detect_facade_rejects_invalid_method(tmp_path):
     cv2.imwrite(str(path), image)
 
     with pytest.raises(ValueError, match="Unsupported detection method"):
-        detect_facade(str(path), method="sam_v1")
+        detect_facade(str(path), method="invalid_method_v9")
 
 
 @pytest.mark.skipif(not model_available(), reason="YOLO ONNX model not built")
@@ -73,10 +73,11 @@ def test_detect_facade_yolo_on_synthetic(tmp_path):
 
 
 @pytest.mark.skipif(not model_available(), reason="YOLO ONNX model not built")
-def test_detect_facade_auto_prefers_yolo(tmp_path):
+def test_detect_facade_auto_uses_fusion(tmp_path):
     image = _synthetic_rectified_facade()
     path = tmp_path / "rectified.jpg"
     cv2.imwrite(str(path), image)
 
     result = detect_facade(str(path), method="auto")
-    assert result.method == "yolo_v1"
+    assert result.method == "auto_fusion_v1"
+    assert len([element for element in result.elements if element.type == "window"]) >= 3

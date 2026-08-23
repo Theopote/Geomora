@@ -5,6 +5,7 @@ from pathlib import Path
 from .image_io import imread_bgr
 
 from .contour_detector import detect_contour_elements
+from .detection_fusion import fuse_yolo_and_facade_row
 from .facade_row_detector import detect_facade_row_elements
 from .mask_refiner import refine_detection_result
 from .models import DetectionResult
@@ -14,8 +15,16 @@ from .yolo_detector import detect_yolo_elements, model_available
 SUPPORTED_METHODS = ("auto", "contour_v1", "facade_row_v1", "yolo_v1", "sam_v1")
 
 
-def _with_scale_hint(result: DetectionResult) -> DetectionResult:
-    hint = estimate_scale(result.elements, result.image_width, result.image_height)
+def _with_scale_hint(
+    result: DetectionResult,
+    facade_bounds: list[int] | None = None,
+) -> DetectionResult:
+    hint = estimate_scale(
+        result.elements,
+        result.image_width,
+        result.image_height,
+        facade_bounds=facade_bounds,
+    )
     if hint:
         result.scale_hint = hint
         result.debug = {**result.debug, "scale_hint": hint}
@@ -23,14 +32,29 @@ def _with_scale_hint(result: DetectionResult) -> DetectionResult:
 
 
 def _detect_auto(image, *, return_overlay: bool = True) -> DetectionResult:
+    row_result = detect_facade_row_elements(image, return_overlay=False)
+    facade_bounds = row_result.debug.get("facade_bounds")
+
     if model_available():
-        yolo_result = detect_yolo_elements(image, return_overlay=return_overlay)
-        if yolo_result.elements:
-            return yolo_result
-    row_result = detect_facade_row_elements(image, return_overlay=return_overlay)
+        yolo_result = detect_yolo_elements(image, return_overlay=False)
+        fused = fuse_yolo_and_facade_row(
+            yolo_result,
+            row_result,
+            image,
+            return_overlay=return_overlay,
+        )
+        if fused.elements:
+            return _with_scale_hint(fused, facade_bounds=facade_bounds)
+
     if row_result.elements:
-        return row_result
-    return detect_contour_elements(image, return_overlay=return_overlay)
+        if return_overlay:
+            row_result = detect_facade_row_elements(image, return_overlay=True)
+        return _with_scale_hint(row_result, facade_bounds=facade_bounds)
+
+    return _with_scale_hint(
+        detect_contour_elements(image, return_overlay=return_overlay),
+        facade_bounds=None,
+    )
 
 
 def detect_facade(
@@ -58,7 +82,9 @@ def detect_facade(
         return _with_scale_hint(detect_contour_elements(image, return_overlay=return_overlay))
 
     if normalized_method == "facade_row_v1":
-        return _with_scale_hint(detect_facade_row_elements(image, return_overlay=return_overlay))
+        row = detect_facade_row_elements(image, return_overlay=return_overlay)
+        bounds = row.debug.get("facade_bounds")
+        return _with_scale_hint(row, facade_bounds=bounds)
 
     if normalized_method == "yolo_v1":
         return _with_scale_hint(detect_yolo_elements(image, return_overlay=return_overlay))
@@ -66,7 +92,8 @@ def detect_facade(
     if normalized_method == "sam_v1":
         base = _detect_auto(image, return_overlay=False)
         refined = refine_detection_result(image, base, return_overlay=return_overlay)
-        return _with_scale_hint(refined)
+        bounds = base.debug.get("facade_bounds")
+        return _with_scale_hint(refined, facade_bounds=bounds)
 
     if normalized_method == "auto":
-        return _with_scale_hint(_detect_auto(image, return_overlay=return_overlay))
+        return _detect_auto(image, return_overlay=return_overlay)

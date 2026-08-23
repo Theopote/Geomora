@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 
 from .models import DetectedElement, DetectionResult
-from .nms import dedupe_doors, suppress_overlaps
+from .nms import dedupe_doors, filter_doors, suppress_overlaps
 from .overlays import draw_overlay, encode_overlay_jpeg
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
@@ -268,7 +268,9 @@ def detect_yolo_elements(
     )
 
     elements = suppress_overlaps(raw_elements, iou_threshold=0.4)
-    elements = dedupe_doors(elements)
+    windows = [element for element in elements if element.type == "window"]
+    doors = filter_doors([element for element in elements if element.type == "door"], windows)
+    elements = dedupe_doors(windows + doors)
     confidence = (
         sum(element.confidence for element in elements) / len(elements) if elements else 0.35
     )

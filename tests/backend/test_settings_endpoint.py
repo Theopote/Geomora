@@ -59,6 +59,8 @@ def test_connection_test_verifies_real_multimodal_contract(monkeypatch):
     assert payload["structured_output"] is True
     assert payload["model"] == "test-vision-model"
     assert captured["base_url"] == "https://example.test/v1"
+    assert captured["timeout"] == 20.0
+    assert captured["attempts"] == 1
 
 
 def test_local_connection_requires_explicit_model_name():

@@ -40,6 +40,7 @@
     capabilities: {},
     cloudUploadAuthorized: false,
     cloudEvidence: null,
+    connectionTestTimer: null,
     evidenceReview: null
     ,architecturalHypotheses: []
     ,hypothesisDecisions: {}
@@ -223,6 +224,8 @@
   function setConnectionTestResult(result) {
     const node = document.getElementById('ai-connection-result');
     const button = document.getElementById('btn-test-ai-connection');
+    if (state.connectionTestTimer) window.clearTimeout(state.connectionTestTimer);
+    state.connectionTestTimer = null;
     button.disabled = false;
     button.textContent = 'Test connection';
     const value = result || {};
@@ -2532,6 +2535,13 @@
     this.textContent = 'Testing…';
     node.className = 'settings-diagnostics';
     node.textContent = 'Testing authentication, model, image input and structured output…';
+    if (state.connectionTestTimer) window.clearTimeout(state.connectionTestTimer);
+    state.connectionTestTimer = window.setTimeout(function () {
+      setConnectionTestResult({
+        success: false, code: 'timeout',
+        message: 'No response was received within 30 seconds. Check the backend and model endpoint.'
+      });
+    }, 30000);
     sketchupCall('test_ai_connection', JSON.stringify(values));
   });
   document.getElementById('btn-settings-save').addEventListener('click', function () {

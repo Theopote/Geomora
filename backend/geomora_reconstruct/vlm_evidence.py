@@ -221,6 +221,7 @@ def request_architectural_evidence(
     api_key: str,
     base_url: str | None = None,
     timeout: float = 120.0,
+    attempts: int = 4,
 ) -> ArchitecturalEvidence:
     """Request structured evidence from an OpenAI-compatible or Gemini VLM."""
     normalized = provider.lower().strip()
@@ -241,6 +242,7 @@ def request_architectural_evidence(
             payload,
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             timeout=timeout,
+            attempts=attempts,
         )
         content = body.get("output_text")
         if not content:
@@ -251,7 +253,10 @@ def request_architectural_evidence(
             "contents": [{"role": "user", "parts": [{"text": user_text}, {"inline_data": {"mime_type": mime, "data": data}}]}],
             "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"},
         }
-        body = post_json_with_retries(gemini_generate_url(model), payload, headers=gemini_headers(api_key), timeout=timeout)
+        body = post_json_with_retries(
+            gemini_generate_url(model), payload, headers=gemini_headers(api_key),
+            timeout=timeout, attempts=attempts,
+        )
         content = body["candidates"][0]["content"]["parts"][0]["text"]
     else:
         raise ValueError("provider must be openai, openai_compatible or gemini")

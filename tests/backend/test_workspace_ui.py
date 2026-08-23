@@ -124,6 +124,10 @@ def test_workspace_has_safe_ai_settings_center():
     assert "renderEndpointPresets" in script
     assert "setConnectionTestResult" in script
     assert "test_ai_connection" in script
+    assert "connectionTestTimer" in script
+    assert "No response was received within 30 seconds" in script
+    assert "Thread.new do" in dialog
+    assert "UI.start_timer" in dialog
     assert 'id="ai-evidence-review"' in html
     assert "function renderEvidenceReview()" in script
     assert "evidence_review: state.evidenceReview" in script

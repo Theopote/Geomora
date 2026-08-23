@@ -3,6 +3,7 @@
 require 'json'
 require 'net/http'
 require 'uri'
+require 'timeout'
 
 module Geomora
   module Perception
@@ -35,12 +36,14 @@ module Geomora
           request = Net::HTTP::Post.new('/settings/test-connection')
           request['Content-Type'] = 'application/json'
           request.body = JSON.generate(provider: provider, model: model, base_url: base_url)
-          response = Net::HTTP.start(host, port, read_timeout: 40, open_timeout: 3) { |http| http.request(request) }
+          response = Net::HTTP.start(host, port, read_timeout: 25, open_timeout: 3) { |http| http.request(request) }
           raise GeometryGenerationError, response.body unless response.is_a?(Net::HTTPSuccess)
 
           JSON.parse(response.body)
-        rescue Errno::ECONNREFUSED, SocketError
-          raise GeometryGenerationError, 'Perception service is not running.'
+        rescue Net::OpenTimeout, Net::ReadTimeout, Timeout::Error
+          raise GeometryGenerationError, 'Connection test timed out. Check the endpoint and whether the model is still loading.'
+        rescue Errno::ECONNREFUSED, SocketError, EOFError, Errno::ECONNRESET
+          raise GeometryGenerationError, 'Perception service or model endpoint is not reachable.'
         end
       end
     end

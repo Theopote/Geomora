@@ -101,19 +101,30 @@ module Geomora
 
           dialog.add_action_callback('test_ai_connection') do |_ctx, json|
             raw = JSON.parse(json)
-            api_key = raw['vlm_api_key'].to_s
-            Perception::SettingsClient.configure_credentials(
-              provider: raw['vlm_provider'], api_key: api_key.empty? ? nil : api_key,
-              base_url: raw['vlm_base_url']
-            )
-            result = Perception::SettingsClient.test_connection(
-              provider: raw['vlm_provider'], model: raw['vlm_model'], base_url: raw['vlm_base_url']
-            )
-            dialog.execute_script("window.geomora.setConnectionTestResult(#{result.to_json})")
+            result_holder = {}
+            Thread.new do
+              begin
+                api_key = raw['vlm_api_key'].to_s
+                Perception::SettingsClient.configure_credentials(
+                  provider: raw['vlm_provider'], api_key: api_key.empty? ? nil : api_key,
+                  base_url: raw['vlm_base_url']
+                )
+                result_holder[:value] = Perception::SettingsClient.test_connection(
+                  provider: raw['vlm_provider'], model: raw['vlm_model'], base_url: raw['vlm_base_url']
+                )
+              rescue StandardError => e
+                result_holder[:value] = { success: false, code: 'service_error', message: e.message }
+              end
+            end
+            timer_id = nil
+            timer_id = ::UI.start_timer(0.1, true) do
+              next unless result_holder.key?(:value)
+
+              ::UI.stop_timer(timer_id)
+              dialog.execute_script("window.geomora.setConnectionTestResult(#{result_holder[:value].to_json})")
+            end
           rescue JSON::ParserError => e
             dialog.execute_script("window.geomora.setConnectionTestResult(#{({ success: false, code: 'invalid_settings', message: e.message }).to_json})")
-          rescue GeomoraError => e
-            dialog.execute_script("window.geomora.setConnectionTestResult(#{({ success: false, code: 'service_error', message: e.message }).to_json})")
           end
 
           dialog.add_action_callback('select_model_entity') do |_ctx, json|

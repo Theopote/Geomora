@@ -114,7 +114,7 @@ def test_settings_connection(settings: ConnectionTestSettings) -> dict[str, obje
             request_architectural_evidence(
                 image_path, photo_id="connection_test", provider=provider,
                 model=model, api_key=key,
-                base_url=provider_base_url(provider, settings.base_url), timeout=30.0,
+                base_url=provider_base_url(provider, settings.base_url), timeout=20.0, attempts=1,
             )
         return {
             "success": True, "code": "verified", "provider": provider, "model": model,

@@ -110,6 +110,23 @@ From repository root:
 py -m pytest tests/backend -q
 ```
 
+### Reconstruction ablation
+
+Use frozen, previously reviewed VLM evidence; the benchmark never calls a
+cloud provider live:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\run_reconstruction_ablation.py `
+  --vlm-cache-dir cache\vlm_architecture_frozen `
+  --out runs\reconstruction_ablation
+```
+
+Each cache file must be named `<photo_id>.json` and follow the architectural
+evidence schema. The reports include A-E stage summaries and a paired
+`without_vlm` / `with_vlm` comparison using the same detection and
+Understanding pipeline. Compare component accuracy first; do not compare RQS
+without checking coverage. Holdout details are sealed by default.
+
 ## Notes
 
 - Phase 2: auto rectify uses line detection + vanishing points + estimated facade quad.

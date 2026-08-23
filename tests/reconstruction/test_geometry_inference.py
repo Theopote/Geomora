@@ -36,6 +36,22 @@ def test_detection_to_prediction_attaches_geometry_block():
     assert payload["openings"][0]["geometry"]["width_facade"] == 0.2
 
 
+def test_detection_to_prediction_carries_runtime_metric_anchors():
+    detection = DetectionResult(
+        method="test",
+        confidence=0.8,
+        image_width=800,
+        image_height=600,
+        elements=[],
+    )
+    anchors = [{"id": "facade_width", "axis": "horizontal", "distance_mm": 12000}]
+
+    payload = detection_to_prediction("anchored", detection, metric_anchors=anchors)
+
+    assert payload["metric_anchors"] == anchors
+    assert payload["metric_anchors"] is not anchors
+
+
 def test_geometry_metrics_match_by_iou_not_id():
     truth = {
         "photo_id": "pair",

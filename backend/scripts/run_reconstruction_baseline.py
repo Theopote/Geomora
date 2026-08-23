@@ -85,6 +85,16 @@ def run_photo(
     photo_dir = out_root / photo_id
     photo_dir.mkdir(parents=True, exist_ok=True)
 
+    gt_path = GT_DIR / f"{photo_id}.json"
+    truth = load_json(gt_path) if gt_path.exists() else None
+    # Surveyed user anchors are reconstruction input, not hidden evaluation
+    # labels. Other GT fields remain isolated from the prediction pipeline.
+    metric_anchors = [
+        dict(anchor)
+        for anchor in ((truth or {}).get("metric_anchors") or [])
+        if anchor.get("distance_mm") not in (None, "")
+    ]
+
     detection = detect_facade(str(image_path), method=method, return_overlay=False)
     image = imread_bgr(image_path)
     observation_graph = build_observation_graph(photo_id, image)
@@ -96,7 +106,7 @@ def run_photo(
         "notes": "Rectification artifact not re-run in baseline exporter v0.1",
     }
     detections = detection.to_dict()
-    prediction = detection_to_prediction(photo_id, detection)
+    prediction = detection_to_prediction(photo_id, detection, metric_anchors=metric_anchors)
     enrich_prediction(prediction, detection, export_ir=True)
     architectural_ir = prediction.get("architectural_ir") or {
         "photo_id": photo_id,
@@ -116,9 +126,7 @@ def run_photo(
     }
 
     metrics_result = None
-    gt_path = GT_DIR / f"{photo_id}.json"
-    if gt_path.exists():
-        truth = load_json(gt_path)
+    if truth is not None:
         metrics_result = evaluate_reconstruction(truth, prediction)
 
     preview_path = photo_dir / "preview.png"

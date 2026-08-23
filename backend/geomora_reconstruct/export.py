@@ -34,6 +34,7 @@ def detection_to_prediction(
     infer_topology: bool = True,
     attach_geometry: bool = True,
     metric: dict[str, Any] | None = None,
+    metric_anchors: list[dict[str, Any]] | None = None,
     rationalization_before: dict[str, float] | None = None,
     rationalization_after: dict[str, float] | None = None,
     sketchup: dict[str, bool] | None = None,
@@ -87,6 +88,9 @@ def detection_to_prediction(
         payload["geometry"] = geometry_payload
     if metric is not None:
         payload["metric"] = metric
+        payload["metric_source"] = "explicit_metric"
+    if metric_anchors is not None:
+        payload["metric_anchors"] = [dict(anchor) for anchor in metric_anchors]
     if rationalization_before is not None:
         payload["rationalization_before"] = rationalization_before
     if rationalization_after is not None:

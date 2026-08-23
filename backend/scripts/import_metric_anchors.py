@@ -3,7 +3,7 @@
 Supports:
   - single-photo JSON: {"photo_id": "photo_11", "distance_mm": 12400}
   - batch JSON: {"version": "metric-anchors-v1", "anchors": [...]}
-  - CSV: photo_id,anchor_id,distance_mm,notes
+  - CSV: photo_id,anchor_id,distance_mm,facade_height_mm,notes
 
 Examples:
   cd backend
@@ -26,7 +26,7 @@ sys.path.insert(0, str(BACKEND_ROOT))
 from geomora_reconstruct.metric_anchors import (  # noqa: E402
     anchor_status_report,
     merge_anchor_updates,
-    validate_anchor,
+    survey_row_to_updates,
 )
 
 DEFAULT_GT_DIR = REPO_ROOT / "tests" / "reconstruction" / "ground_truth"
@@ -53,9 +53,12 @@ def load_updates(path: Path) -> list[dict]:
         return load_csv_updates(path)
     payload = load_json(path)
     if "anchors" in payload:
-        return list(payload["anchors"])
+        expanded: list[dict] = []
+        for row in payload["anchors"]:
+            expanded.extend(survey_row_to_updates(row))
+        return expanded
     if "photo_id" in payload:
-        return [payload]
+        return survey_row_to_updates(payload)
     raise ValueError(f"Unrecognized anchor file format: {path}")
 
 
@@ -72,9 +75,13 @@ def load_csv_updates(path: Path) -> list[dict]:
             }
             if row.get("distance_mm") not in (None, ""):
                 item["distance_mm"] = float(row["distance_mm"])
+            if row.get("facade_width_mm") not in (None, ""):
+                item["facade_width_mm"] = float(row["facade_width_mm"])
+            if row.get("facade_height_mm") not in (None, ""):
+                item["facade_height_mm"] = float(row["facade_height_mm"])
             if row.get("notes"):
                 item["notes"] = row["notes"].strip()
-            rows.append(item)
+            rows.extend(survey_row_to_updates(item))
     return rows
 
 

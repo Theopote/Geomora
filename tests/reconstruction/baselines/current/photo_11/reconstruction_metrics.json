@@ -38,7 +38,12 @@
     "ground_truth_openings": 8,
     "iou_threshold": 0.5
   },
-  "scale": null,
+  "scale": {
+    "facade_width_mm_error": 0.7103,
+    "facade_height_mm_error": 0.6923,
+    "storey_height_mm_error": 0.3846,
+    "mean_relative_error": 0.5958
+  },
   "rationalization": {
     "before": {
       "width_variance": 1.5802,
@@ -73,9 +78,7 @@
     "component_reuse": false,
     "pass_rate": 0.7143
   },
-  "rqs": 51.8,
-  "coverage": 0.9,
-  "not_evaluated": [
-    "scale"
-  ]
+  "rqs": 50.6,
+  "coverage": 1.0,
+  "not_evaluated": []
 }

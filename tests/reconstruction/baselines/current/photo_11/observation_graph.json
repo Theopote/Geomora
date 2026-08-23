@@ -154,8 +154,8 @@
         ]
       },
       "semantic_candidates": {
-        "door": 0.1295,
         "window": 0.7639,
+        "door": 0.1295,
         "unknown_opening": 0.0971
       },
       "confidence": 0.7639,
@@ -329,8 +329,8 @@
         ]
       },
       "semantic_candidates": {
-        "door": 0.0812,
         "window": 0.7643,
+        "door": 0.0812,
         "unknown_opening": 0.0609
       },
       "confidence": 0.7643,

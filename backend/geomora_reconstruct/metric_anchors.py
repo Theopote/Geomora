@@ -103,12 +103,19 @@ def merge_anchor_updates(
             continue
         anchor = anchor_by_id.get(anchor_id)
         if anchor is None:
+            axis = update.get("axis") or anchor_axis({"id": anchor_id})
+            if axis == "vertical":
+                default_start = [0.05, 0.05]
+                default_end = [0.05, 0.95]
+            else:
+                default_start = [0.05, 0.9]
+                default_end = [0.95, 0.9]
             anchor = {
                 "id": anchor_id,
                 "type": update.get("type", "user_distance"),
                 "status": PENDING_STATUS,
-                "start": update.get("start", [0.05, 0.9]),
-                "end": update.get("end", [0.95, 0.9]),
+                "start": update.get("start", default_start),
+                "end": update.get("end", default_end),
                 "distance_mm": None,
                 "notes": update.get("notes", ""),
             }
@@ -133,6 +140,41 @@ def merge_anchor_updates(
     merged = dict(gt)
     merged["metric_anchors"] = anchors
     return apply_metric_anchors_to_gt(merged), warnings
+
+
+def survey_row_to_updates(row: dict[str, Any]) -> list[dict[str, Any]]:
+    photo_id = row.get("photo_id")
+    if not photo_id:
+        return []
+
+    updates: list[dict[str, Any]] = []
+    width = row.get("facade_width_mm")
+    if width in (None, "") and row.get("distance_mm") not in (None, ""):
+        width = row.get("distance_mm")
+    height = row.get("facade_height_mm")
+
+    if width not in (None, ""):
+        updates.append(
+            {
+                "photo_id": photo_id,
+                "anchor_id": row.get("anchor_id") or "anchor_facade_width",
+                "distance_mm": width,
+                "notes": row.get("notes"),
+            }
+        )
+    if height not in (None, ""):
+        updates.append(
+            {
+                "photo_id": photo_id,
+                "anchor_id": "anchor_facade_height",
+                "distance_mm": height,
+                "axis": "vertical",
+                "start": row.get("height_start", [0.05, 0.05]),
+                "end": row.get("height_end", [0.05, 0.95]),
+                "notes": row.get("height_notes") or row.get("notes") or "Surveyed facade height",
+            }
+        )
+    return updates
 
 
 def anchor_status_report(gt: dict[str, Any]) -> dict[str, Any]:

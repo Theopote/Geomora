@@ -3,9 +3,9 @@
   "aggregate": {
     "photos": 5,
     "evaluated": 5,
-    "full_coverage_count": 0,
-    "mean_coverage": 0.86,
-    "mean_rqs": 53.9,
+    "full_coverage_count": 2,
+    "mean_coverage": 0.9,
+    "mean_rqs": 53.7,
     "mean_window_recall": 0.4967,
     "mean_window_precision": 0.3228,
     "gate_ready": false,
@@ -23,14 +23,14 @@
         {
           "id": "mean_rqs",
           "passed": true,
-          "actual": 53.9,
+          "actual": 53.7,
           "threshold": 45.0,
           "detail": "Mean RQS over evaluated metric groups"
         },
         {
           "id": "mean_coverage",
           "passed": true,
-          "actual": 0.86,
+          "actual": 0.9,
           "threshold": 0.7,
           "detail": "Mean annotation coverage across metric groups"
         },
@@ -50,9 +50,9 @@
         },
         {
           "id": "holdout_generate_stable",
-          "passed": false,
+          "passed": true,
           "actual": "3/3",
-          "threshold": ">=4/5",
+          "threshold": ">=2/3",
           "detail": "Hold-out photos with heuristic generate_stable check"
         }
       ],
@@ -60,8 +60,8 @@
       "summary": {
         "photos": 5,
         "evaluated": 5,
-        "mean_rqs": 53.9,
-        "mean_coverage": 0.86,
+        "mean_rqs": 53.7,
+        "mean_coverage": 0.9,
         "val_window_recall": 0.8333,
         "holdout_generate_stable": 3
       }
@@ -198,7 +198,12 @@
           "ground_truth_openings": 8,
           "iou_threshold": 0.5
         },
-        "scale": null,
+        "scale": {
+          "facade_width_mm_error": 0.7103,
+          "facade_height_mm_error": 0.6923,
+          "storey_height_mm_error": 0.3846,
+          "mean_relative_error": 0.5958
+        },
         "rationalization": {
           "before": {
             "width_variance": 1.5802,
@@ -233,11 +238,9 @@
           "component_reuse": false,
           "pass_rate": 0.7143
         },
-        "rqs": 51.8,
-        "coverage": 0.9,
-        "not_evaluated": [
-          "scale"
-        ]
+        "rqs": 50.6,
+        "coverage": 1.0,
+        "not_evaluated": []
       }
     },
     {
@@ -456,7 +459,12 @@
           "ground_truth_openings": 15,
           "iou_threshold": 0.5
         },
-        "scale": null,
+        "scale": {
+          "facade_width_mm_error": 0.4238,
+          "facade_height_mm_error": 0.3333,
+          "storey_height_mm_error": 0.3333,
+          "mean_relative_error": 0.3635
+        },
         "rationalization": {
           "before": {
             "width_variance": 0.3679,
@@ -491,11 +499,9 @@
           "component_reuse": false,
           "pass_rate": 0.8571
         },
-        "rqs": 61.7,
-        "coverage": 0.9,
-        "not_evaluated": [
-          "scale"
-        ]
+        "rqs": 61.9,
+        "coverage": 1.0,
+        "not_evaluated": []
       }
     }
   ]

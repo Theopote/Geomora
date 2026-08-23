@@ -224,7 +224,7 @@
     {
       "id": "anchor_facade_width",
       "type": "user_distance",
-      "status": "pending_survey",
+      "status": "surveyed",
       "start": [
         0.06,
         0.94
@@ -233,10 +233,32 @@
         0.94,
         0.94
       ],
-      "distance_mm": null,
-      "notes": "Requires on-site measurement across full brick facade."
+      "distance_mm": 21000.0,
+      "notes": "user survey facade width and height",
+      "surveyed_at": "2026-08-23T10:14:29.583165+00:00"
+    },
+    {
+      "id": "anchor_facade_height",
+      "type": "user_distance",
+      "status": "surveyed",
+      "start": [
+        0.05,
+        0.05
+      ],
+      "end": [
+        0.05,
+        0.95
+      ],
+      "distance_mm": 9000.0,
+      "notes": "user survey facade width and height",
+      "surveyed_at": "2026-08-23T10:14:29.583181+00:00"
     }
   ],
   "annotation_notes": "The facade of the two-story commercial building features two large windows, one small window, and three doorways on the ground floor, while the second floor has nine small windows.",
-  "reviewed_at": "2026-08-23T08:50:41.544Z"
+  "reviewed_at": "2026-08-23T08:50:41.544Z",
+  "metric": {
+    "facade_width_mm": 21000.0,
+    "facade_height_mm": 9000.0,
+    "storey_height_mm": 4500.0
+  }
 }

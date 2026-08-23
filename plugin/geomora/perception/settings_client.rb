@@ -30,6 +30,18 @@ module Geomora
         rescue Errno::ECONNREFUSED, SocketError
           raise GeometryGenerationError, 'Perception service is not running.'
         end
+
+        def test_connection(provider:, model:, base_url:, host: '127.0.0.1', port: 8765)
+          request = Net::HTTP::Post.new('/settings/test-connection')
+          request['Content-Type'] = 'application/json'
+          request.body = JSON.generate(provider: provider, model: model, base_url: base_url)
+          response = Net::HTTP.start(host, port, read_timeout: 40, open_timeout: 3) { |http| http.request(request) }
+          raise GeometryGenerationError, response.body unless response.is_a?(Net::HTTPSuccess)
+
+          JSON.parse(response.body)
+        rescue Errno::ECONNREFUSED, SocketError
+          raise GeometryGenerationError, 'Perception service is not running.'
+        end
       end
     end
   end

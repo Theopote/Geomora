@@ -220,6 +220,37 @@
       : (caps.message || 'Local perception service unavailable.');
   }
 
+  function setConnectionTestResult(result) {
+    const node = document.getElementById('ai-connection-result');
+    const button = document.getElementById('btn-test-ai-connection');
+    button.disabled = false;
+    button.textContent = 'Test connection';
+    const value = result || {};
+    if (value.success) {
+      node.className = 'settings-diagnostics ready';
+      node.textContent = 'Verified · ' + value.model + ' · vision and structured output supported · ' + value.latency_ms + ' ms';
+      return;
+    }
+    const labels = {
+      not_configured: 'Not configured',
+      model_required: 'Model name required',
+      authentication_failed: 'Authentication failed',
+      model_unavailable: 'Model unavailable',
+      timeout: 'Connection timed out',
+      connection_failed: 'Connection failed',
+      service_error: 'Local service error',
+      invalid_settings: 'Invalid settings'
+    };
+    node.className = 'settings-diagnostics missing';
+    node.textContent = (labels[value.code] || 'Verification failed') + ' · ' + (value.message || 'Check the provider settings.');
+  }
+
+  function markConnectionUnverified() {
+    const node = document.getElementById('ai-connection-result');
+    node.className = 'settings-diagnostics';
+    node.textContent = 'Configuration changed; test the connection again.';
+  }
+
   function openSettings() {
     setSettings(state.settings, state.capabilities);
     els.settingsPanel.hidden = false;
@@ -2313,6 +2344,7 @@
 
   window.geomora = {
     setSettings: setSettings,
+    setConnectionTestResult: setConnectionTestResult,
     loadPayload: loadPayload,
     setImage: setImage,
     resetCorners: resetCorners,
@@ -2469,6 +2501,7 @@
   document.getElementById('btn-refresh-settings').addEventListener('click', function () { sketchupCall('refresh_settings_capabilities'); });
   els.settingsForm.elements.namedItem('vlm_provider').addEventListener('change', function (event) {
     renderEndpointPresets(event.target.value, '', true);
+    markConnectionUnverified();
   });
   document.getElementById('vlm-endpoint-preset').addEventListener('change', function (event) {
     const provider = els.settingsForm.elements.namedItem('vlm_provider').value;
@@ -2480,12 +2513,26 @@
       baseUrl.value = '';
       baseUrl.focus();
     }
+    markConnectionUnverified();
   });
   els.settingsForm.elements.namedItem('vlm_base_url').addEventListener('input', function (event) {
     const provider = els.settingsForm.elements.namedItem('vlm_provider').value;
     const match = (VLM_ENDPOINT_PRESETS[provider] || []).find(function (item) { return item.url === event.target.value; });
     const custom = (VLM_ENDPOINT_PRESETS[provider] || []).find(function (item) { return item.id === 'custom'; });
     document.getElementById('vlm-endpoint-preset').value = match ? match.id : (custom ? custom.id : '');
+    markConnectionUnverified();
+  });
+  ['vlm_model', 'vlm_api_key'].forEach(function (name) {
+    els.settingsForm.elements.namedItem(name).addEventListener('input', markConnectionUnverified);
+  });
+  document.getElementById('btn-test-ai-connection').addEventListener('click', function () {
+    const values = settingsFormValue();
+    const node = document.getElementById('ai-connection-result');
+    this.disabled = true;
+    this.textContent = 'Testing…';
+    node.className = 'settings-diagnostics';
+    node.textContent = 'Testing authentication, model, image input and structured output…';
+    sketchupCall('test_ai_connection', JSON.stringify(values));
   });
   document.getElementById('btn-settings-save').addEventListener('click', function () {
     state.settings = settingsFormValue();

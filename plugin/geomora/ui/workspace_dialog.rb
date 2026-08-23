@@ -99,6 +99,23 @@ module Geomora
             push_settings(dialog)
           end
 
+          dialog.add_action_callback('test_ai_connection') do |_ctx, json|
+            raw = JSON.parse(json)
+            api_key = raw['vlm_api_key'].to_s
+            Perception::SettingsClient.configure_credentials(
+              provider: raw['vlm_provider'], api_key: api_key.empty? ? nil : api_key,
+              base_url: raw['vlm_base_url']
+            )
+            result = Perception::SettingsClient.test_connection(
+              provider: raw['vlm_provider'], model: raw['vlm_model'], base_url: raw['vlm_base_url']
+            )
+            dialog.execute_script("window.geomora.setConnectionTestResult(#{result.to_json})")
+          rescue JSON::ParserError => e
+            dialog.execute_script("window.geomora.setConnectionTestResult(#{({ success: false, code: 'invalid_settings', message: e.message }).to_json})")
+          rescue GeomoraError => e
+            dialog.execute_script("window.geomora.setConnectionTestResult(#{({ success: false, code: 'service_error', message: e.message }).to_json})")
+          end
+
           dialog.add_action_callback('select_model_entity') do |_ctx, json|
             payload = JSON.parse(json)
             selected = Core::WorkspaceSelectionSync.select_entity(payload['entity_id'])

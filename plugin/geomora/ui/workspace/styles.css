@@ -113,6 +113,8 @@ body {
 .provider-status-grid strong.ready { color: #81c995; }
 .provider-status-grid strong.missing { color: #f6aea9; }
 .settings-diagnostics { margin-bottom: 8px; padding: 8px; border-radius: 6px; background: #191b1f; color: #aeb5bf; font-size: 11px; line-height: 1.5; }
+.settings-diagnostics.ready { border: 1px solid rgba(129, 201, 149, 0.45); color: #81c995; }
+.settings-diagnostics.missing { border: 1px solid rgba(246, 174, 169, 0.45); color: #f6aea9; }
 .settings-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 16px; border-top: 1px solid #373a41; background: #1b1d20; }
 
 .workflow-steps {

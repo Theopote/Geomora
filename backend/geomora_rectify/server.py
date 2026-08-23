@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import tempfile
+import time
 from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
@@ -13,6 +14,9 @@ from geomora_capture.video_frames import extract_frames
 from geomora_multiview.pipeline import fuse_openings, multiview_capabilities, register_views
 from geomora_reconstruct.service import reconstruct_facade
 from geomora_reconstruct.runtime_settings import configure_provider, credential_status
+from geomora_reconstruct.runtime_settings import provider_api_key, provider_base_url
+from geomora_reconstruct.vlm_evidence import request_architectural_evidence
+from geomora_detect.vlm_prelabel import default_model, sanitize_error_message
 
 from .pipeline import parse_corners, rectify_image
 
@@ -22,6 +26,12 @@ app = FastAPI(title="Geomora Perception", version="0.19.0")
 class CredentialSettings(BaseModel):
     provider: str
     api_key: str | None = None
+    base_url: str | None = None
+
+
+class ConnectionTestSettings(BaseModel):
+    provider: str
+    model: str = "auto"
     base_url: str | None = None
 
 
@@ -80,6 +90,47 @@ def settings_credentials(settings: CredentialSettings) -> dict[str, object]:
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
     return {"provider": settings.provider, **credential_status(settings.provider), "persisted": False}
+
+
+@app.post("/settings/test-connection")
+def test_settings_connection(settings: ConnectionTestSettings) -> dict[str, object]:
+    provider = settings.provider.strip().lower()
+    key = provider_api_key(provider)
+    if not key:
+        return {"success": False, "code": "not_configured", "message": "API key is not configured."}
+    if provider == "openai_compatible" and settings.model.strip().lower() in {"", "auto"}:
+        return {"success": False, "code": "model_required", "message": "Enter the exact local vision model name before testing."}
+    model = default_model(provider) if settings.model.strip().lower() in {"", "auto"} else settings.model.strip()
+    started = time.perf_counter()
+    try:
+        import cv2
+        import numpy as np
+
+        with tempfile.TemporaryDirectory(prefix="geomora_connection_test_") as temp_dir:
+            image_path = Path(temp_dir) / "test.png"
+            image = np.full((32, 32, 3), 220, dtype=np.uint8)
+            cv2.rectangle(image, (8, 8), (24, 26), (80, 80, 80), 2)
+            cv2.imwrite(str(image_path), image)
+            request_architectural_evidence(
+                image_path, photo_id="connection_test", provider=provider,
+                model=model, api_key=key,
+                base_url=provider_base_url(provider, settings.base_url), timeout=30.0,
+            )
+        return {
+            "success": True, "code": "verified", "provider": provider, "model": model,
+            "vision_input": True, "structured_output": True,
+            "latency_ms": round((time.perf_counter() - started) * 1000),
+            "message": "Connection and multimodal structured output verified.",
+        }
+    except Exception as error:  # noqa: BLE001 - return a safe diagnostic to the settings UI
+        message = sanitize_error_message(str(error), key)
+        lowered = message.lower()
+        code = "authentication_failed" if any(token in lowered for token in ("401", "403", "unauthorized", "api key")) else (
+            "model_unavailable" if any(token in lowered for token in ("model", "404", "not found")) else (
+                "timeout" if "timed out" in lowered or "timeout" in lowered else "connection_failed"
+            )
+        )
+        return {"success": False, "code": code, "provider": provider, "model": model, "message": message}
 
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}

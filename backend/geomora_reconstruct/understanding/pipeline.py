@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
+from ..vlm_evidence import ArchitecturalEvidence
+from .coordinator import coordinate_architectural_evidence
+
 from .bays import infer_bay_columns
 from .facade import bbox_center, infer_facade_bbox
 from .openings import (
@@ -34,10 +37,15 @@ def understand_openings(
     openings: list[dict[str, Any]],
     *,
     facade_bounds: list[float] | None = None,
+    architectural_evidence: ArchitecturalEvidence | None = None,
 ) -> tuple[UnderstandingResult, list[dict[str, Any]]]:
     result = UnderstandingResult()
     if not openings:
         result.uncertainties.append("no_openings")
+        result.debug["storey_count"] = 1
+        result.debug["bay_count"] = 1
+        if architectural_evidence is not None:
+            coordinate_architectural_evidence(result, architectural_evidence)
         return result, []
 
     facade_bbox = infer_facade_bbox(openings, facade_bounds)
@@ -133,11 +141,14 @@ def understand_openings(
     result.debug["window_row_count"] = len(storeys)
     result.debug["window_column_count"] = len(bays)
 
+    if architectural_evidence is not None:
+        coordinate_architectural_evidence(result, architectural_evidence)
+
     return result, enriched
 
 
 def understanding_to_topology(result: UnderstandingResult) -> dict[str, Any]:
-    return {
+    topology = {
         "storey_count": int(result.debug.get("storey_count", 1)),
         "bay_count": int(result.debug.get("bay_count", 1)),
         "method": result.method,
@@ -147,3 +158,6 @@ def understanding_to_topology(result: UnderstandingResult) -> dict[str, Any]:
         "pattern_groups": result.pattern_groups,
         "uncertainties": result.uncertainties,
     }
+    if "evidence_coordination" in result.debug:
+        topology["evidence_coordination"] = result.debug["evidence_coordination"]
+    return topology

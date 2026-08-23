@@ -28,3 +28,12 @@ backend\.venv\Scripts\python.exe backend\scripts\run_reconstruction_baseline.py 
 Cached evidence records provider, model, and prompt version. Changing the
 prompt contract requires a new prompt version and regenerated cache. VLM output
 must pass strict parsing before it enters reconstruction.
+
+## Reconciliation policy
+
+Architectural Understanding remains the decision boundary. CV row/column
+clusters are the default geometric evidence. Matching VLM evidence increases
+confidence. VLM counts override only when VLM confidence is high and geometric
+support is demonstrably weak, such as a single visible opening. Other conflicts
+retain the CV count and are written to `topology.uncertainties` together with
+both candidates, confidences, and the selected source.

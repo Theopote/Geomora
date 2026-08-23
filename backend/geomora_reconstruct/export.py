@@ -7,6 +7,7 @@ from geomora_detect.models import DetectionResult
 
 from .geometry_inference import attach_geometry_to_openings, summarize_geometry
 from .topology_inference import infer_topology_from_openings
+from .vlm_evidence import ArchitecturalEvidence
 
 
 def _normalize_facade_bounds(
@@ -35,6 +36,7 @@ def detection_to_prediction(
     attach_geometry: bool = True,
     metric: dict[str, Any] | None = None,
     metric_anchors: list[dict[str, Any]] | None = None,
+    architectural_evidence: ArchitecturalEvidence | None = None,
     rationalization_before: dict[str, float] | None = None,
     rationalization_after: dict[str, float] | None = None,
     sketchup: dict[str, bool] | None = None,
@@ -60,10 +62,11 @@ def detection_to_prediction(
         facade["bbox"] = facade_bounds
 
     topology_payload = topology
-    if topology_payload is None and infer_topology and openings:
+    if topology_payload is None and infer_topology and (openings or architectural_evidence is not None):
         topology_payload, openings = infer_topology_from_openings(
             openings,
             facade_bounds=facade_bounds,
+            architectural_evidence=architectural_evidence,
         )
 
     geometry_payload = None
@@ -91,6 +94,8 @@ def detection_to_prediction(
         payload["metric_source"] = "explicit_metric"
     if metric_anchors is not None:
         payload["metric_anchors"] = [dict(anchor) for anchor in metric_anchors]
+    if architectural_evidence is not None:
+        payload["architectural_evidence"] = architectural_evidence.to_dict()
     if rationalization_before is not None:
         payload["rationalization_before"] = rationalization_before
     if rationalization_after is not None:

@@ -68,26 +68,33 @@ def write_overlay(image_path: Path, detection, out_path: Path) -> None:
     imwrite_bgr(out_path, overlay)
 
 
-def build_observation_graph(photo_id: str, image, *, vlm_cache_dir: Path | None = None) -> dict:
+def load_vlm_evidence(photo_id: str, vlm_cache_dir: Path | None):
+    if vlm_cache_dir is None:
+        return None
+    evidence_path = vlm_cache_dir / f"{photo_id}.json"
+    if not evidence_path.exists():
+        return None
+    evidence = read_evidence_cache(evidence_path)
+    if evidence.photo_id != photo_id:
+        raise ValueError(f"VLM evidence photo_id mismatch: {evidence_path}")
+    return evidence
+
+
+def build_observation_graph(photo_id: str, image, *, architectural_evidence=None) -> dict:
     graphs = []
     row_result = detect_facade_row_elements(image, return_overlay=False)
     graphs.append(facade_row_to_observations(row_result, photo_id=photo_id))
     if model_available():
         yolo_result = detect_yolo_elements(image, return_overlay=False)
         graphs.append(yolo_to_observations(yolo_result, photo_id=photo_id))
-    if vlm_cache_dir is not None:
-        evidence_path = vlm_cache_dir / f"{photo_id}.json"
-        if evidence_path.exists():
-            evidence = read_evidence_cache(evidence_path)
-            if evidence.photo_id != photo_id:
-                raise ValueError(f"VLM evidence photo_id mismatch: {evidence_path}")
-            graphs.append(
-                vlm_evidence_to_observations(
-                    evidence,
-                    image_width=int(image.shape[1]),
-                    image_height=int(image.shape[0]),
-                )
+    if architectural_evidence is not None:
+        graphs.append(
+            vlm_evidence_to_observations(
+                architectural_evidence,
+                image_width=int(image.shape[1]),
+                image_height=int(image.shape[0]),
             )
+        )
     if len(graphs) == 1:
         return detection_result_to_observations(row_result, photo_id=photo_id).to_dict()
     return fuse_observation_graphs(*graphs).to_dict()
@@ -118,7 +125,12 @@ def run_photo(
 
     detection = detect_facade(str(image_path), method=method, return_overlay=False)
     image = imread_bgr(image_path)
-    observation_graph = build_observation_graph(photo_id, image, vlm_cache_dir=vlm_cache_dir)
+    architectural_evidence = load_vlm_evidence(photo_id, vlm_cache_dir)
+    observation_graph = build_observation_graph(
+        photo_id,
+        image,
+        architectural_evidence=architectural_evidence,
+    )
 
     rectification = {
         "photo_id": photo_id,
@@ -127,7 +139,12 @@ def run_photo(
         "notes": "Rectification artifact not re-run in baseline exporter v0.1",
     }
     detections = detection.to_dict()
-    prediction = detection_to_prediction(photo_id, detection, metric_anchors=metric_anchors)
+    prediction = detection_to_prediction(
+        photo_id,
+        detection,
+        metric_anchors=metric_anchors,
+        architectural_evidence=architectural_evidence,
+    )
     enrich_prediction(prediction, detection, export_ir=True)
     architectural_ir = prediction.get("architectural_ir") or {
         "photo_id": photo_id,

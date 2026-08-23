@@ -34,8 +34,9 @@ then expand to 20 A1 photos. Metric scores only where a real scale anchor exists
 Implementation: `backend/geomora_reconstruct/observations/` and
 `backend/geomora_reconstruct/vlm_evidence.py`. YOLO, facade-row, and cached VLM
 architectural evidence now share the Observation Graph. Architectural
-Understanding must next reconcile these sources instead of treating VLM output
-as final IR.
+Understanding v0.2 now reconciles CV counts with VLM evidence conservatively:
+agreement increases confidence, high-confidence VLM may supplement weak/sparse
+geometry, and unresolved conflicts remain explicit instead of becoming IR.
 
 ### A2 — Failure-driven Improvement (completed)
 

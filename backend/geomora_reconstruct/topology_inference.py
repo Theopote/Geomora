@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from .vlm_evidence import ArchitecturalEvidence
+
 from .understanding.pipeline import understand_openings, understanding_to_topology
 
 DEFAULT_STOREY_TOLERANCE = 0.08
@@ -16,7 +18,12 @@ def infer_topology_from_openings(
     storey_tolerance: float = DEFAULT_STOREY_TOLERANCE,
     bay_tolerance: float = DEFAULT_BAY_TOLERANCE,
     facade_bounds: list[float] | None = None,
+    architectural_evidence: ArchitecturalEvidence | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     del storey_tolerance, bay_tolerance  # adaptive tolerances in understanding_v0.1
-    result, enriched = understand_openings(openings, facade_bounds=facade_bounds)
+    result, enriched = understand_openings(
+        openings,
+        facade_bounds=facade_bounds,
+        architectural_evidence=architectural_evidence,
+    )
     return understanding_to_topology(result), enriched

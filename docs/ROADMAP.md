@@ -43,13 +43,42 @@ not passed. This is not a sequencing contradiction.
 
 ---
 
-## Current validation gate
+## Validation gates
 
-### RC-G1 — Reconstruction Core v0.1 Validation Gate (not passed, P0)
+| Gate | Meaning | Status |
+|------|---------|--------|
+| **RC-G0** | Prototype Bootstrap — pipeline and objective measurement execute coherently | Not yet recorded on the frozen baseline |
+| **RC-G1** | Reconstruction Alpha — credible topology, detection, geometry and editable output on the frozen benchmark | Not passed |
+| **RC-G2** | Product Beta — stronger expanded-set quality and product readiness evidence | Not evaluated |
 
-RC-G1 was historically called **A3 Reconstruction Baseline Gate**. The legacy
-name remains accepted in scripts and archived reports, but new planning text
-must use RC-G1.
+The former `r0_objective` phase maps to RC-G0. The former A3/stage-A phases map
+to RC-G1. Legacy names remain accepted by scripts and archived reports only.
+
+Passing RC-G0 must never be described as Alpha, Beta, or product readiness.
+Only RC-G2 may emit `product_ready: true`.
+
+### Gate thresholds
+
+| Metric | RC-G0 Prototype | RC-G1 Alpha | RC-G2 Beta |
+|--------|-----------------|-------------|-------------|
+| Mean RQS | ≥45 | ≥70 | ≥82 |
+| Minimum evaluated photos | ≥1 bootstrap fixture | ≥5 reviewed photos | ≥20 reviewed real photos |
+| Untouched hold-out photos | diagnostic | ≥5 | ≥5 |
+| Per-photo RQS | — | ≥50 | ≥65 |
+| Coverage | ≥0.70 | ≥0.90 | ≥0.95 |
+| Window recall | ≥0.80 | ≥0.85 | ≥0.92 |
+| Window precision | diagnostic | ≥0.85 | ≥0.92 |
+| Storey relative accuracy | ≥0.50 | ≥0.85 | ≥0.95 |
+| Exact storey count | diagnostic | ≥0.80 | ≥0.92 |
+| Bay accuracy | diagnostic | ≥0.75 | ≥0.88 |
+| Window→storey assignment | diagnostic | ≥0.80 | ≥0.90 |
+| Window→bay assignment | diagnostic | ≥0.75 | ≥0.88 |
+| Mean geometry normalized MAE | ≤0.25 | ≤0.12 | ≤0.07 |
+| Worst per-photo geometry MAE | — | ≤0.20 | ≤0.12 |
+| SketchUp pass rate | diagnostic | ≥0.90 | ≥0.95 |
+| Catastrophic topology/geometry failures | diagnostic | 0 | 0 |
+
+### RC-G1 dependencies
 
 | Dependency | Exit evidence |
 |------------|---------------|
@@ -76,7 +105,8 @@ This is a dependency-aware queue, not a phase sequence.
 3. **RC-S:** verify typed Metric Anchor mathematics and multi-anchor residuals.
 4. **RC-C:** run solver on/off ablation; fix hard-constraint failures before adding constraint types.
 5. **RC-A/RC-U:** run frozen CV-only vs CV+VLM topology ablation.
-6. **RC-G1:** evaluate the gate and publish failed criteria without threshold tuning to individual photos.
+6. **RC-G0:** record the bootstrap result without making a usability claim.
+7. **RC-G1:** evaluate Alpha and publish failed criteria without threshold tuning to individual photos.
 
 No heuristic may be added solely to make one benchmark photo pass. Every
 heuristic needs an architectural rationale and train/validation regression
@@ -108,7 +138,8 @@ These aliases exist only to interpret old commits, scripts, and reports.
 | R3 — Metric Anchors / Scale | RC-S |
 | R4 / B0 — Constraint Graph Solver | RC-C |
 | R5 — VLM semantic evidence | RC-A |
-| A3 — Reconstruction Baseline Gate | RC-G1 |
+| R0 objective/bootstrap gate | RC-G0 |
+| A3 / Stage-A Reconstruction Gate | RC-G1 |
 | B1 — Multi-view production path | RC-O + RC-S future validation |
 | B2 — Evidence-driven model selection | RC-A benchmark policy |
 
@@ -142,6 +173,7 @@ document-specific prefix such as `RP-1`, never an `R` milestone ID.
 | Document | Role |
 |----------|------|
 | `docs/RECONSTRUCTION_METRICS.md` | Objective measurement contract |
+| `backend/scripts/run_reconstruction_gate_check.py` | Canonical RC-G0/RC-G1/RC-G2 evaluator |
 | `docs/REAL_PHOTO_ACCEPTANCE.md` | Real-photo workflow and RC-G1 E2E checklist |
 | `docs/OBSERVATION_LAYER.md` | RC-O evidence boundary design |
 | `docs/RECONSTRUCTION_STATUS.md` | Technical delivery log; defers here for priorities/maturity |

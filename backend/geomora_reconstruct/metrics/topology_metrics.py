@@ -49,6 +49,7 @@ def evaluate_topology(truth: dict[str, Any], prediction: dict[str, Any]) -> dict
     return {
         "storey_count_error": rounded(storey_error),
         "storey_accuracy": rounded(accuracy_from_error(storey_error)),
+        "storey_exact": 1.0 if pred.get("storey_count") == gt.get("storey_count") else 0.0,
         "bay_count_error": rounded(bay_error),
         "bay_accuracy": rounded(accuracy_from_error(bay_error)),
         "window_to_storey_assignment_accuracy": rounded(

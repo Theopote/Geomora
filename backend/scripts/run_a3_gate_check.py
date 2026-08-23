@@ -1,4 +1,4 @@
-"""Evaluate A3 Reconstruction Baseline Gate against minimal set metrics."""
+"""Evaluate tiered Reconstruction Core gates against minimal-set metrics."""
 from __future__ import annotations
 
 import argparse
@@ -10,7 +10,7 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = BACKEND_ROOT.parent
 sys.path.insert(0, str(BACKEND_ROOT))
 
-from geomora_reconstruct.metrics.a3_gate import GateThresholds, evaluate_a3_gate  # noqa: E402
+from geomora_reconstruct.metrics.a3_gate import evaluate_reconstruction_gate  # noqa: E402
 from geomora_reconstruct.metrics import evaluate_reconstruction  # noqa: E402
 from geomora_reconstruct.prediction_enrichment import enrich_prediction  # noqa: E402
 
@@ -26,8 +26,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prediction-dir", type=Path, default=DEFAULT_PRED_DIR)
     parser.add_argument(
         "--phase",
-        choices=("r0_objective", "stage_a_core", "stage_a_full"),
-        default="r0_objective",
+        choices=("prototype_bootstrap", "reconstruction_alpha", "product_beta", "r0_objective", "stage_a_core", "stage_a_full"),
+        default="prototype_bootstrap",
         help="Gate phase to evaluate",
     )
     parser.add_argument("--output", type=Path, default=None)
@@ -78,7 +78,7 @@ def build_results(minimal_set: dict, args: argparse.Namespace) -> tuple[list[dic
 
 
 def print_report(report) -> None:
-    print(f"A3 Gate phase={report.phase} passed={report.passed}")
+    print(f"{report.gate} maturity={report.maturity_claim} phase={report.phase} passed={report.passed}")
     for check in report.checks:
         status = "PASS" if check.passed else "FAIL"
         print(f"  [{status}] {check.id}: actual={check.actual} threshold={check.threshold}")
@@ -100,7 +100,7 @@ def main() -> int:
     args = parse_args()
     minimal_set = load_json(args.minimal_set)
     results, truths = build_results(minimal_set, args)
-    report = evaluate_a3_gate(minimal_set, results, truths=truths, phase=args.phase)
+    report = evaluate_reconstruction_gate(minimal_set, results, truths=truths, phase=args.phase)
 
     payload = {
         "minimal_set": str(args.minimal_set),
@@ -108,7 +108,7 @@ def main() -> int:
         "gate": report.to_dict(),
         "results": results,
     }
-    out_path = args.output or (args.prediction_dir / f"a3_gate_{args.phase}.json")
+    out_path = args.output or (args.prediction_dir / f"reconstruction_gate_{args.phase}.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 

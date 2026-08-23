@@ -32,5 +32,9 @@ anchored RC-G1 sample requires it (legacy reports call this A3).
 - image-specific heuristics are rejected without an architectural rationale;
 - aggregate scores must retain per-photo results and annotation coverage.
 
+Gate tiers are defined in `docs/ROADMAP.md`: RC-G0 is a permissive prototype
+bootstrap, RC-G1 is Reconstruction Alpha, and RC-G2 is Product Beta. A lower
+gate passing does not imply that a higher gate—or product usability—has passed.
+
 The executable example and annotation order are documented in
 `tests/reconstruction/README.md`.

@@ -101,3 +101,61 @@ def test_a3_gate_blocks_internally_inconsistent_ground_truth():
     report = evaluate_a3_gate(minimal_set, [{"photo_id": "photo_19", "metrics": metrics}], truths={"photo_19": truth})
     assert report.passed is False
     assert any(blocker.startswith("ground_truth_inconsistent:photo_19") for blocker in report.blockers)
+
+
+def _strong_gate_metrics(*, storey_accuracy=1.0, geometry_mae=0.02):
+    return {
+        "rqs": 95.0,
+        "coverage": 1.0,
+        "detection": {"window": {"recall": 0.98, "precision": 0.98}},
+        "topology": {
+            "storey_accuracy": storey_accuracy,
+            "storey_exact": 1.0 if storey_accuracy == 1.0 else 0.0,
+            "bay_accuracy": 0.95,
+            "window_to_storey_assignment_accuracy": 0.95,
+            "window_to_bay_assignment_accuracy": 0.95,
+        },
+        "geometry": {"normalized_mae": geometry_mae},
+        "sketchup": {"pass_rate": 1.0, "generate_stable": True},
+        "constraint_solver": {
+            "residual_reduction": 0.2,
+            "hard_satisfaction_rate": 1.0,
+            "mean_bbox_drift": 0.01,
+            "max_bbox_drift": 0.02,
+            "introduced_overlaps": 0,
+            "introduced_boundary_violations": 0,
+        },
+    }
+
+
+def test_rc_g0_pass_does_not_claim_product_readiness():
+    minimal_set = {"photos": [{"id": "photo_01", "split": "val"}]}
+    metrics = _strong_gate_metrics(storey_accuracy=0.5, geometry_mae=0.20)
+    report = evaluate_a3_gate(minimal_set, [{"photo_id": "photo_01", "metrics": metrics}], phase="prototype_bootstrap")
+    payload = report.to_dict()
+    assert report.passed is True
+    assert payload["gate"] == "RC-G0"
+    assert payload["maturity_claim"] == "prototype_bootstrap"
+    assert payload["product_ready"] is False
+
+
+def test_rc_g1_rejects_bootstrap_level_topology_and_geometry():
+    minimal_set = {"photos": [{"id": "photo_01", "split": "val"}]}
+    metrics = _strong_gate_metrics(storey_accuracy=0.5, geometry_mae=0.20)
+    report = evaluate_a3_gate(minimal_set, [{"photo_id": "photo_01", "metrics": metrics}], phase="reconstruction_alpha")
+    failed = {check.id for check in report.checks if not check.passed}
+    assert report.passed is False
+    assert "topology_storey_accuracy" in failed
+    assert "topology_exact_storey" in failed
+    assert "geometry_normalized_mae" in failed
+
+
+def test_only_rc_g2_can_make_product_beta_claim():
+    photos = [{"id": f"photo_{index:02d}", "split": "holdout" if index >= 15 else "val"} for index in range(20)]
+    minimal_set = {"photos": photos}
+    results = [{"photo_id": item["id"], "metrics": _strong_gate_metrics()} for item in photos]
+    report = evaluate_a3_gate(minimal_set, results, phase="product_beta")
+    payload = report.to_dict()
+    assert report.passed is True
+    assert payload["gate"] == "RC-G2"
+    assert payload["product_ready"] is True

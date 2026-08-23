@@ -107,6 +107,7 @@ See **`docs/ROADMAP.md`** for the canonical queue. Summary:
 | **P0** | **RC-S** — validate Metric Anchor and multi-anchor scale mathematics |
 | **P0** | **RC-C** — solver on/off ablation; fixed-dimension correctness before new types |
 | **P0** | **RC-A/RC-U** — frozen CV-only vs VLM topology ablation |
+| **P0 gate** | **RC-G0** — record Prototype Bootstrap without a product-readiness claim |
 | **P0 gate** | **RC-G1** — Reconstruction Core v0.1 Validation Gate |
 | P1 | RC-O/RC-S multi-view and depth validation on real photos |
 | P2 | Richer architectural hypotheses and video provenance |

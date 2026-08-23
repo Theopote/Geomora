@@ -7,7 +7,7 @@ $Root = $PSScriptRoot
 $PluginDir = Join-Path $Root "plugin"
 $DistDir = Join-Path $Root "dist"
 $RbzName = "geomora.rbz"
-$StagingDir = Join-Path $env:TEMP "geomora-rbz-staging"
+$StagingDir = Join-Path ([System.IO.Path]::GetTempPath()) "geomora-rbz-staging"
 
 Write-Host "Geomora RBZ build"
 Write-Host "================="

@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'base64'
+require 'zlib'
 
 module Geomora
   module Core
@@ -60,21 +61,35 @@ module Geomora
       end
 
       def self.write_placeholder_png(path, width:, height:)
-        # Minimal valid 1x1 PNG for headless tests; scaled via HTML display size when capture unavailable.
-        png = [
-          0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
-          0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
-          0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-          0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
-          0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41,
-          0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-          0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00,
-          0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
-          0x42, 0x60, 0x82
-        ].pack('C*')
+        width = [width.to_i, 1].max
+        height = [height.to_i, 1].max
+        png = build_placeholder_png(width, height)
         File.binwrite(path, png)
-        Logger.warn("LOD capture placeholder written: #{path} (#{width}x#{height} requested)")
+        Logger.warn("LOD capture placeholder written: #{path} (#{width}x#{height})")
         path
+      end
+
+      def self.build_placeholder_png(width, height)
+        raw = +''
+        height.times do |y|
+          raw << 0
+          width.times do |x|
+            raw << ((x * 255) / width).chr
+            raw << ((y * 255) / height).chr
+            raw << 120.chr
+          end
+        end
+
+        signature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A].pack('C*')
+        ihdr = [width, height, 8, 2, 0, 0, 0].pack('NNCCCCC')
+        idat = Zlib::Deflate.deflate(raw)
+
+        signature + png_chunk('IHDR', ihdr) + png_chunk('IDAT', idat) + png_chunk('IEND', +'')
+      end
+
+      def self.png_chunk(type, data)
+        crc_input = type + data
+        [data.bytesize].pack('N') + crc_input + [Zlib.crc32(crc_input)].pack('N')
       end
 
       def self.encode_file(path)

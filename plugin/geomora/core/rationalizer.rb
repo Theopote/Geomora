@@ -140,12 +140,15 @@ module Geomora
         spacing = [(zone_width - total_windows) / (count + 1.0), MIN_GAP_MM].max
       end
 
-      zone_start += (zone_width - total_windows - spacing * (count + 1)) / 2.0
-      zone_start = snap(zone_start)
+      pitch = snap(width + spacing)
+      span = (count - 1) * pitch + width
+      return windows if span > zone_width
+
+      lead_gap = (zone_width - span) / 2.0
+      first_offset = zone_start + lead_gap
 
       windows.each_with_index.map do |win, index|
-        offset = zone_start + spacing + index * (width + spacing)
-        win.merge('offset' => snap(offset))
+        win.merge('offset' => first_offset + index * pitch)
       end
     end
 

@@ -4,7 +4,7 @@ require_relative '../test_helper'
 
 class PatternAnalyzerTest < Minitest::Test
   def rationalized_params
-    result = Geomora::Core::Rationalizer.rationalize(
+    params = {
       'wall_length' => 10_000,
       'wall_height' => 3300,
       'windows' => [
@@ -14,7 +14,8 @@ class PatternAnalyzerTest < Minitest::Test
         { 'offset' => 6510, 'width' => 1505, 'height' => 1505, 'sill_height' => 900 }
       ],
       'door' => { 'offset' => 8500, 'width' => 910, 'height' => 2080 }
-    )
+    }
+    result = Geomora::Core::Rationalizer.rationalize(params)
     {
       'wall_length' => 10_000,
       'wall_height' => 3300,

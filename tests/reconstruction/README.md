@@ -70,6 +70,19 @@ Batch metrics + aggregate report:
 `geometry` ratios (`bbox_ratios_v0.1`). Topology and geometry metrics match
 detections to GT by IoU, not by opening id.
 
+## Reconstruction decision audit
+
+Solver safety and exceptional human confirmations are operational audit data,
+not subjective quality scores. Summarize exported Architectural IR files with:
+
+```powershell
+.venv\Scripts\python scripts\summarize_reconstruction_audit.py <ir-file-or-directory>
+```
+
+The report exposes individual train/validation events. Holdout events are
+sealed into a count-only `gate_only_not_for_tuning` block so their decisions
+cannot be used to tune solver weights or reconstruction rules.
+
 Single pair:
 
 ```powershell

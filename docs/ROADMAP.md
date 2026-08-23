@@ -38,6 +38,12 @@ Understanding v0.2 now reconciles CV counts with VLM evidence conservatively:
 agreement increases confidence, high-confidence VLM may supplement weak/sparse
 geometry, and unresolved conflicts remain explicit instead of becoming IR.
 
+The production vertical slice is now available through `POST /reconstruct`.
+Workspace **Analyze building** consumes the shared reconstruction service and
+returns detection evidence, Observation Graph, architectural understanding,
+constraint safety status, and editable IR in one request. Live VLM provider
+selection and richer review overlays remain pending.
+
 ### R4 — Pattern/Constraint Evidence v0.1 (in progress)
 
 Measured row/column repetition now produces IR-compatible soft constraint

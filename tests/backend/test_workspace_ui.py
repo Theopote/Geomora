@@ -65,3 +65,14 @@ def test_workspace_uses_compact_tool_density():
     assert "padding: 7px 8px;" in styles
     assert "margin-bottom: 7px;" in styles
     assert "min-height: 48px;" in styles
+
+
+def test_analyze_building_uses_reconstruction_pipeline():
+    script = (WORKSPACE / "app.js").read_text(encoding="utf-8")
+    dialog = (WORKSPACE.parents[1] / "ui" / "workspace_dialog.rb").read_text(encoding="utf-8")
+
+    assert "sketchupCall('reconstruct', JSON.stringify(collectParams()))" in script
+    assert "applyReconstruction: applyReconstruction" in script
+    assert "Architectural understanding" in script
+    assert "add_action_callback('reconstruct')" in dialog
+    assert "Perception::ReconstructionClient.reconstruct" in dialog

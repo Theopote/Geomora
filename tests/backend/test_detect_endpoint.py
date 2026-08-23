@@ -38,3 +38,30 @@ def test_detect_endpoint_contour(client: TestClient, tmp_path):
     assert payload["method"] == "contour_v1"
     assert payload["image_width"] == 800
     assert len(payload["elements"]) >= 2
+
+
+def test_reconstruct_endpoint_returns_evidence_understanding_and_ir(client: TestClient, tmp_path):
+    image = _synthetic_rectified_facade()
+    path = tmp_path / "facade.jpg"
+    cv2.imwrite(str(path), image)
+
+    with path.open("rb") as handle:
+        response = client.post(
+            "/reconstruct",
+            files={"image": ("facade.jpg", handle, "image/jpeg")},
+            data={
+                "method": "contour_v1",
+                "photo_id": "workspace_test",
+                "wall_length_mm": "12000",
+                "wall_height_mm": "7200",
+            },
+        )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["schema_version"] == "geomora-reconstruction-v0.1"
+    assert payload["photo_id"] == "workspace_test"
+    assert payload["observation_graph"]["observations"]
+    assert payload["understanding"]["opening_count"] >= 2
+    assert payload["architectural_ir"]["metric"]["facade_width_mm"] == 12000
+    assert payload["status"] == "ready"

@@ -45,6 +45,7 @@ module Geomora
     perception/rectify_client
     perception/detection_result
     perception/detect_client
+    perception/reconstruction_client
     perception/video_frame_client
     perception/multiview_result
     perception/multiview_client

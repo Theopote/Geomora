@@ -29,6 +29,7 @@
     doorConfidence: null,
     constraintSolution: null,
     reconstructionReview: null,
+    understanding: null,
     activeStoreyIndex: 0,
     storeyWindows: [[]]
   };
@@ -1203,6 +1204,15 @@
       { type: 'storey', title: params.storey_count + ' storey' + (params.storey_count === 1 ? '' : 's'), detail: params.storey_height ? params.storey_height + ' mm each' : 'Automatic height' },
       { type: 'lod', title: (params.lod_level || 'lod_200').toUpperCase(), detail: 'Model detail' }
     ];
+    if (state.understanding) {
+      const uncertaintyCount = (state.understanding.uncertainties || []).length;
+      items.push({
+        type: uncertaintyCount ? 'review' : 'ai',
+        title: 'Architectural understanding',
+        detail: state.understanding.storey_count + ' storeys · ' + state.understanding.bay_count + ' bays',
+        needsReview: uncertaintyCount > 0
+      });
+    }
     if (state.detection) items.push({ type: 'ai', title: 'AI detection', detail: state.detection.method, confidence: confidenceNumber(state.detection.confidence) });
     if (state.rectification) items.push({ type: 'rectify', title: 'Perspective corrected', detail: state.rectification.method, confidence: confidenceNumber(state.rectification.confidence) });
     if (state.multiview) items.push({ type: 'views', title: 'Multi-view', detail: state.multiview.match_count + ' matches · ' + state.multiview.inlier_count + ' inliers', confidence: confidenceNumber(state.multiview.confidence) });
@@ -1632,6 +1642,31 @@
     }
   }
 
+  function applyReconstruction(payload, overlayUrl) {
+    applyDetection(payload, overlayUrl);
+    state.understanding = payload.understanding || null;
+    state.constraintSolution = payload.constraint_solution || null;
+    state.reconstructionReview = payload.reconstruction_review || null;
+    if (state.understanding && state.understanding.storey_count) {
+      els.form.elements.namedItem('storey_count').value = state.understanding.storey_count;
+      onStoreyCountChange();
+    }
+    if (payload.ir_preview) setIrPreview(payload.ir_preview);
+    renderReconstructionReview();
+    renderTree();
+
+    const summary = state.understanding;
+    if (summary) {
+      const uncertain = (summary.uncertainties || []).length;
+      setStatus(
+        uncertain || payload.review_required ? 'warning' : 'success',
+        'AI understanding: ' + summary.storey_count + ' storeys, ' +
+          summary.bay_count + ' bays, ' + summary.opening_count + ' openings' +
+          (uncertain ? ' · ' + uncertain + ' uncertain items need review.' : ' · ready for review.')
+      );
+    }
+  }
+
   function applyDetection(payload, overlayUrl) {
     setWorkflowStage(2);
     if (payload.scale_hint) {
@@ -1855,6 +1890,7 @@
     setMultiviewRegistration: setMultiviewRegistration,
     setRectifiedImage: setRectifiedImage,
     applyDetection: applyDetection,
+    applyReconstruction: applyReconstruction,
     applyFusion: applyFusion,
     applyRationalization: applyRationalization,
     applyConstraintSolution: applyConstraintSolution,
@@ -2058,7 +2094,8 @@
       );
       return;
     }
-    sketchupCall('detect', JSON.stringify(collectParams()));
+    setStatus('', 'Analyzing facade structure, scale and architectural constraints…');
+    sketchupCall('reconstruct', JSON.stringify(collectParams()));
   });
 
   if (els.btnExportYoloLabels) {

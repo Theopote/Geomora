@@ -369,6 +369,62 @@ module Geomora
             post_message(dialog, 'error', e.message)
           end
 
+          dialog.add_action_callback('reconstruct') do |_ctx, json|
+            params = JSON.parse(json)
+            image_path = detection_image_path(params)
+            if image_path.nil? || image_path.empty?
+              raise GeomoraError, 'Load and rectify a facade image before reconstruction.'
+            end
+
+            method = params['detection_method'].to_s.strip
+            method = 'auto' if method.empty?
+            metric = unless auto_scale_enabled?(params)
+                       {
+                         width: params['wall_length'].to_f,
+                         height: params['wall_height'].to_f
+                       }
+                     end
+            response = Perception::ReconstructionClient.reconstruct(
+              image_path,
+              method: method,
+              photo_id: File.basename(image_path, '.*'),
+              metric: metric
+            )
+            result = Perception::DetectionResult.from_hash(response.fetch('detection'))
+            params = apply_detection_scale!(params, result)
+            @detection = result.to_source_metadata.merge(
+              'reconstruction_schema' => response['schema_version'],
+              'understanding' => response['understanding']
+            )
+            mapped = map_detection_params(result, params)
+            payload = mapped.merge(
+              'detection' => result.to_dict,
+              'understanding' => response['understanding'],
+              'constraint_solution' => response['constraint_solution'],
+              'reconstruction_review' => response.dig('architectural_ir', 'reconstruction', 'review'),
+              'ir_preview' => response['architectural_ir'],
+              'review_required' => response['review_required'],
+              'reconstruction_status' => response['status']
+            )
+            dialog.execute_script(
+              "window.geomora.applyReconstruction(#{payload.to_json}, #{detection_overlay_url(result).to_json})"
+            )
+            understanding = response['understanding'] || {}
+            post_message(
+              dialog,
+              response['review_required'] ? 'warning' : 'success',
+              format(
+                'Building analyzed: %d storeys, %d bays, %d openings%s',
+                understanding['storey_count'].to_i,
+                understanding['bay_count'].to_i,
+                understanding['opening_count'].to_i,
+                response['review_required'] ? ' — review uncertain evidence.' : '.'
+              )
+            )
+          rescue GeomoraError => e
+            post_message(dialog, 'error', e.message)
+          end
+
           dialog.add_action_callback('load_template') do |_ctx, _|
             data = JSON.parse(File.read(Core::Project.fixture_path))
             dialog.execute_script("window.geomora.loadPayload(#{payload_from_ir(data).to_json}, 'template')")

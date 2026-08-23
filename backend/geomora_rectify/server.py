@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from geomora_detect.pipeline import SUPPORTED_METHODS, detect_facade
 from geomora_capture.video_frames import extract_frames
 from geomora_multiview.pipeline import fuse_openings, multiview_capabilities, register_views
+from geomora_reconstruct.service import reconstruct_facade
 
 from .pipeline import parse_corners, rectify_image
 
@@ -23,6 +24,7 @@ def root() -> dict[str, str]:
         "health": "/health",
         "rectify": "POST /rectify",
         "detect": "POST /detect",
+        "reconstruct": "POST /reconstruct",
         "detect_capabilities": "GET /detect/capabilities",
         "video_extract_frames": "POST /video/extract_frames",
         "multiview_register": "POST /multiview/register",
@@ -82,6 +84,43 @@ async def rectify(
             raise HTTPException(status_code=500, detail=str(error)) from error
 
         return JSONResponse(result.to_dict())
+
+
+@app.post("/reconstruct")
+async def reconstruct(
+    image: UploadFile = File(...),
+    method: str = Form(default="auto"),
+    photo_id: str = Form(default="workspace_photo"),
+    wall_length_mm: float | None = Form(default=None),
+    wall_height_mm: float | None = Form(default=None),
+) -> JSONResponse:
+    if not is_image_upload(image):
+        raise HTTPException(status_code=400, detail="Upload must be an image file")
+
+    suffix = Path(image.filename or "upload.jpg").suffix or ".jpg"
+    with tempfile.TemporaryDirectory(prefix="geomora_reconstruct_") as temp_dir:
+        input_path = Path(temp_dir) / f"input{suffix}"
+        input_path.write_bytes(await image.read())
+        metric = None
+        if wall_length_mm and wall_length_mm > 0 and wall_height_mm and wall_height_mm > 0:
+            metric = {
+                "facade_width_mm": wall_length_mm,
+                "facade_height_mm": wall_height_mm,
+            }
+        try:
+            result = reconstruct_facade(
+                input_path,
+                photo_id=photo_id.strip() or "workspace_photo",
+                method=method,
+                metric=metric,
+                return_overlay=True,
+            )
+        except ValueError as error:
+            raise HTTPException(status_code=400, detail=str(error)) from error
+        except Exception as error:  # pragma: no cover - safety net
+            raise HTTPException(status_code=500, detail=str(error)) from error
+
+        return JSONResponse(result)
 
 
 @app.post("/detect")

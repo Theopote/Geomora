@@ -98,6 +98,11 @@ Replacing YOLO → GroundingDINO → future foundation model only changes the Ob
 | Understanding layer | ☐ Detections still map directly to overlay elements in UI |
 | Constraint Graph solver | ☐ P0 after Understanding v0.1 (see `ROADMAP.md` B0) |
 
+Production update: `POST /reconstruct` now runs detection evidence through the
+Observation Graph, Understanding, constraint safety checks, and IR export.
+Workspace **Analyze building** uses this endpoint; the legacy detection callback
+is retained for diagnostics and compatibility.
+
 **Rule:** Observation Graph is now the required boundary for new perception work.
 Legacy detection → overlay path remains via adapters until Understanding v0.1 lands.
 

@@ -32,6 +32,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--output", type=Path, default=None)
     parser.add_argument("--refresh", action="store_true", help="Re-enrich predictions before evaluation")
+    parser.add_argument("--report-only", action="store_true", help="Write the truthful report without failing solely because its quality threshold is not yet met")
     return parser.parse_args()
 
 
@@ -114,7 +115,7 @@ def main() -> int:
 
     print_report(report)
     print(f"Gate report -> {out_path.resolve()}")
-    return 0 if report.passed else 1
+    return 0 if report.passed or args.report_only else 1
 
 
 if __name__ == "__main__":

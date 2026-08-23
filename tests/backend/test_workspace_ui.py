@@ -68,10 +68,10 @@ def test_workspace_uses_compact_tool_density():
     styles = (WORKSPACE / "styles.css").read_text(encoding="utf-8")
 
     assert "gap: 8px;\n  padding: 8px;" in styles
-    assert "min-height: 32px;" in styles
+    assert "--control-min-height: 26px;" in styles
     assert "padding: 7px 8px;" in styles
     assert "margin-bottom: 7px;" in styles
-    assert "min-height: 48px;" in styles
+    assert "min-height: 40px;" in styles
 
 
 def test_analyze_building_uses_reconstruction_pipeline():

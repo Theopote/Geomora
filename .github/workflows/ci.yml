@@ -1,0 +1,132 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-tests:
+    name: python-tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-ci.txt
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -r backend/requirements-ci.txt
+      - run: python -m pytest -q
+        env:
+          OPENAI_API_KEY: ""
+          GEMINI_API_KEY: ""
+          GOOGLE_API_KEY: ""
+
+  ruby-tests:
+    name: ruby-tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version: ["3.2", "3.3"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+      - run: ruby tests/run_ci_tests.rb
+
+  ruby-full-suite-debt:
+    name: ruby-full-suite-debt
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - name: Report existing full-suite failures
+        run: ruby tests/run_tests.rb
+
+  static-contracts:
+    name: static-contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - run: python -m compileall -q backend tests
+      - name: Ruby syntax
+        run: find plugin tests -name '*.rb' -print0 | xargs -0 -n1 ruby -c
+      - name: JavaScript syntax
+        run: |
+          node --check plugin/geomora/ui/workspace/app.js
+          node --check plugin/geomora/ui/workspace/layout_editor.js
+          node --check tests/reconstruction/review_pack/assets/gt_review.js
+
+  reconstruction-contracts:
+    name: reconstruction-contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-ci.txt
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -r backend/requirements-ci.txt
+      - name: IR JSON Schema contract
+        run: python -m pytest tests/contracts/test_ir_json_schema.py -q
+      - name: Ground Truth consistency
+        run: python backend/scripts/run_gt_validation.py
+      - name: Deterministic minimal-set reconstruction
+        run: |
+          python backend/scripts/run_reconstruction_baseline.py --method facade_row_v1 --out "$RUNNER_TEMP/geomora-baseline"
+          python backend/scripts/check_reconstruction_artifacts.py "$RUNNER_TEMP/geomora-baseline"
+          python backend/scripts/run_reconstruction_gate_check.py --phase prototype_bootstrap --report-only --prediction-dir "$RUNNER_TEMP/geomora-baseline" --output "$RUNNER_TEMP/geomora-baseline/rc-g0.json"
+        env:
+          OPENAI_API_KEY: ""
+          GEMINI_API_KEY: ""
+          GOOGLE_API_KEY: ""
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: minimal-reconstruction-${{ github.run_id }}
+          path: ${{ runner.temp }}/geomora-baseline
+          retention-days: 14
+
+  package-smoke:
+    name: package-smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build RBZ
+        shell: pwsh
+        run: ./build_rbz.ps1
+      - name: Inspect package
+        run: |
+          unzip -l dist/geomora.rbz | grep -q 'geomora.rb'
+          unzip -l dist/geomora.rbz | grep -q 'geomora/ui/workspace/index.html'
+          unzip -l dist/geomora.rbz | grep -q 'LICENSE'

@@ -1,0 +1,41 @@
+name: Reconstruction Benchmark
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 3 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-ci.txt
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -r backend/requirements-ci.txt
+      - name: Reconstruct frozen minimal set without cloud calls
+        run: python backend/scripts/run_reconstruction_baseline.py --method facade_row_v1 --out "$RUNNER_TEMP/geomora-benchmark"
+        env:
+          OPENAI_API_KEY: ""
+          GEMINI_API_KEY: ""
+          GOOGLE_API_KEY: ""
+      - name: Evaluate maturity gates
+        run: |
+          python backend/scripts/check_reconstruction_artifacts.py "$RUNNER_TEMP/geomora-benchmark"
+          python backend/scripts/run_reconstruction_gate_check.py --phase prototype_bootstrap --report-only --prediction-dir "$RUNNER_TEMP/geomora-benchmark" --output "$RUNNER_TEMP/geomora-benchmark/rc-g0.json"
+          python backend/scripts/run_reconstruction_gate_check.py --phase reconstruction_alpha --report-only --prediction-dir "$RUNNER_TEMP/geomora-benchmark" --output "$RUNNER_TEMP/geomora-benchmark/rc-g1.json"
+          echo "RC-G0 and RC-G1 reports are attached; report-only preserves their truthful passed fields." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reconstruction-benchmark-${{ github.run_id }}
+          path: ${{ runner.temp }}/geomora-benchmark
+          retention-days: 30

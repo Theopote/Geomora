@@ -14,7 +14,13 @@ Thank you for your interest in contributing to Geomora.
 
 ## Development Workflow
 
-- **Ruby plugin tests** (no SketchUp required):
+- **Required Ruby reconstruction contracts** (no SketchUp required):
+
+  ```bash
+  ruby tests/run_ci_tests.rb
+  ```
+
+- **Full historical Ruby suite** (currently reported as CI technical debt):
 
   ```bash
   ruby tests/run_tests.rb
@@ -28,6 +34,8 @@ Thank you for your interest in contributing to Geomora.
   ```
 
 - For SketchUp integration changes, verify manually in SketchUp after installing via RBZ or symlink.
+- See `docs/CI.md` for required checks, deterministic reconstruction boundaries,
+  and branch-protection setup.
 
 ## Pull Requests
 

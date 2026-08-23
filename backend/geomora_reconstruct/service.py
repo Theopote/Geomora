@@ -8,7 +8,10 @@ from geomora_detect.pipeline import detect_facade
 
 from .export import detection_to_prediction
 from .observations.adapters import detection_result_to_observations
+from .observations.vlm_adapter import vlm_evidence_to_observations
 from .prediction_enrichment import enrich_prediction
+from .vlm_evidence import provider_api_key, request_architectural_evidence
+from geomora_detect.vlm_prelabel import default_model, sanitize_error_message
 
 
 def reconstruct_facade(
@@ -19,6 +22,10 @@ def reconstruct_facade(
     metric: dict[str, float] | None = None,
     metric_anchors: list[dict[str, Any]] | None = None,
     return_overlay: bool = True,
+    routing_mode: str = "local_only",
+    vlm_provider: str = "openai",
+    vlm_model: str = "auto",
+    cloud_upload_authorized: bool = False,
 ) -> dict[str, Any]:
     """Turn one facade image into evidence, understanding and editable IR.
 
@@ -30,11 +37,31 @@ def reconstruct_facade(
         detection,
         photo_id=photo_id,
     )
+    cloud = {"requested": routing_mode == "cloud_enhanced", "used": False, "provider": vlm_provider}
+    architectural_evidence = None
+    if routing_mode == "cloud_enhanced":
+        if not cloud_upload_authorized:
+            cloud["status"] = "authorization_required"
+        else:
+            key = provider_api_key(vlm_provider)
+            if not key:
+                cloud["status"] = "provider_not_configured"
+            else:
+                active_model = default_model(vlm_provider) if vlm_model in {"", "auto"} else vlm_model
+                try:
+                    architectural_evidence = request_architectural_evidence(Path(image_path), photo_id=photo_id, provider=vlm_provider, model=active_model, api_key=key)
+                    vlm_graph = vlm_evidence_to_observations(architectural_evidence, image_width=detection.image_width, image_height=detection.image_height)
+                    observation_graph.observations.extend(vlm_graph.observations)
+                    observation_graph.debug["vlm_evidence_count"] = len(vlm_graph.observations)
+                    cloud.update({"used": True, "status": "completed", "model": active_model})
+                except Exception as error:  # noqa: BLE001 - local reconstruction must survive cloud failure
+                    cloud.update({"status": "failed", "error": sanitize_error_message(str(error), key)})
     prediction = detection_to_prediction(
         photo_id,
         detection,
         metric=metric,
         metric_anchors=metric_anchors or [],
+        architectural_evidence=architectural_evidence,
     )
     enrich_prediction(prediction, detection, export_ir=True)
 
@@ -73,4 +100,5 @@ def reconstruct_facade(
         "prediction": prediction,
         "architectural_ir": prediction.get("architectural_ir"),
         "review_required": review_required,
+        "cloud_evidence": cloud,
     }

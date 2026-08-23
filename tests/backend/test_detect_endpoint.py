@@ -68,3 +68,21 @@ def test_reconstruct_endpoint_returns_evidence_understanding_and_ir(client: Test
     assert payload["understanding"]["facade_bbox"]
     assert payload["architectural_ir"]["metric"]["facade_width_mm"] == 12000
     assert payload["status"] == "ready"
+
+
+def test_cloud_reconstruction_requires_per_upload_authorization(client: TestClient, tmp_path):
+    path = tmp_path / "facade.jpg"
+    cv2.imwrite(str(path), _synthetic_rectified_facade())
+    with path.open("rb") as handle:
+        response = client.post(
+            "/reconstruct",
+            files={"image": ("facade.jpg", handle, "image/jpeg")},
+            data={"method": "contour_v1", "routing_mode": "cloud_enhanced", "vlm_provider": "openai"},
+        )
+    assert response.status_code == 200
+    assert response.json()["cloud_evidence"] == {
+        "requested": True,
+        "used": False,
+        "provider": "openai",
+        "status": "authorization_required",
+    }

@@ -5,6 +5,7 @@ VLM output is evidence only. It never contains final dimensions or IR geometry.
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -48,6 +49,34 @@ Schema:
 }
 Coordinates are normalized to the image. Use null/empty arrays rather than
 guessing when evidence is insufficient."""
+
+ARCHITECTURE_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["building_type", "facade", "opening_groups", "occlusions", "uncertainties"],
+    "properties": {
+        "building_type": {"$ref": "#/$defs/string_evidence"},
+        "facade": {
+            "type": "object", "additionalProperties": False,
+            "required": ["bbox", "visible_storeys", "bay_count", "repetition"],
+            "properties": {
+                "bbox": {"anyOf": [{"$ref": "#/$defs/bbox"}, {"type": "null"}]},
+                "visible_storeys": {"$ref": "#/$defs/count_evidence"},
+                "bay_count": {"$ref": "#/$defs/count_evidence"},
+                "repetition": {"type": "object", "additionalProperties": False, "required": ["value", "confidence"], "properties": {"value": {"type": "string", "enum": sorted(ALLOWED_REPETITION)}, "confidence": {"$ref": "#/$defs/confidence"}}},
+            },
+        },
+        "opening_groups": {"type": "array", "items": {"type": "object", "additionalProperties": False, "required": ["type", "rows", "columns", "region", "confidence"], "properties": {"type": {"type": "string", "enum": ["window", "door", "mixed", "unknown"]}, "rows": {"type": "integer", "minimum": 0, "maximum": 100}, "columns": {"type": "integer", "minimum": 0, "maximum": 100}, "region": {"$ref": "#/$defs/bbox"}, "confidence": {"$ref": "#/$defs/confidence"}}}},
+        "occlusions": {"type": "array", "items": {"type": "object", "additionalProperties": False, "required": ["region", "likely_hidden_opening", "confidence", "reason"], "properties": {"region": {"$ref": "#/$defs/bbox"}, "likely_hidden_opening": {"type": "boolean"}, "confidence": {"$ref": "#/$defs/confidence"}, "reason": {"type": "string"}}}},
+        "uncertainties": {"type": "array", "items": {"type": "string"}},
+    },
+    "$defs": {
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "bbox": {"type": "array", "items": {"type": "number", "minimum": 0, "maximum": 1}, "minItems": 4, "maxItems": 4},
+        "string_evidence": {"type": "object", "additionalProperties": False, "required": ["value", "confidence"], "properties": {"value": {"type": "string"}, "confidence": {"$ref": "#/$defs/confidence"}}},
+        "count_evidence": {"type": "object", "additionalProperties": False, "required": ["value", "confidence"], "properties": {"value": {"type": "integer", "minimum": 0, "maximum": 100}, "confidence": {"$ref": "#/$defs/confidence"}}},
+    },
+}
 
 
 def _confidence(value: Any, field_name: str) -> float:
@@ -200,20 +229,22 @@ def request_architectural_evidence(
     if normalized == "openai":
         payload = {
             "model": model,
-            "temperature": 0.1,
-            "response_format": {"type": "json_object"},
-            "messages": [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": [{"type": "text", "text": user_text}, {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{data}"}}]},
+            "store": False,
+            "instructions": SYSTEM_PROMPT,
+            "input": [
+                {"role": "user", "content": [{"type": "input_text", "text": user_text}, {"type": "input_image", "detail": "high", "image_url": f"data:{mime};base64,{data}"}]},
             ],
+            "text": {"format": {"type": "json_schema", "name": "geomora_architectural_evidence", "strict": True, "schema": ARCHITECTURE_SCHEMA}},
         }
         body = post_json_with_retries(
-            f"{(base_url or 'https://api.openai.com/v1').rstrip('/')}/chat/completions",
+            f"{(base_url or 'https://api.openai.com/v1').rstrip('/')}/responses",
             payload,
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             timeout=timeout,
         )
-        content = body["choices"][0]["message"]["content"]
+        content = body.get("output_text")
+        if not content:
+            content = next(part["text"] for item in body.get("output", []) if item.get("type") == "message" for part in item.get("content", []) if part.get("type") == "output_text")
     elif normalized == "gemini":
         payload = {
             "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
@@ -225,3 +256,11 @@ def request_architectural_evidence(
     else:
         raise ValueError("provider must be openai or gemini")
     return parse_architectural_evidence(content, photo_id=photo_id, provider=normalized, model=model)
+
+
+def provider_api_key(provider: str) -> str | None:
+    if provider == "openai":
+        return os.getenv("OPENAI_API_KEY")
+    if provider == "gemini":
+        return os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    return None

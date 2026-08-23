@@ -102,3 +102,5 @@ def test_workspace_has_safe_ai_settings_center():
     assert "setSettings: setSettings" in script
     assert "ai_settings: Object.assign({}, state.settings)" in script
     assert "add_action_callback('save_settings')" in dialog
+    assert "Continue with this one upload?" in script
+    assert "cloud_upload_authorized: state.cloudUploadAuthorized" in script

@@ -12,12 +12,12 @@ module Geomora
       DEFAULT_TIMEOUT = 120
 
       class << self
-        def reconstruct(image_path, method: 'auto', photo_id: 'workspace_photo', metric: nil,
+        def reconstruct(image_path, method: 'auto', photo_id: 'workspace_photo', metric: nil, ai_settings: {}, cloud_upload_authorized: false,
                         host: DEFAULT_HOST, port: DEFAULT_PORT)
           raise GeomoraError, "Image not found: #{image_path}" unless File.exist?(image_path)
 
           boundary = "----GeomoraReconstruct#{rand(1_000_000)}"
-          body = multipart_body(boundary, image_path, method, photo_id, metric)
+          body = multipart_body(boundary, image_path, method, photo_id, metric, ai_settings, cloud_upload_authorized)
           request = Net::HTTP::Post.new(URI("http://#{host}:#{port}/reconstruct"))
           request['Content-Type'] = "multipart/form-data; boundary=#{boundary}"
           request.body = body
@@ -34,11 +34,15 @@ module Geomora
 
         private
 
-        def multipart_body(boundary, image_path, method, photo_id, metric)
+        def multipart_body(boundary, image_path, method, photo_id, metric, ai_settings, cloud_upload_authorized)
           parts = []
           add_file(parts, boundary, image_path)
           add_field(parts, boundary, 'method', method)
           add_field(parts, boundary, 'photo_id', photo_id)
+          add_field(parts, boundary, 'routing_mode', ai_settings['routing_mode'] || 'local_only')
+          add_field(parts, boundary, 'vlm_provider', ai_settings['vlm_provider'] || 'openai')
+          add_field(parts, boundary, 'vlm_model', ai_settings['vlm_model'] || 'auto')
+          add_field(parts, boundary, 'cloud_upload_authorized', cloud_upload_authorized)
           add_field(parts, boundary, 'wall_length_mm', metric[:width]) if metric && metric[:width].positive?
           add_field(parts, boundary, 'wall_height_mm', metric[:height]) if metric && metric[:height].positive?
           parts << "--#{boundary}--\r\n"

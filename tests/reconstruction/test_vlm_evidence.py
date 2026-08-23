@@ -11,6 +11,7 @@ from geomora_reconstruct.vlm_evidence import (
     parse_architectural_evidence,
     read_evidence_cache,
     write_evidence_cache,
+    request_architectural_evidence,
 )
 
 
@@ -62,3 +63,22 @@ def test_vlm_schema_rejects_unbounded_confidence():
 def test_observation_package_keeps_existing_public_api():
     assert ObservationGraphBuilder is not None
     assert yolo_to_observations is not None
+
+
+def test_openai_architecture_request_uses_responses_structured_output(monkeypatch, tmp_path):
+    image = tmp_path / "facade.jpg"
+    image.write_bytes(b"unused")
+    captured = {}
+
+    monkeypatch.setattr("geomora_reconstruct.vlm_evidence.encode_image_base64", lambda *_args, **_kwargs: ("image/jpeg", "abc"))
+    def fake_post(url, payload, **kwargs):
+        captured.update(url=url, payload=payload, headers=kwargs["headers"])
+        return {"output_text": json.dumps(SAMPLE)}
+    monkeypatch.setattr("geomora_reconstruct.vlm_evidence.post_json_with_retries", fake_post)
+
+    evidence = request_architectural_evidence(image, photo_id="p1", provider="openai", model="gpt-test", api_key="secret")
+    assert captured["url"].endswith("/responses")
+    assert captured["payload"]["store"] is False
+    assert captured["payload"]["text"]["format"]["type"] == "json_schema"
+    assert captured["payload"]["input"][0]["content"][1]["type"] == "input_image"
+    assert evidence.visible_storeys.value == 3

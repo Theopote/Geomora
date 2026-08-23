@@ -37,7 +37,8 @@
     storeyWindows: [[]],
     settings: {},
     settingsSnapshot: {},
-    capabilities: {}
+    capabilities: {},
+    cloudUploadAuthorized: false
   };
 
   const els = {
@@ -1527,6 +1528,7 @@
 
     return {
       ai_settings: Object.assign({}, state.settings),
+      cloud_upload_authorized: state.cloudUploadAuthorized,
       project_name: formData.get('project_name'),
       wall_length: Number(formData.get('wall_length')),
       wall_height: Number(formData.get('wall_height')),
@@ -2350,7 +2352,21 @@
       return;
     }
     setStatus('', 'Analyzing facade structure, scale and architectural constraints…');
+    state.cloudUploadAuthorized = false;
+    if (state.settings.routing_mode === 'cloud_enhanced') {
+      const provider = state.settings.vlm_provider === 'gemini' ? 'Google Gemini' : 'OpenAI';
+      const approved = window.confirm(
+        'Cloud-enhanced analysis will upload the current facade photo to ' + provider + '.\n\n' +
+        'The photo may contain location, people, signs or other private details. Continue with this one upload?'
+      );
+      if (!approved) {
+        setStatus('warning', 'Cloud upload cancelled. Choose Local only or Automatic to analyze without uploading.');
+        return;
+      }
+      state.cloudUploadAuthorized = true;
+    }
     sketchupCall('reconstruct', JSON.stringify(collectParams()));
+    state.cloudUploadAuthorized = false;
   });
 
   if (els.btnExportYoloLabels) {

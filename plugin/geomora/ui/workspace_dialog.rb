@@ -415,7 +415,9 @@ module Geomora
               image_path,
               method: method,
               photo_id: File.basename(image_path, '.*'),
-              metric: metric
+              metric: metric,
+              ai_settings: ai_settings,
+              cloud_upload_authorized: params['cloud_upload_authorized'] == true
             )
             result = Perception::DetectionResult.from_hash(response.fetch('detection'))
             params = apply_detection_scale!(params, result)
@@ -431,7 +433,8 @@ module Geomora
               'reconstruction_review' => response.dig('architectural_ir', 'reconstruction', 'review'),
               'ir_preview' => response['architectural_ir'],
               'review_required' => response['review_required'],
-              'reconstruction_status' => response['status']
+              'reconstruction_status' => response['status'],
+              'cloud_evidence' => response['cloud_evidence']
             )
             dialog.execute_script(
               "window.geomora.applyReconstruction(#{payload.to_json}, #{detection_overlay_url(result).to_json})"

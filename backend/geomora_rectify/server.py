@@ -128,6 +128,10 @@ async def reconstruct(
     photo_id: str = Form(default="workspace_photo"),
     wall_length_mm: float | None = Form(default=None),
     wall_height_mm: float | None = Form(default=None),
+    routing_mode: str = Form(default="local_only"),
+    vlm_provider: str = Form(default="openai"),
+    vlm_model: str = Form(default="auto"),
+    cloud_upload_authorized: bool = Form(default=False),
 ) -> JSONResponse:
     if not is_image_upload(image):
         raise HTTPException(status_code=400, detail="Upload must be an image file")
@@ -149,6 +153,10 @@ async def reconstruct(
                 method=method,
                 metric=metric,
                 return_overlay=True,
+                routing_mode=routing_mode,
+                vlm_provider=vlm_provider,
+                vlm_model=vlm_model,
+                cloud_upload_authorized=cloud_upload_authorized,
             )
         except ValueError as error:
             raise HTTPException(status_code=400, detail=str(error)) from error

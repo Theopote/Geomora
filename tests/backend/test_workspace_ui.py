@@ -89,3 +89,16 @@ def test_analyze_building_uses_reconstruction_pipeline():
     assert "function renderOpeningEvidence()" in script
     assert "setModelSelection: setModelSelection" in script
     assert "sketchupCall('select_model_entity'" in script
+def test_workspace_has_safe_ai_settings_center():
+    html = (WORKSPACE / "index.html").read_text(encoding="utf-8")
+    script = (WORKSPACE / "app.js").read_text(encoding="utf-8")
+    dialog = (WORKSPACE.parent / "workspace_dialog.rb").read_text(encoding="utf-8")
+
+    assert 'id="btn-settings"' in html
+    assert 'id="settings-panel"' in html
+    assert 'name="routing_mode"' in html
+    assert 'name="vlm_provider"' in html
+    assert 'name="api_key"' not in html
+    assert "setSettings: setSettings" in script
+    assert "ai_settings: Object.assign({}, state.settings)" in script
+    assert "add_action_callback('save_settings')" in dialog

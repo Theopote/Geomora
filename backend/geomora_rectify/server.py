@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import tempfile
 from pathlib import Path
 
@@ -26,6 +27,7 @@ def root() -> dict[str, str]:
         "detect": "POST /detect",
         "reconstruct": "POST /reconstruct",
         "detect_capabilities": "GET /detect/capabilities",
+        "settings_capabilities": "GET /settings/capabilities",
         "video_extract_frames": "POST /video/extract_frames",
         "multiview_register": "POST /multiview/register",
         "multiview_fuse": "POST /multiview/fuse",
@@ -36,6 +38,39 @@ def root() -> dict[str, str]:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "service": "geomora-perception"}
+
+
+@app.get("/settings/capabilities")
+def settings_capabilities() -> dict[str, object]:
+    detection = detect_capabilities()
+    multiview = multiview_capabilities()
+    return {
+        "service_available": True,
+        "service_version": app.version,
+        "cloud_providers": {
+            "openai": {
+                "configured": bool(os.getenv("OPENAI_API_KEY", "").strip()),
+                "credential_source": "OPENAI_API_KEY",
+            },
+            "gemini": {
+                "configured": bool(
+                    os.getenv("GEMINI_API_KEY", "").strip()
+                    or os.getenv("GOOGLE_API_KEY", "").strip()
+                ),
+                "credential_source": "GEMINI_API_KEY or GOOGLE_API_KEY",
+            },
+        },
+        "local_inference": {
+            "detection_methods": detection["methods"],
+            "yolo_available": detection["yolo_available"],
+            "sam_onnx_available": detection["sam_onnx_available"],
+            "multiview": multiview,
+        },
+        "security": {
+            "api_keys_returned": False,
+            "settings_store_contains_secrets": False,
+        },
+    }
 
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}

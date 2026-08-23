@@ -13,6 +13,7 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></symbol>
     <symbol id="i-building" viewBox="0 0 24 24"><path d="M5 21V4h10v17M15 9h4v12M8 8h2M8 12h2M8 16h2M3 21h18"/></symbol>
     <symbol id="i-tools" viewBox="0 0 24 24"><path d="M14 6a4 4 0 0 0 4 4l-8 8-4-4 8-8zM5 13l6 6"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM4.9 7.5l-1.4-2 2-2 2 1.4A8 8 0 0 1 10 4l.4-2h3.2l.4 2a8 8 0 0 1 2.5.9l2-1.4 2 2-1.4 2a8 8 0 0 1 .9 2.5l2 .4v3.2l-2 .4a8 8 0 0 1-.9 2.5l1.4 2-2 2-2-1.4a8 8 0 0 1-2.5.9l-.4 2h-3.2l-.4-2a8 8 0 0 1-2.5-.9l-2 1.4-2-2 1.4-2A8 8 0 0 1 4 14l-2-.4v-3.2l2-.4a8 8 0 0 1 .9-2.5z"/></symbol>
   </svg>
   <header class="topbar">
     <div class="brand-block"><div class="brand">Geomora Workspace</div><div class="subtitle">Photo to editable SketchUp model</div></div>
@@ -20,7 +21,48 @@
       <li class="active">1 Source</li><li>2 AI analysis</li><li>3 Review</li><li>4 Generate</li>
     </ol>
     <div id="status" class="status">Ready</div>
+    <button id="btn-settings" class="icon-button" type="button" aria-label="Open settings" title="AI and plugin settings"><svg class="icon"><use href="#i-settings"/></svg></button>
   </header>
+
+  <div id="settings-backdrop" class="settings-backdrop" hidden></div>
+  <aside id="settings-panel" class="settings-panel" aria-label="Geomora settings" aria-hidden="true" hidden>
+    <header class="settings-header">
+      <div><h2>Settings</h2><p>AI routing, privacy and local inference</p></div>
+      <button id="btn-settings-close" class="icon-button" type="button" aria-label="Close settings">&times;</button>
+    </header>
+    <form id="settings-form" class="settings-form">
+      <section class="settings-section">
+        <h3>AI routing</h3>
+        <label>Processing mode<select name="routing_mode"><option value="automatic">Automatic (recommended)</option><option value="local_only">Local only</option><option value="cloud_enhanced">Cloud enhanced</option></select></label>
+        <p class="settings-help">Automatic keeps geometric detection local and only uses configured services when explicitly enabled.</p>
+      </section>
+      <section class="settings-section" id="cloud-provider-settings">
+        <h3>Multimodal provider</h3>
+        <label>Provider<select name="vlm_provider"><option value="openai">OpenAI</option><option value="gemini">Google Gemini</option></select></label>
+        <label>Model<input name="vlm_model" type="text" value="auto" maxlength="100" placeholder="auto"></label>
+        <div class="provider-status-grid"><div><span>OpenAI</span><strong id="openai-status">Checking…</strong></div><div><span>Gemini</span><strong id="gemini-status">Checking…</strong></div></div>
+        <p class="settings-help">API keys are read by the local backend from environment variables. Geomora never displays or stores the key value.</p>
+      </section>
+      <section class="settings-section">
+        <h3>Local inference</h3>
+        <label>Default detector<select name="detection_method"><option value="auto">Auto</option><option value="sam_v1">SAM refine</option><option value="facade_row_v1">Facade row</option><option value="yolo_v1">YOLO</option><option value="contour_v1">Contour fallback</option></select></label>
+        <label>Default depth<select name="depth_method"><option value="auto">Auto</option><option value="depth_anything_v2_small_v1">Depth Anything V2</option><option value="depth_anything_v2_small_q4_v1">Depth Anything V2 Q4</option><option value="marigold_v1_1_v1">Marigold</option><option value="midas_v21_v1">MiDaS</option><option value="gradient_laplacian_v1">Gradient proxy</option><option value="colmap_dense_v1">COLMAP dense</option></select></label>
+        <label>Compute device<select name="onnx_device"><option value="auto">Auto</option><option value="cpu">CPU</option><option value="cuda">CUDA</option><option value="directml">DirectML</option></select></label>
+      </section>
+      <section class="settings-section">
+        <h3>Privacy and review</h3>
+        <label class="checkbox-label"><input name="cloud_upload_confirm" type="checkbox"> Ask before uploading a photo</label>
+        <label class="checkbox-label"><input name="cache_vlm_evidence" type="checkbox"> Cache AI evidence locally</label>
+        <label class="checkbox-label"><input name="require_review_before_generate" type="checkbox"> Require review before model generation</label>
+      </section>
+      <section class="settings-section">
+        <h3>Diagnostics</h3>
+        <div id="settings-diagnostics" class="settings-diagnostics">Checking local service…</div>
+        <button id="btn-refresh-settings" class="btn secondary" type="button">Refresh diagnostics</button>
+      </section>
+    </form>
+    <footer class="settings-actions"><button id="btn-settings-cancel" class="btn secondary" type="button">Cancel</button><button id="btn-settings-save" class="btn primary" type="button">Save settings</button></footer>
+  </aside>
 
   <main class="layout">
     <aside class="panel sources">

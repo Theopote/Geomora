@@ -76,7 +76,20 @@ module Geomora
           dialog.add_action_callback('ready') do |_ctx, _|
             payload = default_payload
             dialog.execute_script("window.geomora.loadPayload(#{payload.to_json})")
+            push_settings(dialog)
             Core::WorkspaceSelectionSync.start(dialog)
+          end
+
+          dialog.add_action_callback('save_settings') do |_ctx, json|
+            settings = Core::Settings.save(JSON.parse(json))
+            dialog.execute_script("window.geomora.setSettings(#{settings.to_json})")
+            post_message(dialog, 'success', 'Settings saved on this computer.')
+          rescue JSON::ParserError => e
+            post_message(dialog, 'error', "Invalid settings: #{e.message}")
+          end
+
+          dialog.add_action_callback('refresh_settings_capabilities') do |_ctx, _|
+            push_settings(dialog)
           end
 
           dialog.add_action_callback('select_model_entity') do |_ctx, json|
@@ -388,7 +401,9 @@ module Geomora
               raise GeomoraError, 'Load and rectify a facade image before reconstruction.'
             end
 
+            ai_settings = Core::Settings.sanitize(params['ai_settings'])
             method = params['detection_method'].to_s.strip
+            method = ai_settings['detection_method'] if method.empty? || method == 'auto'
             method = 'auto' if method.empty?
             metric = unless auto_scale_enabled?(params)
                        {
@@ -899,6 +914,18 @@ module Geomora
 
         def post_message(dialog, level, message)
           dialog.execute_script("window.geomora.setStatus(#{level.to_json}, #{message.to_json})")
+        end
+
+        def push_settings(dialog)
+          capabilities = Perception::SettingsClient.capabilities
+          dialog.execute_script(
+            "window.geomora.setSettings(#{Core::Settings.load.to_json}, #{capabilities.to_json})"
+          )
+        rescue GeomoraError => e
+          dialog.execute_script(
+            "window.geomora.setSettings(#{Core::Settings.load.to_json}, " \
+            "#{({ 'service_available' => false, 'message' => e.message }).to_json})"
+          )
         end
       end
     end

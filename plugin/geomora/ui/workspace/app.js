@@ -34,7 +34,10 @@
     uncertaintyDecisions: {},
     modelSelectionEvidence: null,
     activeStoreyIndex: 0,
-    storeyWindows: [[]]
+    storeyWindows: [[]],
+    settings: {},
+    settingsSnapshot: {},
+    capabilities: {}
   };
 
   const els = {
@@ -73,8 +76,68 @@
     btnExportYoloLabels: document.getElementById('btn-export-yolo-labels'),
     registerMethod: document.getElementById('register-method'),
     depthMethod: document.getElementById('depth-method'),
-    storeyWindowBar: document.getElementById('storey-window-bar')
+    storeyWindowBar: document.getElementById('storey-window-bar'),
+    settingsPanel: document.getElementById('settings-panel'),
+    settingsBackdrop: document.getElementById('settings-backdrop'),
+    settingsForm: document.getElementById('settings-form')
   };
+
+  function setSettings(settings, capabilities) {
+    state.settings = Object.assign({}, settings || {});
+    state.settingsSnapshot = Object.assign({}, state.settings);
+    state.capabilities = capabilities || state.capabilities || {};
+    Object.keys(state.settings).forEach(function (key) {
+      const input = els.settingsForm && els.settingsForm.elements.namedItem(key);
+      if (!input) return;
+      if (input.type === 'checkbox') input.checked = !!state.settings[key];
+      else input.value = state.settings[key];
+    });
+    renderSettingsCapabilities();
+  }
+
+  function settingsFormValue() {
+    const data = new FormData(els.settingsForm);
+    return {
+      routing_mode: data.get('routing_mode'), vlm_provider: data.get('vlm_provider'),
+      vlm_model: data.get('vlm_model') || 'auto', detection_method: data.get('detection_method'),
+      depth_method: data.get('depth_method'), onnx_device: data.get('onnx_device'),
+      cloud_upload_confirm: data.get('cloud_upload_confirm') === 'on',
+      cache_vlm_evidence: data.get('cache_vlm_evidence') === 'on',
+      require_review_before_generate: data.get('require_review_before_generate') === 'on'
+    };
+  }
+
+  function renderSettingsCapabilities() {
+    const caps = state.capabilities || {};
+    const providers = caps.cloud_providers || {};
+    [['openai', providers.openai], ['gemini', providers.gemini]].forEach(function (entry) {
+      const node = document.getElementById(entry[0] + '-status');
+      if (!node) return;
+      const ready = !!(entry[1] && entry[1].configured);
+      node.textContent = ready ? 'Configured' : 'Not configured';
+      node.className = ready ? 'ready' : 'missing';
+    });
+    const local = caps.local_inference || {};
+    const diagnostic = document.getElementById('settings-diagnostics');
+    if (diagnostic) diagnostic.textContent = caps.service_available
+      ? 'Backend ' + (caps.service_version || '') + ' · YOLO ' + (local.yolo_available ? 'ready' : 'unavailable') + ' · MobileSAM ' + (local.sam_onnx_available ? 'ready' : 'unavailable')
+      : (caps.message || 'Local perception service unavailable.');
+  }
+
+  function openSettings() {
+    setSettings(state.settings, state.capabilities);
+    els.settingsPanel.hidden = false;
+    els.settingsBackdrop.hidden = false;
+    els.settingsPanel.setAttribute('aria-hidden', 'false');
+    sketchupCall('refresh_settings_capabilities');
+  }
+
+  function closeSettings(restore) {
+    if (restore) setSettings(state.settingsSnapshot, state.capabilities);
+    els.settingsPanel.hidden = true;
+    els.settingsBackdrop.hidden = true;
+    els.settingsPanel.setAttribute('aria-hidden', 'true');
+  }
 
   function cloneWindows(windows) {
     return (windows || []).map(function (win) {
@@ -1463,6 +1526,7 @@
     const windows = storeyWindows[state.activeStoreyIndex] || storeyWindows[0] || [];
 
     return {
+      ai_settings: Object.assign({}, state.settings),
       project_name: formData.get('project_name'),
       wall_length: Number(formData.get('wall_length')),
       wall_height: Number(formData.get('wall_height')),
@@ -2056,6 +2120,7 @@
   }
 
   window.geomora = {
+    setSettings: setSettings,
     loadPayload: loadPayload,
     setImage: setImage,
     resetCorners: resetCorners,
@@ -2204,6 +2269,20 @@
 
   enhanceInspector();
   if (els.treeReviewOnly) els.treeReviewOnly.addEventListener('change', renderTree);
+
+  document.getElementById('btn-settings').addEventListener('click', openSettings);
+  document.getElementById('btn-settings-close').addEventListener('click', function () { closeSettings(true); });
+  document.getElementById('btn-settings-cancel').addEventListener('click', function () { closeSettings(true); });
+  els.settingsBackdrop.addEventListener('click', function () { closeSettings(true); });
+  document.getElementById('btn-refresh-settings').addEventListener('click', function () { sketchupCall('refresh_settings_capabilities'); });
+  document.getElementById('btn-settings-save').addEventListener('click', function () {
+    state.settings = settingsFormValue();
+    sketchupCall('save_settings', JSON.stringify(state.settings));
+    closeSettings(false);
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !els.settingsPanel.hidden) closeSettings(true);
+  });
 
   document.getElementById('btn-pick-image').addEventListener('click', function () {
     sketchupCall('pick_image');

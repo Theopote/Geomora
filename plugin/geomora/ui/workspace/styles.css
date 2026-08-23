@@ -64,6 +64,41 @@ body {
   text-align: right;
 }
 
+.icon-button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid #3b3f47;
+  border-radius: 7px;
+  background: #24272c;
+  color: #d8dbe1;
+  cursor: pointer;
+}
+
+.icon-button:hover { background: #30343a; border-color: #59606c; }
+.icon-button .icon { margin: 0; }
+
+.settings-backdrop { position: fixed; inset: 0; z-index: 20; background: rgba(0, 0, 0, .55); }
+.settings-panel { position: fixed; z-index: 21; top: 0; right: 0; bottom: 0; width: min(440px, 92vw); display: flex; flex-direction: column; background: #202226; border-left: 1px solid #41454e; box-shadow: -12px 0 32px rgba(0,0,0,.35); }
+.settings-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #373a41; }
+.settings-header h2 { margin: 0; font-size: 18px; }
+.settings-header p { margin: 3px 0 0; color: #9da3ad; font-size: 12px; }
+.settings-form { flex: 1; overflow: auto; padding: 8px 16px; }
+.settings-section { padding: 10px 0 12px; border-bottom: 1px solid #35383e; }
+.settings-section h3 { margin: 0 0 9px; font-size: 13px; color: #d7dbe2; }
+.settings-section > label:not(.checkbox-label) { display: grid; grid-template-columns: 125px 1fr; gap: 10px; align-items: center; margin: 7px 0; color: #bfc4cc; font-size: 12px; }
+.settings-section select, .settings-section input[type="text"] { width: 100%; padding: 7px 8px; border: 1px solid #454a54; border-radius: 6px; background: #17191c; color: #f1f3f4; }
+.settings-help { margin: 7px 0 0; color: #9299a4; font-size: 11px; line-height: 1.45; }
+.provider-status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 9px; }
+.provider-status-grid > div { display: flex; justify-content: space-between; padding: 8px; border-radius: 6px; background: #191b1f; font-size: 11px; }
+.provider-status-grid strong.ready { color: #81c995; }
+.provider-status-grid strong.missing { color: #f6aea9; }
+.settings-diagnostics { margin-bottom: 8px; padding: 8px; border-radius: 6px; background: #191b1f; color: #aeb5bf; font-size: 11px; line-height: 1.5; }
+.settings-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 16px; border-top: 1px solid #373a41; background: #1b1d20; }
+
 .workflow-steps {
   display: flex;
   gap: 4px;

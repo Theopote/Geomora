@@ -8,6 +8,7 @@ module Geomora
     version
     core/errors
     core/logger
+    core/settings
     core/loader
     geometry/units
     geometry/vectors
@@ -46,6 +47,7 @@ module Geomora
     perception/detection_result
     perception/detect_client
     perception/reconstruction_client
+    perception/settings_client
     perception/video_frame_client
     perception/multiview_result
     perception/multiview_client

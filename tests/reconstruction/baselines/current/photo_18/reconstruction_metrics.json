@@ -31,8 +31,12 @@
   },
   "geometry": {
     "normalized_mae": null,
+    "width_facade_mae": null,
+    "height_storey_mae": null,
+    "sill_storey_mae": null,
     "matched_openings": 0,
-    "ground_truth_openings": 7
+    "ground_truth_openings": 7,
+    "iou_threshold": 0.5
   },
   "scale": null,
   "rationalization": null,

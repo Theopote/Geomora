@@ -17,7 +17,12 @@
       ],
       "confidence": 0.8307,
       "storey": 1,
-      "bay": 4
+      "bay": 4,
+      "geometry": {
+        "width_facade": 0.0984,
+        "height_storey": 1.09,
+        "sill_storey": 0.8845
+      }
     },
     {
       "id": "pred_002",
@@ -30,7 +35,12 @@
       ],
       "confidence": 0.6631,
       "storey": 4,
-      "bay": 1
+      "bay": 1,
+      "geometry": {
+        "width_facade": 0.0294,
+        "height_storey": 3.0335,
+        "sill_storey": 0.958
+      }
     },
     {
       "id": "pred_003",
@@ -43,7 +53,12 @@
       ],
       "confidence": 0.6457,
       "storey": 2,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.0853,
+        "height_storey": 0.2215,
+        "sill_storey": 0.477
+      }
     },
     {
       "id": "pred_004",
@@ -56,7 +71,12 @@
       ],
       "confidence": 0.695,
       "storey": 4,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.054,
+        "height_storey": 0.9085,
+        "sill_storey": 0.8355
+      }
     },
     {
       "id": "pred_005",
@@ -69,7 +89,12 @@
       ],
       "confidence": 0.693,
       "storey": 4,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.0475,
+        "height_storey": 0.752,
+        "sill_storey": 0.9525
+      }
     },
     {
       "id": "pred_006",
@@ -82,7 +107,12 @@
       ],
       "confidence": 0.6639,
       "storey": 1,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.061,
+        "height_storey": 0.2135,
+        "sill_storey": 0.308
+      }
     },
     {
       "id": "pred_007",
@@ -95,7 +125,12 @@
       ],
       "confidence": 0.623,
       "storey": 4,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.048,
+        "height_storey": 0.7585,
+        "sill_storey": 0.937
+      }
     },
     {
       "id": "pred_008",
@@ -108,7 +143,12 @@
       ],
       "confidence": 0.552,
       "storey": 4,
-      "bay": 3
+      "bay": 3,
+      "geometry": {
+        "width_facade": 0.0439,
+        "height_storey": 0.775,
+        "sill_storey": 0.922
+      }
     },
     {
       "id": "pred_009",
@@ -121,7 +161,12 @@
       ],
       "confidence": 0.7402,
       "storey": 2,
-      "bay": 3
+      "bay": 3,
+      "geometry": {
+        "width_facade": 0.0619,
+        "height_storey": 0.3475,
+        "sill_storey": 0.256
+      }
     },
     {
       "id": "pred_010",
@@ -134,7 +179,12 @@
       ],
       "confidence": 0.8841,
       "storey": 4,
-      "bay": 3
+      "bay": 3,
+      "geometry": {
+        "width_facade": 0.0454,
+        "height_storey": 0.7275,
+        "sill_storey": 0.963
+      }
     },
     {
       "id": "pred_011",
@@ -147,7 +197,12 @@
       ],
       "confidence": 0.6697,
       "storey": 3,
-      "bay": 3
+      "bay": 3,
+      "geometry": {
+        "width_facade": 0.1237,
+        "height_storey": 0.363,
+        "sill_storey": 0.8485
+      }
     },
     {
       "id": "pred_012",
@@ -160,7 +215,12 @@
       ],
       "confidence": 0.6681,
       "storey": 5,
-      "bay": 3
+      "bay": 3,
+      "geometry": {
+        "width_facade": 0.0653,
+        "height_storey": 0.1895,
+        "sill_storey": 0.455
+      }
     },
     {
       "id": "pred_013",
@@ -173,7 +233,12 @@
       ],
       "confidence": 0.7779,
       "storey": 4,
-      "bay": 3
+      "bay": 3,
+      "geometry": {
+        "width_facade": 0.0439,
+        "height_storey": 0.7225,
+        "sill_storey": 0.972
+      }
     },
     {
       "id": "pred_014",
@@ -186,7 +251,12 @@
       ],
       "confidence": 0.7633,
       "storey": 4,
-      "bay": 4
+      "bay": 4,
+      "geometry": {
+        "width_facade": 0.044,
+        "height_storey": 0.741,
+        "sill_storey": 0.9555
+      }
     },
     {
       "id": "pred_015",
@@ -199,7 +269,12 @@
       ],
       "confidence": 0.8328,
       "storey": 4,
-      "bay": 4
+      "bay": 4,
+      "geometry": {
+        "width_facade": 0.044,
+        "height_storey": 0.718,
+        "sill_storey": 0.98
+      }
     },
     {
       "id": "pred_016",
@@ -212,7 +287,12 @@
       ],
       "confidence": 0.718,
       "storey": 4,
-      "bay": 4
+      "bay": 4,
+      "geometry": {
+        "width_facade": 0.0453,
+        "height_storey": 0.7675,
+        "sill_storey": 0.958
+      }
     },
     {
       "id": "pred_017",
@@ -225,7 +305,12 @@
       ],
       "confidence": 0.7308,
       "storey": 1,
-      "bay": 5
+      "bay": 5,
+      "geometry": {
+        "width_facade": 0.0575,
+        "height_storey": 0.174,
+        "sill_storey": 0.0
+      }
     },
     {
       "id": "pred_018",
@@ -238,7 +323,12 @@
       ],
       "confidence": 0.9491,
       "storey": 5,
-      "bay": 5
+      "bay": 5,
+      "geometry": {
+        "width_facade": 0.0747,
+        "height_storey": 1.533,
+        "sill_storey": 0.4525
+      }
     }
   ],
   "pipeline": {
@@ -258,5 +348,9 @@
     "method": "cluster_v0.1",
     "window_row_count": 5,
     "window_column_count": 5
+  },
+  "geometry": {
+    "method": "bbox_ratios_v0.1",
+    "opening_count": 18
   }
 }

@@ -17,7 +17,12 @@
       ],
       "confidence": 0.7309,
       "storey": 2,
-      "bay": 1
+      "bay": 1,
+      "geometry": {
+        "width_facade": 0.0371,
+        "height_storey": 1.129,
+        "sill_storey": 0.1495
+      }
     },
     {
       "id": "pred_002",
@@ -30,7 +35,12 @@
       ],
       "confidence": 0.658,
       "storey": 2,
-      "bay": 3
+      "bay": 3,
+      "geometry": {
+        "width_facade": 1.0,
+        "height_storey": 3.2615,
+        "sill_storey": 0.4365
+      }
     },
     {
       "id": "pred_003",
@@ -43,7 +53,12 @@
       ],
       "confidence": 0.6411,
       "storey": 1,
-      "bay": 1
+      "bay": 1,
+      "geometry": {
+        "width_facade": 0.0451,
+        "height_storey": 0.367,
+        "sill_storey": 0.367
+      }
     },
     {
       "id": "pred_004",
@@ -56,7 +71,12 @@
       ],
       "confidence": 0.4657,
       "storey": 5,
-      "bay": 1
+      "bay": 1,
+      "geometry": {
+        "width_facade": 0.0525,
+        "height_storey": 1.394,
+        "sill_storey": 0.593
+      }
     },
     {
       "id": "pred_005",
@@ -69,7 +89,12 @@
       ],
       "confidence": 0.6739,
       "storey": 1,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.1997,
+        "height_storey": 0.8445,
+        "sill_storey": 0.4295
+      }
     },
     {
       "id": "pred_006",
@@ -82,7 +107,12 @@
       ],
       "confidence": 0.3524,
       "storey": 3,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.0794,
+        "height_storey": 1.045,
+        "sill_storey": 0.87
+      }
     },
     {
       "id": "pred_007",
@@ -95,7 +125,12 @@
       ],
       "confidence": 0.6396,
       "storey": 2,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.0398,
+        "height_storey": 0.3805,
+        "sill_storey": 0.219
+      }
     },
     {
       "id": "pred_008",
@@ -108,7 +143,12 @@
       ],
       "confidence": 0.8225,
       "storey": 3,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.1131,
+        "height_storey": 1.184,
+        "sill_storey": 0.7355
+      }
     },
     {
       "id": "pred_009",
@@ -121,7 +161,12 @@
       ],
       "confidence": 0.7043,
       "storey": 2,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.0778,
+        "height_storey": 0.194,
+        "sill_storey": 0.0015
+      }
     },
     {
       "id": "pred_010",
@@ -134,7 +179,12 @@
       ],
       "confidence": 0.8301,
       "storey": 3,
-      "bay": 3
+      "bay": 3,
+      "geometry": {
+        "width_facade": 0.1096,
+        "height_storey": 1.184,
+        "sill_storey": 0.7285
+      }
     },
     {
       "id": "pred_011",
@@ -147,7 +197,12 @@
       ],
       "confidence": 0.8135,
       "storey": 3,
-      "bay": 4
+      "bay": 4,
+      "geometry": {
+        "width_facade": 0.1095,
+        "height_storey": 1.2185,
+        "sill_storey": 0.694
+      }
     },
     {
       "id": "pred_012",
@@ -160,7 +215,12 @@
       ],
       "confidence": 0.6954,
       "storey": 4,
-      "bay": 5
+      "bay": 5,
+      "geometry": {
+        "width_facade": 0.0848,
+        "height_storey": 0.159,
+        "sill_storey": 0.7535
+      }
     },
     {
       "id": "pred_013",
@@ -173,7 +233,12 @@
       ],
       "confidence": 0.5939,
       "storey": 3,
-      "bay": 5
+      "bay": 5,
+      "geometry": {
+        "width_facade": 0.0839,
+        "height_storey": 1.0695,
+        "sill_storey": 0.83
+      }
     }
   ],
   "pipeline": {
@@ -193,5 +258,9 @@
     "method": "cluster_v0.1",
     "window_row_count": 5,
     "window_column_count": 5
+  },
+  "geometry": {
+    "method": "bbox_ratios_v0.1",
+    "opening_count": 13
   }
 }

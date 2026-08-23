@@ -1,12 +1,16 @@
 {
   "photo_id": "photo_18",
-  "status": "topology_inferred",
+  "status": "topology_geometry_inferred",
   "topology": {
     "storey_count": 2,
     "bay_count": 4,
     "method": "cluster_v0.1",
     "window_row_count": 2,
     "window_column_count": 4
+  },
+  "geometry": {
+    "method": "bbox_ratios_v0.1",
+    "opening_count": 7
   },
   "openings": [
     {
@@ -20,7 +24,12 @@
       ],
       "confidence": 0.6957,
       "storey": 1,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.8943,
+        "height_storey": 1.3648,
+        "sill_storey": 0.167
+      }
     },
     {
       "id": "pred_002",
@@ -33,7 +42,12 @@
       ],
       "confidence": 0.7398,
       "storey": 1,
-      "bay": 1
+      "bay": 1,
+      "geometry": {
+        "width_facade": 0.1078,
+        "height_storey": 0.0908,
+        "sill_storey": 0.4718
+      }
     },
     {
       "id": "pred_003",
@@ -46,7 +60,12 @@
       ],
       "confidence": 0.6996,
       "storey": 1,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.0676,
+        "height_storey": 0.1016,
+        "sill_storey": 0.5046
+      }
     },
     {
       "id": "pred_004",
@@ -59,7 +78,12 @@
       ],
       "confidence": 0.6428,
       "storey": 1,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.0317,
+        "height_storey": 0.196,
+        "sill_storey": 0.3956
+      }
     },
     {
       "id": "pred_005",
@@ -72,7 +96,12 @@
       ],
       "confidence": 0.3426,
       "storey": 2,
-      "bay": 3
+      "bay": 3,
+      "geometry": {
+        "width_facade": 0.1577,
+        "height_storey": 0.1586,
+        "sill_storey": 0.7428
+      }
     },
     {
       "id": "pred_006",
@@ -85,7 +114,12 @@
       ],
       "confidence": 0.6603,
       "storey": 1,
-      "bay": 3
+      "bay": 3,
+      "geometry": {
+        "width_facade": 0.0613,
+        "height_storey": 0.1052,
+        "sill_storey": 0.363
+      }
     },
     {
       "id": "pred_007",
@@ -98,8 +132,13 @@
       ],
       "confidence": 0.3542,
       "storey": 2,
-      "bay": 4
+      "bay": 4,
+      "geometry": {
+        "width_facade": 0.0738,
+        "height_storey": 0.152,
+        "sill_storey": 0.7388
+      }
     }
   ],
-  "notes": "Rule-based storey/bay clustering from detection (cluster_v0.1)"
+  "notes": "Rule-based storey/bay clustering + facade-relative geometry ratios (v0.1)"
 }

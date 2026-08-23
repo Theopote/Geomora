@@ -30,15 +30,19 @@
     "matched_openings": 2
   },
   "geometry": {
-    "normalized_mae": null,
-    "matched_openings": 0,
-    "ground_truth_openings": 6
+    "normalized_mae": 0.2133,
+    "width_facade_mae": 0.027,
+    "height_storey_mae": 0.1183,
+    "sill_storey_mae": 0.4945,
+    "matched_openings": 2,
+    "ground_truth_openings": 6,
+    "iou_threshold": 0.5
   },
   "scale": null,
   "rationalization": null,
   "sketchup": null,
-  "rqs": 25.7,
-  "coverage": 0.5,
+  "rqs": 40.8,
+  "coverage": 0.7,
   "not_evaluated": [
     "scale",
     "rationalization",

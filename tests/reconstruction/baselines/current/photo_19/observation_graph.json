@@ -239,8 +239,8 @@
       },
       "semantic_candidates": {
         "unknown_opening": 0.0462,
-        "window": 0.7779,
-        "door": 0.0616
+        "door": 0.0616,
+        "window": 0.7779
       },
       "confidence": 0.7779,
       "sources": [
@@ -274,8 +274,8 @@
       },
       "semantic_candidates": {
         "unknown_opening": 0.0284,
-        "window": 0.8328,
-        "door": 0.0379
+        "door": 0.0379,
+        "window": 0.8328
       },
       "confidence": 0.8328,
       "sources": [
@@ -309,8 +309,8 @@
       },
       "semantic_candidates": {
         "unknown_opening": 0.0423,
-        "window": 0.7431,
-        "door": 0.0564
+        "door": 0.0564,
+        "window": 0.7431
       },
       "confidence": 0.7431,
       "sources": [

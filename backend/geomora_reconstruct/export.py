@@ -5,6 +5,7 @@ from typing import Any
 
 from geomora_detect.models import DetectionResult
 
+from .geometry_inference import attach_geometry_to_openings, summarize_geometry
 from .topology_inference import infer_topology_from_openings
 
 
@@ -14,6 +15,7 @@ def detection_to_prediction(
     *,
     topology: dict[str, Any] | None = None,
     infer_topology: bool = True,
+    attach_geometry: bool = True,
     metric: dict[str, Any] | None = None,
     rationalization_before: dict[str, float] | None = None,
     rationalization_after: dict[str, float] | None = None,
@@ -30,14 +32,20 @@ def detection_to_prediction(
             }
         )
 
+    facade = {"width": 1.0, "height": 1.0}
     topology_payload = topology
     if topology_payload is None and infer_topology and openings:
         topology_payload, openings = infer_topology_from_openings(openings)
 
+    geometry_payload = None
+    if attach_geometry and openings and topology_payload is not None:
+        openings = attach_geometry_to_openings(openings, facade, topology_payload)
+        geometry_payload = summarize_geometry(openings)
+
     payload: dict[str, Any] = {
         "schema_version": "reconstruction-metrics-v1",
         "photo_id": photo_id,
-        "facade": {"width": 1.0, "height": 1.0},
+        "facade": facade,
         "openings": openings,
         "pipeline": {
             "detection_method": detection.method,
@@ -47,6 +55,8 @@ def detection_to_prediction(
     }
     if topology_payload is not None:
         payload["topology"] = topology_payload
+    if geometry_payload is not None:
+        payload["geometry"] = geometry_payload
     if metric is not None:
         payload["metric"] = metric
     if rationalization_before is not None:

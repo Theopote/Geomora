@@ -4,8 +4,8 @@
     "photos": 5,
     "evaluated": 5,
     "full_coverage_count": 0,
-    "mean_coverage": 0.5,
-    "mean_rqs": 30.4,
+    "mean_coverage": 0.66,
+    "mean_rqs": 39.4,
     "mean_window_recall": 0.4967,
     "mean_window_precision": 0.3228,
     "gate_ready": false
@@ -47,15 +47,19 @@
           "matched_openings": 1
         },
         "geometry": {
-          "normalized_mae": null,
-          "matched_openings": 0,
-          "ground_truth_openings": 3
+          "normalized_mae": 0.1956,
+          "width_facade_mae": 0.1002,
+          "height_storey_mae": 0.0792,
+          "sill_storey_mae": 0.4074,
+          "matched_openings": 1,
+          "ground_truth_openings": 3,
+          "iou_threshold": 0.5
         },
         "scale": null,
         "rationalization": null,
         "sketchup": null,
-        "rqs": 33.7,
-        "coverage": 0.5,
+        "rqs": 47.1,
+        "coverage": 0.7,
         "not_evaluated": [
           "scale",
           "rationalization",
@@ -99,15 +103,19 @@
           "matched_openings": 5
         },
         "geometry": {
-          "normalized_mae": null,
-          "matched_openings": 0,
-          "ground_truth_openings": 8
+          "normalized_mae": 0.4551,
+          "width_facade_mae": 0.0171,
+          "height_storey_mae": 0.7017,
+          "sill_storey_mae": 0.6466,
+          "matched_openings": 5,
+          "ground_truth_openings": 8,
+          "iou_threshold": 0.5
         },
         "scale": null,
         "rationalization": null,
         "sketchup": null,
-        "rqs": 31.0,
-        "coverage": 0.5,
+        "rqs": 37.7,
+        "coverage": 0.7,
         "not_evaluated": [
           "scale",
           "rationalization",
@@ -151,15 +159,19 @@
           "matched_openings": 2
         },
         "geometry": {
-          "normalized_mae": null,
-          "matched_openings": 0,
-          "ground_truth_openings": 6
+          "normalized_mae": 0.2133,
+          "width_facade_mae": 0.027,
+          "height_storey_mae": 0.1183,
+          "sill_storey_mae": 0.4945,
+          "matched_openings": 2,
+          "ground_truth_openings": 6,
+          "iou_threshold": 0.5
         },
         "scale": null,
         "rationalization": null,
         "sketchup": null,
-        "rqs": 25.7,
-        "coverage": 0.5,
+        "rqs": 40.8,
+        "coverage": 0.7,
         "not_evaluated": [
           "scale",
           "rationalization",
@@ -204,8 +216,12 @@
         },
         "geometry": {
           "normalized_mae": null,
+          "width_facade_mae": null,
+          "height_storey_mae": null,
+          "sill_storey_mae": null,
           "matched_openings": 0,
-          "ground_truth_openings": 7
+          "ground_truth_openings": 7,
+          "iou_threshold": 0.5
         },
         "scale": null,
         "rationalization": null,
@@ -255,15 +271,19 @@
           "matched_openings": 9
         },
         "geometry": {
-          "normalized_mae": null,
-          "matched_openings": 0,
-          "ground_truth_openings": 15
+          "normalized_mae": 0.4059,
+          "width_facade_mae": 0.0037,
+          "height_storey_mae": 0.4521,
+          "sill_storey_mae": 0.7621,
+          "matched_openings": 9,
+          "ground_truth_openings": 15,
+          "iou_threshold": 0.5
         },
         "scale": null,
         "rationalization": null,
         "sketchup": null,
-        "rqs": 23.9,
-        "coverage": 0.5,
+        "rqs": 34.0,
+        "coverage": 0.7,
         "not_evaluated": [
           "scale",
           "rationalization",

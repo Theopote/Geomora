@@ -1,12 +1,16 @@
 {
   "photo_id": "photo_01",
-  "status": "topology_inferred",
+  "status": "topology_geometry_inferred",
   "topology": {
     "storey_count": 1,
     "bay_count": 5,
     "method": "cluster_v0.1",
     "window_row_count": 1,
     "window_column_count": 5
+  },
+  "geometry": {
+    "method": "bbox_ratios_v0.1",
+    "opening_count": 5
   },
   "openings": [
     {
@@ -20,7 +24,12 @@
       ],
       "confidence": 0.662,
       "storey": 1,
-      "bay": 3
+      "bay": 3,
+      "geometry": {
+        "width_facade": 1.0,
+        "height_storey": 0.3085,
+        "sill_storey": 0.2297
+      }
     },
     {
       "id": "pred_002",
@@ -33,7 +42,12 @@
       ],
       "confidence": 0.7422,
       "storey": 1,
-      "bay": 1
+      "bay": 1,
+      "geometry": {
+        "width_facade": 0.0599,
+        "height_storey": 0.0532,
+        "sill_storey": 0.452
+      }
     },
     {
       "id": "pred_003",
@@ -46,7 +60,12 @@
       ],
       "confidence": 0.7933,
       "storey": 1,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.0738,
+        "height_storey": 0.0498,
+        "sill_storey": 0.4433
+      }
     },
     {
       "id": "pred_004",
@@ -59,7 +78,12 @@
       ],
       "confidence": 0.8115,
       "storey": 1,
-      "bay": 4
+      "bay": 4,
+      "geometry": {
+        "width_facade": 0.3715,
+        "height_storey": 0.1898,
+        "sill_storey": 0.3478
+      }
     },
     {
       "id": "pred_005",
@@ -72,8 +96,13 @@
       ],
       "confidence": 0.7687,
       "storey": 1,
-      "bay": 5
+      "bay": 5,
+      "geometry": {
+        "width_facade": 0.1424,
+        "height_storey": 0.0654,
+        "sill_storey": 0.4491
+      }
     }
   ],
-  "notes": "Rule-based storey/bay clustering from detection (cluster_v0.1)"
+  "notes": "Rule-based storey/bay clustering + facade-relative geometry ratios (v0.1)"
 }

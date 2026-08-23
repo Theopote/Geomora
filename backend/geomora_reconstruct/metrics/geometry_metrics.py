@@ -2,39 +2,46 @@ from __future__ import annotations
 
 from typing import Any
 
+from ..geometry_inference import opening_geometry_ratios
 from .common import mean, rounded
+from .matching import match_openings_by_iou
 
 
-def _ratios(item: dict[str, Any], facade: dict[str, float], topology: dict[str, Any]) -> dict[str, float]:
-    x1, y1, x2, y2 = item["bbox"]
-    facade_width = facade.get("width", 1.0)
-    facade_height = facade.get("height", 1.0)
-    storeys = max(int(topology.get("storey_count", 1)), 1)
-    storey_height = facade_height / storeys
-    return {
-        "width_facade": (x2 - x1) / facade_width,
-        "height_storey": (y2 - y1) / storey_height,
-        "sill_storey": (facade_height - y2) % storey_height / storey_height,
-    }
-
-
-def evaluate_geometry(truth: dict[str, Any], prediction: dict[str, Any]) -> dict[str, Any] | None:
+def evaluate_geometry(
+    truth: dict[str, Any],
+    prediction: dict[str, Any],
+    *,
+    iou_threshold: float = 0.5,
+) -> dict[str, Any] | None:
     if not all(key in truth and key in prediction for key in ("facade", "openings", "topology")):
         return None
-    predicted_by_id = {item.get("id"): item for item in prediction["openings"]}
+
     errors: list[float] = []
-    matched = 0
-    for expected in truth["openings"]:
-        actual = predicted_by_id.get(expected.get("id"))
-        if actual is None:
-            continue
-        expected_ratios = _ratios(expected, truth["facade"], truth["topology"])
-        actual_ratios = _ratios(actual, prediction["facade"], prediction["topology"])
-        errors.extend(abs(actual_ratios[key] - value) for key, value in expected_ratios.items())
-        matched += 1
+    width_errors: list[float] = []
+    height_errors: list[float] = []
+    sill_errors: list[float] = []
+    pairs = match_openings_by_iou(
+        truth["openings"],
+        prediction["openings"],
+        iou_threshold=iou_threshold,
+    )
+
+    for expected, actual in pairs:
+        expected_ratios = opening_geometry_ratios(expected, truth["facade"], truth["topology"])
+        actual_ratios = opening_geometry_ratios(actual, prediction["facade"], prediction["topology"])
+        for key in ("width_facade", "height_storey", "sill_storey"):
+            delta = abs(actual_ratios[key] - expected_ratios[key])
+            errors.append(delta)
+        width_errors.append(abs(actual_ratios["width_facade"] - expected_ratios["width_facade"]))
+        height_errors.append(abs(actual_ratios["height_storey"] - expected_ratios["height_storey"]))
+        sill_errors.append(abs(actual_ratios["sill_storey"] - expected_ratios["sill_storey"]))
+
     return {
         "normalized_mae": rounded(mean(errors)),
-        "matched_openings": matched,
+        "width_facade_mae": rounded(mean(width_errors)),
+        "height_storey_mae": rounded(mean(height_errors)),
+        "sill_storey_mae": rounded(mean(sill_errors)),
+        "matched_openings": len(pairs),
         "ground_truth_openings": len(truth["openings"]),
+        "iou_threshold": iou_threshold,
     }
-

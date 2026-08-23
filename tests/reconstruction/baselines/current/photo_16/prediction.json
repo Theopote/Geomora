@@ -17,7 +17,12 @@
       ],
       "confidence": 0.7779,
       "storey": 1,
-      "bay": 1
+      "bay": 1,
+      "geometry": {
+        "width_facade": 0.0323,
+        "height_storey": 0.1036,
+        "sill_storey": 0.0678
+      }
     },
     {
       "id": "pred_002",
@@ -30,7 +35,12 @@
       ],
       "confidence": 0.7814,
       "storey": 1,
-      "bay": 2
+      "bay": 2,
+      "geometry": {
+        "width_facade": 0.2719,
+        "height_storey": 0.3706,
+        "sill_storey": 0.9436
+      }
     },
     {
       "id": "pred_003",
@@ -43,7 +53,12 @@
       ],
       "confidence": 0.6752,
       "storey": 1,
-      "bay": 3
+      "bay": 3,
+      "geometry": {
+        "width_facade": 0.1709,
+        "height_storey": 0.4764,
+        "sill_storey": 0.8608
+      }
     },
     {
       "id": "pred_004",
@@ -56,7 +71,12 @@
       ],
       "confidence": 0.6536,
       "storey": 2,
-      "bay": 4
+      "bay": 4,
+      "geometry": {
+        "width_facade": 0.2651,
+        "height_storey": 1.4108,
+        "sill_storey": 0.5892
+      }
     }
   ],
   "pipeline": {
@@ -76,5 +96,9 @@
     "method": "cluster_v0.1",
     "window_row_count": 2,
     "window_column_count": 4
+  },
+  "geometry": {
+    "method": "bbox_ratios_v0.1",
+    "opening_count": 4
   }
 }

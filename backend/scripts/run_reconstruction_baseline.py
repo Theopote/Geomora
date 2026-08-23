@@ -98,10 +98,11 @@ def run_photo(
     prediction = detection_to_prediction(photo_id, detection)
     rationalized = {
         "photo_id": photo_id,
-        "status": "topology_inferred",
+        "status": "topology_geometry_inferred",
         "topology": prediction.get("topology"),
+        "geometry": prediction.get("geometry"),
         "openings": prediction.get("openings"),
-        "notes": "Rule-based storey/bay clustering from detection (cluster_v0.1)",
+        "notes": "Rule-based storey/bay clustering + facade-relative geometry ratios (v0.1)",
     }
     architectural_ir = {
         "photo_id": photo_id,

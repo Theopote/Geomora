@@ -213,7 +213,16 @@ def list_gemini_models(api_key: str, *, timeout: float = 30.0) -> list[str]:
         follow_redirects=True,
     ) as client:
         response = client.get(url, headers=gemini_headers(api_key))
-        response.raise_for_status()
+        if response.is_error:
+            try:
+                error_body = response.json()
+                detail = json.dumps(error_body, ensure_ascii=False)
+            except ValueError:
+                detail = response.text
+            raise RuntimeError(
+                f"Gemini model listing returned HTTP {response.status_code}: "
+                f"{sanitize_error_message(detail[:1000], api_key)}"
+            )
         body = response.json()
     models: list[str] = []
     for item in body.get("models", []):

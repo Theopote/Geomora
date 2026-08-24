@@ -29,7 +29,7 @@ multiple subsystems, not development phases.
 
 | ID | Subsystem | Maturity | Current evidence | Next exit work |
 |----|-----------|----------|------------------|----------------|
-| **RC-M** | Metrics & Ground Truth | **Prototype** | Metrics v1, five-photo GT, GT validator, RC-G1 evaluator | Complete two-person GT review and record reproducible baseline |
+| **RC-M** | Metrics & Ground Truth | **Prototype** | Metrics v1, five-photo GT clean (5/5, 0 errors, 0 warnings), frozen baseline recorded | Freeze reviewed VLM evidence and record the A-E ablation |
 | **RC-O** | Observation Graph | **Prototype** | CV, structural, depth and VLM adapters feed a shared graph | Validate provenance/fusion on reviewed real photos |
 | **RC-U** | Architectural Understanding | **Prototype** | Storey, bay, opening and pattern hypotheses run in production | Measure topology accuracy beyond regular window arrays |
 | **RC-S** | Metric Scale & Anchors | **Experimental** | Typed anchors and scale derivation exist | Validate multi-anchor consistency and anchored scale error |
@@ -47,7 +47,7 @@ not passed. This is not a sequencing contradiction.
 
 | Gate | Meaning | Status |
 |------|---------|--------|
-| **RC-G0** | Prototype Bootstrap — pipeline and objective measurement execute coherently | Not yet recorded on the frozen baseline |
+| **RC-G0** | Prototype Bootstrap — pipeline and objective measurement execute coherently | **Recorded — FAIL** (`storey_accuracy = 0.4667 < 0.50`; RQS and coverage pass) |
 | **RC-G1** | Reconstruction Alpha — credible topology, detection, geometry and editable output on the frozen benchmark | Not passed |
 | **RC-G2** | Product Beta — stronger expanded-set quality and product readiness evidence | Not evaluated |
 
@@ -100,13 +100,11 @@ as Validated merely because it is connected to the production pipeline.
 
 This is a dependency-aware queue, not a phase sequence.
 
-1. **RC-M:** finish GT audit and freeze the minimal baseline inputs.
-2. **RC-M/RC-E:** record the current full Reconstruction Metrics baseline.
-3. **RC-S:** verify typed Metric Anchor mathematics and multi-anchor residuals.
-4. **RC-C:** run solver on/off ablation; fix hard-constraint failures before adding constraint types.
-5. **RC-A/RC-U:** run frozen CV-only vs CV+VLM topology ablation.
-6. **RC-G0:** record the bootstrap result without making a usability claim.
-7. **RC-G1:** evaluate Alpha and publish failed criteria without threshold tuning to individual photos.
+1. **RC-A:** freeze and human-review VLM evidence for the five-photo baseline.
+2. **RC-A/RC-U:** run the formal A-E ablation and paired CV-only/CV+VLM benchmark from frozen evidence.
+3. **RC-M:** publish every stage delta without changing GT, gates, detector parameters, Understanding tolerances, or Solver weights.
+4. **Reconstruction Core:** choose exactly one P0 algorithm target from the measured deltas.
+5. **RC-G1:** re-evaluate Alpha only after that evidence-selected algorithm sprint; publish failed criteria without threshold tuning to individual photos.
 
 No heuristic may be added solely to make one benchmark photo pass. Every
 heuristic needs an architectural rationale and train/validation regression

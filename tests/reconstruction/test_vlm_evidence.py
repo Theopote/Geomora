@@ -82,3 +82,26 @@ def test_openai_architecture_request_uses_responses_structured_output(monkeypatc
     assert captured["payload"]["text"]["format"]["type"] == "json_schema"
     assert captured["payload"]["input"][0]["content"][1]["type"] == "input_image"
     assert evidence.visible_storeys.value == 3
+
+
+def test_gemini_architecture_request_uses_available_model_fallback(monkeypatch, tmp_path):
+    image = tmp_path / "facade.jpg"
+    image.write_bytes(b"unused")
+    captured = {}
+
+    monkeypatch.setattr("geomora_reconstruct.vlm_evidence.encode_image_base64", lambda *_args, **_kwargs: ("image/jpeg", "abc"))
+    monkeypatch.setattr(
+        "geomora_reconstruct.vlm_evidence.resolve_gemini_models",
+        lambda requested, _key: ["gemini-account-model"] if requested == "missing-model" else [],
+    )
+
+    def fake_post(url, _payload, **_kwargs):
+        captured["url"] = url
+        return {"candidates": [{"content": {"parts": [{"text": json.dumps(SAMPLE)}]}}]}
+
+    monkeypatch.setattr("geomora_reconstruct.vlm_evidence.post_json_with_retries", fake_post)
+    evidence = request_architectural_evidence(
+        image, photo_id="p1", provider="gemini", model="missing-model", api_key="secret",
+    )
+    assert evidence.model == "gemini-account-model"
+    assert "gemini-account-model:generateContent" in captured["url"]

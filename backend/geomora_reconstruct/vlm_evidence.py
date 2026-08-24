@@ -16,6 +16,7 @@ from geomora_detect.vlm_prelabel import (
     gemini_generate_url,
     gemini_headers,
     post_json_with_retries,
+    resolve_gemini_models,
 )
 
 
@@ -225,7 +226,9 @@ def request_architectural_evidence(
 ) -> ArchitecturalEvidence:
     """Request structured evidence from an OpenAI-compatible or Gemini VLM."""
     normalized = provider.lower().strip()
-    mime, data = encode_image_base64(image_path, max_dim=1536, jpeg_quality=88)
+    # Architectural topology does not need full source resolution. A smaller
+    # payload is substantially more reliable on proxied/slow Gemini links.
+    mime, data = encode_image_base64(image_path, max_dim=1280, jpeg_quality=80)
     user_text = "Analyze this facade as architectural evidence. Return JSON only."
     if normalized in {"openai", "openai_compatible"}:
         payload = {
@@ -253,14 +256,36 @@ def request_architectural_evidence(
             "contents": [{"role": "user", "parts": [{"text": user_text}, {"inline_data": {"mime_type": mime, "data": data}}]}],
             "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"},
         }
-        body = post_json_with_retries(
-            gemini_generate_url(model), payload, headers=gemini_headers(api_key),
-            timeout=timeout, attempts=attempts,
-        )
+        candidates = resolve_gemini_models(model, api_key)
+        if not candidates:
+            raise ValueError("no Gemini model supporting generateContent is available for this API key")
+        body = None
+        active_model = model
+        last_error: Exception | None = None
+        for candidate in candidates:
+            try:
+                body = post_json_with_retries(
+                    gemini_generate_url(candidate), payload, headers=gemini_headers(api_key),
+                    timeout=timeout, attempts=attempts,
+                )
+                active_model = candidate
+                break
+            except Exception as error:  # Only a model-selection failure justifies another candidate.
+                last_error = error
+                status_code = getattr(getattr(error, "response", None), "status_code", None)
+                if status_code not in {400, 404}:
+                    raise RuntimeError(
+                        f"Gemini request failed for selected model {candidate}: {error}"
+                    ) from error
+        if body is None:
+            raise RuntimeError(f"all available Gemini models failed; last error: {last_error}") from last_error
         content = body["candidates"][0]["content"]["parts"][0]["text"]
     else:
         raise ValueError("provider must be openai, openai_compatible or gemini")
-    return parse_architectural_evidence(content, photo_id=photo_id, provider=normalized, model=model)
+    return parse_architectural_evidence(
+        content, photo_id=photo_id, provider=normalized,
+        model=active_model if normalized == "gemini" else model,
+    )
 
 
 def provider_api_key(provider: str) -> str | None:
